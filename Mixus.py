@@ -11,7 +11,8 @@ class BottleMenu(QDialog):
         uic.loadUi('BottleMenu.ui', self)
 
         self.pushButton_return.released.connect(lambda: manager.switch_window("MaintenanceMenu"))
-        self.pushButton_confirm.released.connect(lambda: manager.switch_window("MainMenu")) #Ajouter logique pour modifier objets bouteille
+        self.pushButton_confirm.released.connect(lambda: manager.switch_window("MainMenu"))
+        #TODO Ajouter logique pour modifier objets bouteille (reecrire dans fichier persistance lors de la fermeture)
 
 
 class MixingMenu(QDialog):
@@ -22,6 +23,7 @@ class MixingMenu(QDialog):
         uic.loadUi('MixingMenu.ui', self)
 
         self.pushButton_return.released.connect(lambda: manager.switch_window("MainMenu"))
+        #TODO Transfert de commandes gcodes(ici ou DrinkOptionMenu) + update status et afficher dans widgets
 
 
 class DrinkOptionMenu(QDialog):
@@ -33,9 +35,11 @@ class DrinkOptionMenu(QDialog):
 
         self.pushButton_return.released.connect(lambda: manager.switch_window("MainMenu"))
         self.pushButton_confirm.released.connect(lambda: manager.switch_window("MixingMenu"))
+        #TODO lancer algorithme de generation de gcode + lancement commandes?
 
     def setup_drink(self, drink):
-        self.label_title.setText(drink)  # Eventuellement setup la page au complet
+        self.label_title.setText(drink)
+        #TODO setup image + ingredients
 
 
 class MaintenanceMenu(QDialog):
@@ -57,6 +61,7 @@ class MainMenu(QMainWindow):
         uic.loadUi('MainMenu.ui', self)
 
         self.pushButton_exit.released.connect(lambda: sys.exit(app.exec_()))
+        #TODO Updater les fichiers de persistance a la fermeture
         self.pushButton_maintenance.released.connect(lambda: manager.switch_window("MaintenanceMenu"))
 
         self.scrollArea_drinklist.setWidgetResizable(True)
@@ -71,7 +76,8 @@ class MainMenu(QMainWindow):
             P.setText(str(x + 1))
             P.setFixedSize(300, 600)
             self.scroll_layout.addWidget(P)
-            P.released.connect(lambda drink=P: manager.switch_window("DrinkOptionMenu", drink))  # Eventuellement passer un drink
+            P.released.connect(lambda drink=P: manager.switch_window("DrinkOptionMenu", drink))
+            #TODO passer un drink plutot que le bouton (drink devrait etre un attribut dun drinkButton)
 
 
 class WindowManager:
