@@ -113,6 +113,8 @@ def init_app():
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
 
+
+
     init_app()
 
     sys.exit(app.exec_())
