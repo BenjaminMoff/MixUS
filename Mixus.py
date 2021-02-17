@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QComboBox, QMenu, QApplication, QLabel, QMainWindow,
     QVBoxLayout
 from Enums import *
 from DataModel import *
+from JsonHandler import *
 import sys
 
 
@@ -25,13 +26,14 @@ class BottleLayout:
     def __init_liquid_type(self, liquid_type):
         self.liquid_type = QComboBox()
         self.liquid_type.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.liquid_type.currentIndexChanged.connect(self.update_volume_left)
-        self.update_volume_left(liquid_type)
+        self.liquid_type.currentIndexChanged.connect(self.update_liquid_type)
+        self.update_liquid_type(liquid_type)
 
     def __init_volume_left(self, volume):
         self.volume_left = QComboBox()
         self.volume_left.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.volume_left.currentIndexChanged.connect(self.bottle.set_volume_left())
+        self.volume_left.currentIndexChanged.connect(self.update_volume_left)
+        self.update_volume_left(volume)
 
     def update_liquid_type(self, new_liquid_type):
         self.bottle.set_liquid_type(new_liquid_type)
@@ -57,22 +59,26 @@ class BottleLayout:
             if size is not new_volume:
                 self.liquid_type.addItem(size)
 
+
 class BottleMenu(QDialog):
     name = "BottleMenu"
+    bottles = []
     temp_bottles = []
     bottle_layouts = []
+    manager = None
 
-    def __init__(self, manager):
+    def __init__(self, manager, bottles):
         super(BottleMenu, self).__init__()
         uic.loadUi('BottleMenu.ui', self)
+        self.manager = manager
 
         self.scroll_layout = QVBoxLayout(self.scrollAreaWidgetContents)
         self.scroll_layout.setSpacing(10)
         self.scroll_layout.setObjectName("scroll_layout")
         self.scroll_layout.setContentsMargins(5, 5, 5, 5)
 
-        # TODO prendre les bouteilles du fichiers JSON
-        for bottle in range(1, 12):
+        self.bottles = bottles
+        for bottle in bottles:
             temp_bottle = Bottle(bottle.get_slot_number(),
                                  bottle.get_liquid_type(),
                                  bottle.get_volume_left)
@@ -82,8 +88,14 @@ class BottleMenu(QDialog):
             self.scroll_layout.addLayout(bottle_layout)
 
         self.pushButton_return.released.connect(lambda: manager.switch_window("MaintenanceMenu"))
-        self.pushButton_confirm.released.connect(lambda: manager.switch_window("MainMenu"))
-        # TODO merge la liste temp de bouteilles avec BottleManager + ecriture dans persistance
+        self.pushButton_confirm.released.connect(self.confirm_button_released())
+        # TODO ecriture dans persistance
+
+    def confirm_button_released(self):
+        # save changes done in the menu to the bottle list accessible by other menus
+        self.bottles.clear()
+        self.bottles.extend(self.temp_bottles)
+        self.manager.switch_window("MainMenu")
 
 
 class MixingMenu(QDialog):
@@ -166,15 +178,19 @@ class WindowManager:
         self.stack.setCurrentIndex(self.windows.get(window_name))
 
 
-def init_app():
+def init_app_ui():
     stack = QStackedWidget()
     manager = WindowManager()
+    json_handler = JsonHandler(Paths.BOTTLES.value, Paths.DRINKS.value)
+
+    bottles = json_handler.load_bottles()
+    drinks = json_handler.load_drinks()
 
     stack.addWidget(MainMenu(manager))
     stack.addWidget(MaintenanceMenu(manager))
     stack.addWidget(DrinkOptionMenu(manager))
     stack.addWidget(MixingMenu(manager))
-    stack.addWidget(BottleMenu(manager))
+    stack.addWidget(BottleMenu(manager, bottles))
 
     manager.create_windows_dict(stack)
     stack.resize(1920, 1080)
@@ -184,8 +200,6 @@ def init_app():
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
 
-
-
-    init_app()
+    init_app_ui()
 
     sys.exit(app.exec_())

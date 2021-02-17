@@ -1,26 +1,39 @@
 from enum import Enum
+import os
 
 
 class Liquid(Enum):
+
+    def __new__(cls, *args, **kwds):
+        value = len(cls.__members__) + 2
+        obj = object.__new__(cls)
+        obj._value_ = value
+        return obj
+
+    def __init__(self, string_name, is_alcoholized, is_filler):
+        self.string_name = string_name
+        self.is_alcoholized = is_alcoholized
+        self.is_filler = is_filler
+
     # Liquors
-    RUM = "Rum"
-    VODKA = "Vodka"
-    TEQUILA = "Tequila"
-    GIN = "Gin"
+    RUM = "Rum", True, False
+    VODKA = "Vodka", True, False
+    TEQUILA = "Tequila", True, False
+    GIN = "Gin", True, False
 
     # Mixers
-    TRIPLE_SEC = "Triple sec"
-    LIMONCELLO = "Limoncello"
+    TRIPLE_SEC = "Triple sec", True, False
+    LIMONCELLO = "Limoncello", True, False
 
     # Alcohol-free
-    ORANGE_JUICE = "Jus d'orange"
-    CRANBERRY_JUICE = "Jus de canneberge"
-    COKE = "Coke"
-    SPRITE = "Sprite"
+    ORANGE_JUICE = "Jus d'orange", False, True
+    CRANBERRY_JUICE = "Jus de canneberge", False, True
+    COKE = "Coke", False, True
+    SPRITE = "Sprite", False, True
 
     @staticmethod
     def list():
-        return list(map(lambda c: c.value, Liquid))
+        return list(map(lambda c: c.string_name, Liquid))
 
 
 class BottleSize(Enum):
@@ -32,3 +45,10 @@ class BottleSize(Enum):
     @staticmethod
     def list():
         return list(map(lambda c: c.value, BottleSize))
+
+
+class Paths(Enum):
+    BOTTLES = os.path.join(os.path.dirname(__file__),
+                           "persistance/bottles.json")
+    DRINKS = os.path.join(os.path.dirname(__file__),
+                          "persistance/drinks.json")
