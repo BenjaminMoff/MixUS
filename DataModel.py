@@ -1,10 +1,8 @@
 class Bottle:
-    def __init__(self, slot_number=None, liquid_type=None, volume_left=None, is_alcoholized=False, is_filler=False):
+    def __init__(self, slot_number=None, liquid_type=None, volume_left=None):
         self.__slot_number = slot_number
         self.__liquid_type = liquid_type
         self.__volume_left = volume_left            # In ounces
-        self.__is_alcooholized = is_alcoholized
-        self.__is_filler = is_filler
         self.isempty = False
 
     # Method that load the object's attributes from a dictionnary
@@ -40,10 +38,10 @@ class Bottle:
         return self.__slot_number
 
     def is_alcoholized(self):
-        return self.__is_alcooholized
+        return self.__liquid_type.is_alcoholized
 
     def is_filler(self):
-        return self.__is_filler
+        return self.__liquid_type.is_filler
 
 
 class Drink:
