@@ -1,0 +1,1 @@
+[{"name": "rhum_and_coke", "ingredients": {"Rhum": 100, "Coke": 300}, "image_path": "image1.png", "double": false, "no_alcool": false}, {"name": "vodka_orange_juice", "ingredients": {"Vodka": 100, "Orange Juice": 300}, "image_path": "image2.png", "double": false, "no_alcool": false}]

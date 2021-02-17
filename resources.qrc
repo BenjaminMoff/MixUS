@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="drinks">
+    <file>rhum_and_coke.png</file>
+  </qresource>
+</RCC>

@@ -7,8 +7,8 @@ class JsonHandler:
         self.bottle_file_path = bottle_file_path
         self.drink_file_path = drink_file_path
 
-    def load_data_from_dict(self, dict, obj):
-        obj.__dict__ = dict
+    def load_data_from_dict(self, d, obj):
+        obj.__dict__ = d
         return obj
 
     def save_data(self, item_list):
@@ -59,9 +59,6 @@ if __name__ == '__main__':
     #print(Liquid)
     bottle_list = [Bottle(1, Liquid.RUM, 750), Bottle(2, Liquid.VODKA, 500),
                    Bottle(3, Liquid.TEQUILA, 375), Bottle(4, Liquid.COKE, 1000)]
-
-    drink_list = [Drink({'Rhum': 100, 'Coke': 300}, "image1.png"),
-                  Drink({'Vodka': 100, 'Orange Juice': 300}, "image2.png")]
 
     Json = JsonHandler("data_bottle.json", "data_drink.json")
 
