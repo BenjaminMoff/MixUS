@@ -1,6 +1,3 @@
-import json
-
-
 class Bottle:
     def __init__(self, slot_number=None, liquid_type=None, volume_left=None):
         self.__slot_number = slot_number
@@ -32,8 +29,8 @@ class Bottle:
     def get_volume_left(self):
         return self.__volume_left
 
-    def set_slot_number(self, n):
-        self.__slot_number = n
+    def set_slot_number(self, slot_number):
+        self.__slot_number = slot_number
 
     def get_slot_number(self):
         return self.__slot_number
