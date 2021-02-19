@@ -16,8 +16,11 @@ class Liquid(Enum):
         self.is_alcoholized = is_alcoholized
         self.is_filler = is_filler
 
+    # Used to describe an empty slot
+    NONE = "Aucun", False, False
+
     # Liquors
-    RUM = "Rum", True, False
+    RUM = "Rhum", True, False
     VODKA = "Vodka", True, False
     TEQUILA = "Tequila", True, False
     GIN = "Gin", True, False
@@ -55,6 +58,7 @@ class BottleSize(Enum):
         return list(map(lambda c: c.value, BottleSize))
 
 
+# Paths to persistence files
 class Paths(Enum):
     BOTTLES = os.path.join(os.path.dirname(__file__),
                            "persistance/bottles.json")

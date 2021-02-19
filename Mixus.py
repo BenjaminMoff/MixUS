@@ -67,10 +67,10 @@ class BottleMenu(QDialog):
     bottle_layouts = []
     manager = None
 
-    def __init__(self, manager, bottles):
+    def __init__(self, window_manager, bottles):
         super(BottleMenu, self).__init__()
         uic.loadUi('BottleMenu.ui', self)
-        self.manager = manager
+        self.manager = window_manager
 
         self.scroll_layout = QVBoxLayout(self.scrollAreaWidgetContents)
         self.scroll_layout.setSpacing(10)
@@ -87,7 +87,7 @@ class BottleMenu(QDialog):
             self.bottle_layouts.append(bottle_layout)
             self.scroll_layout.addLayout(bottle_layout)
 
-        self.pushButton_return.released.connect(lambda: manager.switch_window("MaintenanceMenu"))
+        self.pushButton_return.released.connect(lambda: window_manager.switch_window("MaintenanceMenu"))
         self.pushButton_confirm.released.connect(self.confirm_button_released())
         # TODO ecriture dans persistance
 
@@ -97,27 +97,32 @@ class BottleMenu(QDialog):
         self.bottles.extend(self.temp_bottles)
         self.manager.switch_window("MainMenu")
 
+    #TODO use bottle manager instead
+    def update_layout(self, bottles):
+        self.temp_bottles.clear()
+        self.temp_bottles.extend(bottles)
+        self.bottle_layouts
 
 class MixingMenu(QDialog):
     name = "MixingMenu"
 
-    def __init__(self, manager):
+    def __init__(self, window_manager):
         super(MixingMenu, self).__init__()
         uic.loadUi('MixingMenu.ui', self)
 
-        self.pushButton_return.released.connect(lambda: manager.switch_window("MainMenu"))
+        self.pushButton_return.released.connect(lambda: window_manager.switch_window("MainMenu"))
         # TODO Transfert de commandes gcodes(ici ou DrinkOptionMenu) + update status et afficher dans widgets
 
 
 class DrinkOptionMenu(QDialog):
     name = "DrinkOptionMenu"
 
-    def __init__(self, manager):
+    def __init__(self, window_manager):
         super(DrinkOptionMenu, self).__init__()
         uic.loadUi('DrinkOptionMenu.ui', self)
 
-        self.pushButton_return.released.connect(lambda: manager.switch_window("MainMenu"))
-        self.pushButton_confirm.released.connect(lambda: manager.switch_window("MixingMenu"))
+        self.pushButton_return.released.connect(lambda: window_manager.switch_window("MainMenu"))
+        self.pushButton_confirm.released.connect(lambda: window_manager.switch_window("MixingMenu"))
         # TODO lancer algorithme de generation de gcode + lancement commandes?
 
     def setup_drink(self, drink):
@@ -128,25 +133,25 @@ class DrinkOptionMenu(QDialog):
 class MaintenanceMenu(QDialog):
     name = "MaintenanceMenu"
 
-    def __init__(self, manager):
+    def __init__(self, window_manager):
         super(MaintenanceMenu, self).__init__()
         uic.loadUi('MaintenanceMenu.ui', self)
 
-        self.pushButton_return.released.connect(lambda: manager.switch_window("MainMenu"))
-        self.pushButton_bottle.released.connect(lambda: manager.switch_window("BottleMenu"))
+        self.pushButton_return.released.connect(lambda: window_manager.switch_window("MainMenu"))
+        self.pushButton_bottle.released.connect(lambda: window_manager.switch_window("BottleMenu"))
         # TODO update les combobox de bottle menu lors de louverture
 
 
 class MainMenu(QMainWindow):
     name = "MainMenu"
 
-    def __init__(self, manager):
+    def __init__(self, window_manager):
         super(MainMenu, self).__init__()
         uic.loadUi('MainMenu.ui', self)
 
         self.pushButton_exit.released.connect(lambda: sys.exit(app.exec_()))
         # TODO Updater les fichiers de persistance a la fermeture
-        self.pushButton_maintenance.released.connect(lambda: manager.switch_window("MaintenanceMenu"))
+        self.pushButton_maintenance.released.connect(lambda: window_manager.switch_window("MaintenanceMenu"))
 
         self.scrollArea_drinklist.setWidgetResizable(True)
         self.scroll_layout = QHBoxLayout(self.scrollAreaWidgetContents)
@@ -159,7 +164,7 @@ class MainMenu(QMainWindow):
             P.setText(str(x + 1))
             P.setFixedSize(300, 600)
             self.scroll_layout.addWidget(P)
-            P.released.connect(lambda drink=P: manager.switch_window("DrinkOptionMenu", drink))
+            P.released.connect(lambda drink=P: window_manager.switch_window("DrinkOptionMenu", drink))
             # TODO passer un drink plutot que le bouton (drink devrait etre un attribut dun drinkButton)
 
 
@@ -180,19 +185,19 @@ class WindowManager:
 
 def init_app_ui():
     stack = QStackedWidget()
-    manager = WindowManager()
+    window_manager = WindowManager()
     json_handler = JsonHandler(Paths.BOTTLES.value, Paths.DRINKS.value)
 
     bottles = json_handler.load_bottles()
     drinks = json_handler.load_drinks()
 
-    stack.addWidget(MainMenu(manager))
-    stack.addWidget(MaintenanceMenu(manager))
-    stack.addWidget(DrinkOptionMenu(manager))
-    stack.addWidget(MixingMenu(manager))
-    stack.addWidget(BottleMenu(manager, bottles))
+    stack.addWidget(MainMenu(window_manager))
+    stack.addWidget(MaintenanceMenu(window_manager))
+    stack.addWidget(DrinkOptionMenu(window_manager))
+    stack.addWidget(MixingMenu(window_manager))
+    stack.addWidget(BottleMenu(window_manager, bottles))
 
-    manager.create_windows_dict(stack)
+    window_manager.create_windows_dict(stack)
     stack.resize(1920, 1080)
     stack.show()
 
