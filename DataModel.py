@@ -15,10 +15,13 @@ class Bottle:
             self.__volume_left -= ounces
 
     # Bunch of methods that sets and gets the attributes of Bottle
-    def set_liquid_type(self, liquid):
+    def set_liquid(self, liquid):
         self.__liquid = liquid
 
-    def get_liquid_type(self):
+    def get_liquid(self):
+        return self.__liquid
+
+    def get_liquid_name(self):
         return self.__liquid.string_name
 
     def set_volume_left(self, vol_left):
@@ -53,13 +56,13 @@ class Drink:
             for ingredient in list(self.ingredients):
                 self.liquids.append(Liquid.get_liquid_from_string_name(ingredient))
 
-    # Method that determines what drinks are available depending on current bottles
+    # Method that determines what drinks are available depending on current bottle_manager
     def is_available(self, bottles):
         counter = 0
         for liquid in self.liquids:
             for bottle in bottles:
                 # If the remaining volume in the bottle is enough to make the drink, then the counter increases
-                if bottle.get_liquid_type() == liquid.string_name and bottle._Bottle__volume_left >= self.ingredients. \
+                if bottle.get_liquid_name() == liquid.string_name and bottle._Bottle__volume_left >= self.ingredients. \
                         get(liquid.string_name):
                     counter += 1
                     break
@@ -69,14 +72,14 @@ class Drink:
         else:
             return False
 
-    # Method that determines if the bottles have enough to make a double of this drink (double the alcohol)
+    # Method that determines if the bottle_manager have enough to make a double of this drink (double the alcohol)
     def enough_for_double(self, bottles):
         counter = 0
         alcoholized_liquids = self.__find_alcoholized()
-        # Check for each alcoholized liquid if the volume left in the bottles is enough to make a double
+        # Check for each alcoholized liquid if the volume left in the bottle_manager is enough to make a double
         for alcoholized_liquid in alcoholized_liquids:
             for bottle in bottles:
-                if bottle.get_liquid_type() == alcoholized_liquid.string_name and bottle.get_volume_left >= \
+                if bottle.get_liquid_name() == alcoholized_liquid.string_name and bottle.get_volume_left >= \
                         self.ingredients.get(alcoholized_liquid) * 2:
                     counter += 1
         # If the counter is equal to the number of alcoholized liquids, then the doubled drink is available for the user
@@ -85,7 +88,7 @@ class Drink:
         else:
             return False
 
-    # Method that determines if the bottles have enough to make a virgin drink (all the alcohol is replaced by filler)
+    # Method that determines if the bottle_manager have enough to make a virgin drink (all the alcohol is replaced by filler)
     def enough_for_virgin(self, bottles):
         # Find the total volume of alcohol in the drink
         added_volume = self.__alcohol_volume()
@@ -93,7 +96,7 @@ class Drink:
         # Find the default volume of filler and add it to added_volume
         for liquid in self.liquids:
             for bottle in bottles:
-                if bottle.get_liquid_type() == liquid.string_name and liquid.is_filler is True:
+                if bottle.get_liquid_name() == liquid.string_name and liquid.is_filler is True:
                     total_volume += self.ingredients.get(liquid)
                 # Check if the total volume is higher than the remaining volume in the bottle
                 if bottle.get_volume_left() >= total_volume:
@@ -105,7 +108,7 @@ class Drink:
     def make(self, bottles):
         for bottle in bottles:
             for liquid in self.liquids:
-                if bottle.get_liquid_type() == liquid.string_name:
+                if bottle.get_liquid_name() == liquid.string_name:
                     # TODO call g-code
                     for ounces in self.ingredients.get(liquid):
                         # TODO call g-code pour
@@ -164,16 +167,21 @@ class BottleManager:
 
     def update(self, bottles):
         if len(bottles) > self.number_of_bottles:
-            raise ValueError("Too Many bottles for the number of slots")
+            raise ValueError("Too Many bottle_manager for the number of slots")
         for bottle in bottles:
             self.bottles_dict.update({bottle.get_slot_number(): bottle})
+
+        # Updates persistence file every time a modification is made
         self.json_handler.save_data(bottles)
+
+    def get_bottles(self):
+        return list(self.bottles_dict.values())
 
     def remove_bottle(self, slot):
         self.bottles_dict.update({slot: None})
 
     def save_data(self):
-        self.json_handler.save_data(list(self.bottles_dict.values()))
+        self.json_handler.save_data(self.get_bottles())
 
 
 class DrinkManager:
