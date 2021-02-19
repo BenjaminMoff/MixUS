@@ -1,6 +1,7 @@
 import json
-from DataModel import Bottle, Drink
-from Enums import Liquid
+from DataModel import *
+from Enums import *
+
 
 class JsonHandler:
     def __init__(self, bottle_file_path, drink_file_path):
@@ -32,7 +33,7 @@ class JsonHandler:
 
     def load_drinks(self):
         with open(self.drink_file_path, 'r') as infile:
-            encrypted_list = json.load(infile)
+            encrypted_list = json.load(infile, object_hook=as_enum)
 
         drinks = []
         for encrypted_item in encrypted_list:
@@ -56,15 +57,20 @@ def as_enum(d):
 
 
 if __name__ == '__main__':
-    #print(Liquid)
-    bottle_list = [Bottle(1, Liquid.RUM, 750), Bottle(2, Liquid.VODKA, 500),
-                   Bottle(3, Liquid.TEQUILA, 375), Bottle(4, Liquid.COKE, 1000)]
+    bottle_list = [Bottle(1, Liquid.RUM, 25), Bottle(2, Liquid.VODKA, 16),
+                   Bottle(3, Liquid.TEQUILA, 12), Bottle(4, Liquid.COKE, 32)]
 
-    Json = JsonHandler("data_bottle.json", "data_drink.json")
+    drink_list = [Drink("Rhum_and_coke", {Liquid.RUM.string_name: 3, Liquid.COKE.string_name: 9}, "test"),
+                  Drink("Vodka_jus_canneberge", {Liquid.VODKA.string_name: 3, Liquid.CRANBERRY_JUICE.string_name: 9},
+                        "test")]
 
+    Json = JsonHandler(Paths.BOTTLES.value, Paths.DRINKS.value)
     Json.save_data(bottle_list)
     bottle_list2 = Json.load_bottles()
     Json.save_data(drink_list)
     drink_list2 = Json.load_drinks()
+    print(drink_list2[0].is_available(bottle_list2))
+    print(drink_list2[1].is_available(bottle_list2))
 
+    butt_manager = BottleManager(Json)
     pass

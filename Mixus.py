@@ -170,7 +170,7 @@ class WindowManager:
     def create_windows_dict(self, stack):
         self.stack = stack
         for x in range(0, stack.count()):
-            self.windows.update({stack.widget(x).name: x})
+            self.windows.update({stack.widget(x).string_name: x})
 
     def switch_window(self, window_name, drink=None):
         if window_name == "DrinkOptionMenu":

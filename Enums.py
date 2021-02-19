@@ -11,6 +11,7 @@ class Liquid(Enum):
         return obj
 
     def __init__(self, string_name, is_alcoholized, is_filler):
+        super().__init__()
         self.string_name = string_name
         self.is_alcoholized = is_alcoholized
         self.is_filler = is_filler
@@ -34,6 +35,13 @@ class Liquid(Enum):
     @staticmethod
     def list():
         return list(map(lambda c: c.string_name, Liquid))
+
+    @staticmethod
+    def get_liquid_from_string_name(string_name):
+        for liquid in Liquid:
+            if liquid.string_name == string_name:
+                return Liquid[liquid.name]
+        raise ValueError("No Liquid contains this string_name: " + string_name)
 
 
 class BottleSize(Enum):
