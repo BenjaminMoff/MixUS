@@ -1,1 +1,0 @@
-[{"name": "Rhum_and_coke", "ingredients": {"Rum": 3, "Coke": 9}, "image_path": "test", "liquids": [{"__enum__": "Liquid.RUM"}, {"__enum__": "Liquid.COKE"}]}, {"name": "Vodka_jus_canneberge", "ingredients": {"Vodka": 3, "Jus de canneberge": 9}, "image_path": "test", "liquids": [{"__enum__": "Liquid.VODKA"}, {"__enum__": "Liquid.CRANBERRY_JUICE"}]}]

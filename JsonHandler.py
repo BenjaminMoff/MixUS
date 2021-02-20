@@ -69,8 +69,6 @@ if __name__ == '__main__':
     bottle_list2 = Json.load_bottles()
     Json.save_data(drink_list)
     drink_list2 = Json.load_drinks()
-    #print(drink_list2[0].is_available(bottle_list2))
-    #print(drink_list2[1].is_available(bottle_list2))
 
     butt_manager = BottleManager(Json)
     drink_manager = DrinkManager(Json, butt_manager)

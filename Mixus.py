@@ -1,8 +1,7 @@
 from PyQt5 import QtWidgets, uic, QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QComboBox, QMenu, QApplication, QLabel, QMainWindow, QDialog, QStackedWidget, QPushButton, \
-    QHBoxLayout, \
-    QVBoxLayout
+    QHBoxLayout, QVBoxLayout
 from Enums import *
 from DataModel import *
 from JsonHandler import *
@@ -148,9 +147,11 @@ class MaintenanceMenu(QDialog):
 class MainMenu(QMainWindow):
     name = "MainMenu"
 
-    def __init__(self, window_manager):
+    def __init__(self, window_manager, drink_manager):
         super(MainMenu, self).__init__()
         uic.loadUi('MainMenu.ui', self)
+        self.window_manager = window_manager
+        self.drink_manager = drink_manager
 
         self.pushButton_exit.released.connect(lambda: sys.exit(app.exec_()))
         # TODO Updater les fichiers de persistance a la fermeture
@@ -161,14 +162,24 @@ class MainMenu(QMainWindow):
         self.scroll_layout.setSpacing(10)
         self.scroll_layout.setObjectName("scroll_layout")
         self.scroll_layout.setContentsMargins(5, 5, 5, 5)
+        self.update_layout()
 
-        for x in range(0, 10):
-            P = QPushButton(self.scrollAreaWidgetContents)
-            P.setText(str(x + 1))
+    def update_layout(self):
+        for i in reversed(range(self.scroll_layout.count())):
+            self.scroll_layout.itemAt(i).widget().setParent(None)
+        for drink in self.drink_manager.get_available_drinks():
+            P = DrinkButton(self.scrollAreaWidgetContents, drink)
             P.setFixedSize(300, 600)
             self.scroll_layout.addWidget(P)
-            P.released.connect(lambda drink=P: window_manager.switch_window("DrinkOptionMenu", drink))
+            P.released.connect(lambda drink=P: self.window_manager.switch_window("DrinkOptionMenu", drink))
             # TODO passer un drink plutot que le bouton (drink devrait etre un attribut dun drinkButton)
+
+
+class DrinkButton(QPushButton):
+    def __init__(self, scrollAreaWidgetContents, drink):
+        super(DrinkButton, self).__init__(scrollAreaWidgetContents)
+        self.drink = drink
+        self.setText(self.drink.name)
 
 
 class WindowManager:
@@ -186,6 +197,8 @@ class WindowManager:
     def switch_window(self, window_name, drink=None):
         if window_name == "DrinkOptionMenu":
             self.stack.widget(self.windows.get(window_name)).setup_drink(drink.text())
+        elif window_name == "MainMenu":
+            self.stack.widget(self.windows.get(window_name)).update_layout()
         self.stack.setCurrentIndex(self.windows.get(window_name))
 
 
@@ -195,9 +208,9 @@ def init_app_ui():
     json_handler = JsonHandler(Paths.BOTTLES.value, Paths.DRINKS.value)
 
     bottle_manager = BottleManager(json_handler)
-    drinks = json_handler.load_drinks()
+    drink_manager = DrinkManager(json_handler, bottle_manager)
 
-    window_manager.append_window(MainMenu(window_manager))
+    window_manager.append_window(MainMenu(window_manager, drink_manager))
     window_manager.append_window(MaintenanceMenu(window_manager))
     window_manager.append_window(DrinkOptionMenu(window_manager))
     window_manager.append_window(MixingMenu(window_manager))
