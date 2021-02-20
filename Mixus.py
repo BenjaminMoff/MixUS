@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets, uic, QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QComboBox, QMenu, QApplication, QLabel, QMainWindow, QDialog, QStackedWidget, QPushButton, QHBoxLayout, \
+from PyQt5.QtWidgets import QComboBox, QMenu, QApplication, QLabel, QMainWindow, QDialog, QStackedWidget, QPushButton, \
+    QHBoxLayout, \
     QVBoxLayout
 from Enums import *
 from DataModel import *
@@ -25,50 +26,48 @@ class BottleLayout(QHBoxLayout):
         self.slot_number.setText(str(number))
         super().addWidget(self.slot_number)
 
-    def __init_liquid_type(self, liquid_type):
+    def __init_liquid_type(self, liquid_type_name):
         self.liquid_type = QComboBox()
         self.liquid_type.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.liquid_type.activated.connect(self.update_liquid_type)
-        self.update_liquid_type(liquid_type)
+        self.__init_combo_box(self.liquid_type, liquid_type_name, Liquid.list())
+        self.liquid_type.activated.connect(self.new_liquid_type_selected)
         super().addWidget(self.liquid_type)
 
     def __init_volume_left(self, volume):
         self.volume_left = QComboBox()
         self.volume_left.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.volume_left.activated.connect(self.update_volume_left)
-        self.update_volume_left(volume)
+        self.__init_combo_box(self.volume_left, str(volume), BottleSize.list())
+        self.volume_left.activated.connect(self.new_volume_selected)
         super().addWidget(self.volume_left)
 
-    def update_liquid_type(self, new_liquid_type):
-        self.bottle.set_liquid(new_liquid_type)
+    def __init_combo_box(self, combo_box, selected_item, items):
+        # First item added is selected
+        combo_box.addItem(selected_item)
+
+        for item in items:
+            if item != selected_item:
+                combo_box.addItem(item)
+
+    def new_liquid_type_selected(self):
+        self.bottle.set_liquid(Liquid.get_liquid_from_string_name(self.liquid_type.currentText()))
+
+    def new_volume_selected(self):
+        self.bottle.set_volume_left(int(self.volume_left.currentText()))
+
+    def update_layout(self, new_bottle):
+        self.bottle = new_bottle
         self.liquid_type.clear()
-
-        # First item added is the current liquid type
-        self.liquid_type.addItem(new_liquid_type)
-
-        # Add other liquid type options
-        for liquid in Liquid.list():
-            if liquid is not new_liquid_type:
-                self.liquid_type.addItem(liquid)
-
-    def update_volume_left(self, new_volume):
-        self.bottle.set_volume_left(new_volume)
         self.volume_left.clear()
 
-        # First item added is the current volume
-        self.liquid_type.addItem(str(new_volume))
-
-        # Add other volume options
-        for size in BottleSize.list():
-            if size is not new_volume:
-                self.liquid_type.addItem(str(size))
+        self.__init_combo_box(self.liquid_type, self.bottle.get_liquid_name(), Liquid.list())
+        self.__init_combo_box(self.volume_left, str(self.bottle.get_volume_left()), BottleSize.list())
 
 
 class BottleMenu(QDialog):
     name = "BottleMenu"
     bottle_manager = []
     temp_bottles = []
-    bottle_layouts = []
+    bottle_layouts = {}
     manager = None
 
     def __init__(self, window_manager, bottle_manger):
@@ -83,28 +82,29 @@ class BottleMenu(QDialog):
 
         self.bottle_manager = bottle_manger
         for bottle in bottle_manger.get_bottles():
-            temp_bottle = Bottle(bottle.get_slot_number(),
-                                 bottle.get_liquid(),
-                                 bottle.get_volume_left())
+            temp_bottle = bottle.copy()
             self.temp_bottles.append(temp_bottle)
             bottle_layout = BottleLayout(temp_bottle)
-            self.bottle_layouts.append(bottle_layout)
+            self.bottle_layouts.update({temp_bottle.get_slot_number(): bottle_layout})
             self.scroll_layout.addLayout(bottle_layout)
 
         self.pushButton_return.released.connect(lambda: window_manager.switch_window("MaintenanceMenu"))
-        self.pushButton_confirm.released.connect(self.confirm_button_released())
+        self.pushButton_confirm.released.connect(self.confirm_button_released)
         # TODO ecriture dans persistance
 
     def confirm_button_released(self):
         # save changes done in the menu to the bottle list accessible by other menus
-        self.bottle_manager.extend(self.temp_bottles)
+        self.bottle_manager.update(self.temp_bottles)
         self.manager.switch_window("MainMenu")
 
-    #TODO use bottle manager instead
+    # TODO use bottle manager instead
     def update_layout(self):
         self.temp_bottles.clear()
-        self.temp_bottles.extend(self.bottle_manager.get_bottles())
-        self.bottle_layouts
+        for bottle in self.bottle_manager.get_bottles():
+            temp_bottle = bottle.copy()
+            self.temp_bottles.append(temp_bottle)
+            self.bottle_layouts.get(temp_bottle.get_slot_number).update_layout(temp_bottle)
+
 
 class MixingMenu(QDialog):
     name = "MixingMenu"
@@ -159,7 +159,7 @@ class MainMenu(QMainWindow):
         self.scrollArea_drinklist.setWidgetResizable(True)
         self.scroll_layout = QHBoxLayout(self.scrollAreaWidgetContents)
         self.scroll_layout.setSpacing(10)
-        self.scroll_layout.setObjectName(u"scroll_layout")
+        self.scroll_layout.setObjectName("scroll_layout")
         self.scroll_layout.setContentsMargins(5, 5, 5, 5)
 
         for x in range(0, 10):
@@ -175,10 +175,13 @@ class WindowManager:
     windows = {}
     stack = None
 
-    def create_windows_dict(self, stack):
+    def __init__(self, stack):
         self.stack = stack
-        for x in range(0, stack.count()):
-            self.windows.update({stack.widget(x).string_name: x})
+
+    def append_window(self, window):
+        self.stack.addWidget(window)
+        window_index = self.stack.count() - 1
+        self.windows.update({self.stack.widget(window_index).name: window_index})
 
     def switch_window(self, window_name, drink=None):
         if window_name == "DrinkOptionMenu":
@@ -188,19 +191,18 @@ class WindowManager:
 
 def init_app_ui():
     stack = QStackedWidget()
-    window_manager = WindowManager()
+    window_manager = WindowManager(stack)
     json_handler = JsonHandler(Paths.BOTTLES.value, Paths.DRINKS.value)
 
     bottle_manager = BottleManager(json_handler)
     drinks = json_handler.load_drinks()
 
-    stack.addWidget(MainMenu(window_manager))
-    stack.addWidget(MaintenanceMenu(window_manager))
-    stack.addWidget(DrinkOptionMenu(window_manager))
-    stack.addWidget(MixingMenu(window_manager))
-    stack.addWidget(BottleMenu(window_manager, bottle_manager))
+    window_manager.append_window(MainMenu(window_manager))
+    window_manager.append_window(MaintenanceMenu(window_manager))
+    window_manager.append_window(DrinkOptionMenu(window_manager))
+    window_manager.append_window(MixingMenu(window_manager))
+    window_manager.append_window(BottleMenu(window_manager, bottle_manager))
 
-    window_manager.create_windows_dict(stack)
     stack.resize(1920, 1080)
     stack.show()
 

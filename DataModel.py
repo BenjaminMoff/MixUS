@@ -42,6 +42,9 @@ class Bottle:
     def is_filler(self):
         return self.__liquid.is_filler
 
+    def copy(self):
+        return Bottle(self.__slot_number, self.__liquid, self.__volume_left)
+
 
 class Drink:
     def __init__(self, name=None, ingredients_dict=None, image_path=None):
@@ -167,12 +170,12 @@ class BottleManager:
 
     def update(self, bottles):
         if len(bottles) > self.number_of_bottles:
-            raise ValueError("Too Many bottle_manager for the number of slots")
+            raise ValueError("Too many bottle_manager for the number of slots")
         for bottle in bottles:
             self.bottles_dict.update({bottle.get_slot_number(): bottle})
 
         # Updates persistence file every time a modification is made
-        self.json_handler.save_data(bottles)
+        self.save_data()
 
     def get_bottles(self):
         return list(self.bottles_dict.values())

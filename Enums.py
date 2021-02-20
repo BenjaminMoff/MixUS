@@ -55,7 +55,7 @@ class BottleSize(Enum):
 
     @staticmethod
     def list():
-        return list(map(lambda c: c.value, BottleSize))
+        return list(map(lambda c: str(c.value), BottleSize))
 
 
 # Paths to persistence files
