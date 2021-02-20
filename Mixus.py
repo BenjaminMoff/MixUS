@@ -69,7 +69,7 @@ class BottleMenu(QDialog):
     bottle_layouts = {}
     manager = None
 
-    def __init__(self, window_manager, bottle_manger):
+    def __init__(self, window_manager, bottle_manager):
         super(BottleMenu, self).__init__()
         uic.loadUi('BottleMenu.ui', self)
         self.manager = window_manager
@@ -79,8 +79,8 @@ class BottleMenu(QDialog):
         self.scroll_layout.setObjectName("scroll_layout")
         self.scroll_layout.setContentsMargins(5, 5, 5, 5)
 
-        self.bottle_manager = bottle_manger
-        for bottle in bottle_manger.get_bottles():
+        self.bottle_manager = bottle_manager
+        for bottle in bottle_manager.get_bottles():
             temp_bottle = bottle.copy()
             self.temp_bottles.append(temp_bottle)
             bottle_layout = BottleLayout(temp_bottle)
@@ -96,13 +96,12 @@ class BottleMenu(QDialog):
         self.bottle_manager.update(self.temp_bottles)
         self.manager.switch_window("MainMenu")
 
-    # TODO use bottle manager instead
     def update_layout(self):
         self.temp_bottles.clear()
         for bottle in self.bottle_manager.get_bottles():
             temp_bottle = bottle.copy()
             self.temp_bottles.append(temp_bottle)
-            self.bottle_layouts.get(temp_bottle.get_slot_number).update_layout(temp_bottle)
+            self.bottle_layouts.get(temp_bottle.get_slot_number()).update_layout(temp_bottle)
 
 
 class MixingMenu(QDialog):
@@ -198,6 +197,8 @@ class WindowManager:
         if window_name == "DrinkOptionMenu":
             self.stack.widget(self.windows.get(window_name)).setup_drink(drink.text())
         elif window_name == "MainMenu":
+            self.stack.widget(self.windows.get(window_name)).update_layout()
+        elif window_name == "BottleMenu":
             self.stack.widget(self.windows.get(window_name)).update_layout()
         self.stack.setCurrentIndex(self.windows.get(window_name))
 
