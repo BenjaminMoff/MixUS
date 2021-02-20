@@ -62,11 +62,12 @@ class Drink:
                 if bottle.get_liquid_type() == liquid.string_name and bottle._Bottle__volume_left >= self.ingredients. \
                         get(liquid.string_name):
                     counter += 1
+                    break
         # If the counter is equal to the number of ingredients, then the drink is available for the user
         if counter == len(self.ingredients):
-            return 1
+            return True
         else:
-            return 0
+            return False
 
     # Method that determines if the bottles have enough to make a double of this drink (double the alcohol)
     def enough_for_double(self, bottles):
@@ -80,9 +81,9 @@ class Drink:
                     counter += 1
         # If the counter is equal to the number of alcoholized liquids, then the doubled drink is available for the user
         if counter == len(alcoholized_liquids):
-            return 1
+            return True
         else:
-            return 0
+            return False
 
     # Method that determines if the bottles have enough to make a virgin drink (all the alcohol is replaced by filler)
     def enough_for_virgin(self, bottles):
@@ -96,9 +97,9 @@ class Drink:
                     total_volume += self.ingredients.get(liquid)
                 # Check if the total volume is higher than the remaining volume in the bottle
                 if bottle.get_volume_left() >= total_volume:
-                    return 1
+                    return True
                 else:
-                    return 0
+                    return False
 
     # Method called to make the drink
     def make(self, bottles):
@@ -174,3 +175,17 @@ class BottleManager:
     def save_data(self):
         self.json_handler.save_data(list(self.bottles_dict.values()))
 
+
+class DrinkManager:
+    def __init__(self, json_handler, bottle_manager):
+        self.json_handler = json_handler
+        self.drinks = self.json_handler.load_drinks()
+        self.bottle_manager = bottle_manager
+
+    # Method that returns a list of the available drinks depending on the bottles
+    def get_available_drinks(self):
+        available_drinks = []
+        for drink in self.drinks:
+            if drink.is_available(list(self.bottle_manager.bottles_dict.values())) is True:
+                available_drinks.append(drink)
+        return available_drinks
