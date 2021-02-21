@@ -117,18 +117,42 @@ class MixingMenu(QDialog):
 
 class DrinkOptionMenu(QDialog):
     name = "DrinkOptionMenu"
+    drink = None
 
-    def __init__(self, window_manager):
+    def __init__(self, window_manager, drink_manager):
         super(DrinkOptionMenu, self).__init__()
         uic.loadUi('DrinkOptionMenu.ui', self)
 
+        self.window_manager = window_manager
+        self.drink_manager = drink_manager
+
+        self.radioButton_normal.toggled.connect(self.is_current_setting_valid)
+        self.radioButton_double.toggled.connect(self.is_current_setting_valid)
+        self.radioButton_virgin.toggled.connect(self.is_current_setting_valid)
+
         self.pushButton_return.released.connect(lambda: window_manager.switch_window("MainMenu"))
-        self.pushButton_confirm.released.connect(lambda: window_manager.switch_window("MixingMenu"))
+        self.pushButton_confirm.released.connect(lambda: self.window_manager.switch_window("MixingMenu"))
         # TODO lancer algorithme de generation de gcode + lancement commandes?
 
-    def setup_drink(self, drink):
-        self.label_title.setText(drink)
+    def update_layout(self, drink):
+        self.drink = drink
+        self.label_title.setText(drink.name)
+
+        self.radioButton_normal.setChecked(True)
         # TODO setup image + ingredients
+
+    # Disable confirm button if the drink cant be made with current settings
+    def is_current_setting_valid(self):
+        is_valid = (self.radioButton_double.isChecked() and self.is_double_available()) or \
+                   (self.radioButton_virgin.isChecked() and self.is_virgin_available()) or \
+                    self.radioButton_normal.isChecked()
+        self.pushButton_confirm.setEnabled(is_valid)
+
+    def is_double_available(self):
+        return self.drink_manager.is_double_available(self.drink)
+
+    def is_virgin_available(self):
+        return self.drink_manager.is_virgin_available(self.drink)
 
 
 class MaintenanceMenu(QDialog):
@@ -167,16 +191,16 @@ class MainMenu(QMainWindow):
         for i in reversed(range(self.scroll_layout.count())):
             self.scroll_layout.itemAt(i).widget().setParent(None)
         for drink in self.drink_manager.get_available_drinks():
-            P = DrinkButton(self.scrollAreaWidgetContents, drink)
-            P.setFixedSize(300, 600)
-            self.scroll_layout.addWidget(P)
-            P.released.connect(lambda drink=P: self.window_manager.switch_window("DrinkOptionMenu", drink))
+            button = DrinkButton(self.scrollAreaWidgetContents, drink)
+            button.setFixedSize(300, 600)
+            self.scroll_layout.addWidget(button)
+            button.released.connect(lambda button_drink=button.drink: self.window_manager.switch_window("DrinkOptionMenu", button_drink))
             # TODO passer un drink plutot que le bouton (drink devrait etre un attribut dun drinkButton)
 
 
 class DrinkButton(QPushButton):
-    def __init__(self, scrollAreaWidgetContents, drink):
-        super(DrinkButton, self).__init__(scrollAreaWidgetContents)
+    def __init__(self, scroll_area_widget_contents, drink):
+        super(DrinkButton, self).__init__(scroll_area_widget_contents)
         self.drink = drink
         self.setText(self.drink.name)
 
@@ -195,7 +219,7 @@ class WindowManager:
 
     def switch_window(self, window_name, drink=None):
         if window_name == "DrinkOptionMenu":
-            self.stack.widget(self.windows.get(window_name)).setup_drink(drink.text())
+            self.stack.widget(self.windows.get(window_name)).update_layout(drink)
         elif window_name == "MainMenu":
             self.stack.widget(self.windows.get(window_name)).update_layout()
         elif window_name == "BottleMenu":
@@ -213,7 +237,7 @@ def init_app_ui():
 
     window_manager.append_window(MainMenu(window_manager, drink_manager))
     window_manager.append_window(MaintenanceMenu(window_manager))
-    window_manager.append_window(DrinkOptionMenu(window_manager))
+    window_manager.append_window(DrinkOptionMenu(window_manager, drink_manager))
     window_manager.append_window(MixingMenu(window_manager))
     window_manager.append_window(BottleMenu(window_manager, bottle_manager))
 

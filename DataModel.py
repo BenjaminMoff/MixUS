@@ -82,8 +82,8 @@ class Drink:
         # Check for each alcoholized liquid if the volume left in the bottle_manager is enough to make a double
         for alcoholized_liquid in alcoholized_liquids:
             for bottle in bottles:
-                if bottle.get_liquid_name() == alcoholized_liquid.string_name and bottle.get_volume_left >= \
-                        self.ingredients.get(alcoholized_liquid) * 2:
+                if bottle.get_liquid_name() == alcoholized_liquid.string_name and bottle.get_volume_left() >= \
+                        self.ingredients.get(alcoholized_liquid.string_name) * 2:
                     counter += 1
         # If the counter is equal to the number of alcoholized liquids, then the doubled drink is available for the user
         if counter == len(alcoholized_liquids):
@@ -100,35 +100,12 @@ class Drink:
         for liquid in self.liquids:
             for bottle in bottles:
                 if bottle.get_liquid_name() == liquid.string_name and liquid.is_filler is True:
-                    total_volume += self.ingredients.get(liquid)
+                    total_volume += self.ingredients.get(liquid.string_name)
                 # Check if the total volume is higher than the remaining volume in the bottle
                 if bottle.get_volume_left() >= total_volume:
                     return True
                 else:
                     return False
-
-    # Method called to make the drink
-    def make(self, bottles):
-        for bottle in bottles:
-            for liquid in self.liquids:
-                if bottle.get_liquid_name() == liquid.string_name:
-                    # TODO call g-code
-                    for ounces in self.ingredients.get(liquid):
-                        # TODO call g-code pour
-                        # When the cup uses the distributor of a liquid, we need to update the
-                        # quantity remaining of that liquid.
-                        # If the liquid is alcoholized and the user wants it doubled, the quantity needs to be doubled
-                        if liquid.is_alcoholized is True and self.double is True:
-                            bottle.pour(2 * self.ingredients.get(liquid))
-                        # If the liquid is the filler and the drink is doubled, the quantity of filler needs to be
-                        # reduced by the extra volume added to have the same drink volume
-                        elif liquid.is_filler is True and self.double is True:
-                            volume_to_remove = self.__alcohol_volume()
-                            poured_ounces = self.ingredients.get(liquid) - volume_to_remove
-                            bottle.pour(poured_ounces)
-                        else:
-                            bottle.pour(self.ingredients.get(liquid))
-        self.__make_normal()
 
     # Method that finds the alcoholized liquids in the drink
     def __find_alcoholized(self):
@@ -145,7 +122,7 @@ class Drink:
         alcoholized_list = self.__find_alcoholized()
         # Sum of the volumes of all the alcoholized ingredients in the drink
         for liquid in alcoholized_list:
-            alcohol_volume += self.ingredients.get(liquid)
+            alcohol_volume += self.ingredients.get(liquid.string_name)
         return alcohol_volume
 
     # Method that is called after the drink has been made to make it normal again
@@ -154,7 +131,6 @@ class Drink:
         self.virgin = False
 
 
-# TODO CHANGE THE SHIT
 class BottleManager:
     def __init__(self, json_handler):
         self.json_handler = json_handler
@@ -200,3 +176,36 @@ class DrinkManager:
             if drink.is_available(list(self.bottle_manager.bottles_dict.values())) is True:
                 available_drinks.append(drink)
         return available_drinks
+
+    def is_double_available(self, drink):
+        return drink.enough_for_double(self.bottle_manager.get_bottles())
+
+    def is_virgin_available(self, drink):
+        return drink.enough_for_virgin(self.bottle_manager.get_bottles())
+
+    # Returns list of g-code instructions for a specific drink
+    def get_instructions(self, drink):
+        for bottle in self.bottle_manager.get_bottles():
+            for liquid in drink.liquids:
+                if bottle.get_liquid_name() == liquid.string_name:
+                    # TODO call g-code
+                    for ounces in drink.ingredients.get(liquid):
+                        # TODO call g-code pour
+                        # When the cup uses the distributor of a liquid, we need to update the
+                        # quantity remaining of that liquid.
+                        # If the liquid is alcoholized and the user wants it doubled, the quantity needs to be doubled
+                        if liquid.is_alcoholized is True and self.double is True:
+                            bottle.pour(2 * self.ingredients.get(liquid))
+                        # If the liquid is the filler and the drink is doubled, the quantity of filler needs to be
+                        # reduced by the extra volume added to have the same drink volume
+                        elif liquid.is_filler is True and self.double is True:
+                            volume_to_remove = self.__alcohol_volume()
+                            poured_ounces = self.ingredients.get(liquid) - volume_to_remove
+                            bottle.pour(poured_ounces)
+                        else:
+                            bottle.pour(self.ingredients.get(liquid))
+        self.__make_normal()
+
+    # Returns the order in which the ingredients should be added to minimize distance
+    def sort_ingredients_by_slot_numbers(self, drink):
+        pass
