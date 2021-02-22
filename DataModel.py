@@ -1,7 +1,10 @@
 from Enums import Liquid
-
+from SerialCommunication import GCodeGenerator
 
 class Bottle:
+    """
+    Class that stores current volume and liquid type of bottles on the machine
+    """
     def __init__(self, slot_number=None, liquid=None, volume_left=None):
         self.__slot_number = slot_number
         self.__liquid = liquid
@@ -47,20 +50,24 @@ class Bottle:
 
 
 class Drink:
+    """
+    Class that stores ingredients for a specific drink and image path for display
+    """
     def __init__(self, name=None, ingredients_dict=None, image_path=None):
         self.name = name
         self.ingredients = ingredients_dict  # self.ingredients is a dictionnary of Liquid.string_name:Volume tuples
         self.image_path = image_path  # Path to the image for diplay use
-        # self.double = False
-        # self.virgin = False
-        # self.liquids = list(self.ingredients) if self.ingredients is not None else []  # List of the Liquids
         self.liquids = []
         if self.ingredients is not None:
             for ingredient in list(self.ingredients):
                 self.liquids.append(Liquid.get_liquid_from_string_name(ingredient))
 
-    # Method that determines what drinks are available depending on current bottle_manager
     def is_available(self, bottles):
+        """
+        Method that determines if their is enough liquid in the bottle list provided to make the drink
+        :param bottles:
+        :return:
+        """
         counter = 0
         for liquid in self.liquids:
             for bottle in bottles:
@@ -75,8 +82,13 @@ class Drink:
         else:
             return False
 
-    # Method that determines if the bottle_manager have enough to make a double of this drink (double the alcohol)
     def enough_for_double(self, bottles):
+        """
+        Method that determines if their is enough liquid in the bottle list provided to make a double of this drink
+        (double the alcohol)
+        :param bottles:
+        :return:
+        """
         counter = 0
         alcoholized_liquids = self.__find_alcoholized()
         # Check for each alcoholized liquid if the volume left in the bottle_manager is enough to make a double
@@ -91,10 +103,15 @@ class Drink:
         else:
             return False
 
-    # Method that determines if the bottle_manager have enough to make a virgin drink (all the alcohol is replaced by filler)
     def enough_for_virgin(self, bottles):
+        """
+        Method that determines if their is enough liquid in the bottle list provided to make a virgin of this drink
+        (all the alcohol is replaced by filler)
+        :param bottles:
+        :return:
+        """
         # Find the total volume of alcohol in the drink
-        added_volume = self.__alcohol_volume()
+        added_volume = self.alcohol_volume()
         total_volume = added_volume
         # Find the default volume of filler and add it to added_volume
         for liquid in self.liquids:
@@ -107,8 +124,11 @@ class Drink:
                 else:
                     return False
 
-    # Method that finds the alcoholized liquids in the drink
     def __find_alcoholized(self):
+        """
+        Method that finds the alcoholized liquids in the drink
+        :return:
+        """
         alcoholized_list = []
         # If the ingredient in the drink is alcoholized, it is added to the list
         for liquid in self.liquids:
@@ -116,8 +136,11 @@ class Drink:
                 alcoholized_list.append(liquid)
         return alcoholized_list
 
-    # Method that calculates the volume of alcohol (whatever the type) in the drink
-    def __alcohol_volume(self):
+    def alcohol_volume(self):
+        """
+        Method that calculates the volume of alcohol (whatever the type) in the drink
+        :return:
+        """
         alcohol_volume = 0
         alcoholized_list = self.__find_alcoholized()
         # Sum of the volumes of all the alcoholized ingredients in the drink
@@ -125,24 +148,18 @@ class Drink:
             alcohol_volume += self.ingredients.get(liquid.string_name)
         return alcohol_volume
 
-    # Method that is called after the drink has been made to make it normal again
-    def __make_normal(self):
-        self.double = False
-        self.virgin = False
-
 
 class BottleManager:
+    """
+    Class to manage bottles on the machine
+    Load data from persistence file at instantiation and saves data when bottle list is modified
+    """
     def __init__(self, json_handler):
         self.json_handler = json_handler
         bottles = self.json_handler.load_bottles()
         self.number_of_bottles = len(bottles)
         self.bottles_dict = {}
         self.update(bottles)
-
-    def change_bottle(self, bottle, slot):
-        if slot > self.number_of_bottles:
-            raise ValueError("slot number given exceeds the physical number of slots")
-        self.bottles_dict.update({slot: bottle})
 
     def update(self, bottles):
         if len(bottles) > self.number_of_bottles:
@@ -171,6 +188,10 @@ class DrinkManager:
 
     # Method that returns a list of the available drinks depending on the bottles
     def get_available_drinks(self):
+        """
+        Method that returns a list of drink that can be made with the content of the bottles stored in bottle_manager
+        :return: list of available drinks
+        """
         available_drinks = []
         for drink in self.drinks:
             if drink.is_available(list(self.bottle_manager.bottles_dict.values())) is True:
@@ -184,27 +205,60 @@ class DrinkManager:
         return drink.enough_for_virgin(self.bottle_manager.get_bottles())
 
     # Returns list of g-code instructions for a specific drink
-    def get_instructions(self, drink):
+    def get_instructions(self, drink, is_double=False, is_virgin=False):
+        """
+        :param drink: specified drink to make
+        :param is_double: specify if the alcohol content should be doubled
+        :param is_virgin: specify if the alcohol content should be removed
+        :return: list of list of g-code strings to make the drink
+        """
+        instructions = []
+        poured_liquids = []
+
+        # Move the cup in the machine
+        instructions.append(GCodeGenerator.insert_cup())
+
+        # TODO handle multiple fillers
+        # Find bottles that match the drink ingredients in their order of apparition in the slots
         for bottle in self.bottle_manager.get_bottles():
             for liquid in drink.liquids:
-                if bottle.get_liquid_name() == liquid.string_name:
-                    # TODO call g-code
-                    for ounces in drink.ingredients.get(liquid):
-                        # TODO call g-code pour
-                        # When the cup uses the distributor of a liquid, we need to update the
-                        # quantity remaining of that liquid.
-                        # If the liquid is alcoholized and the user wants it doubled, the quantity needs to be doubled
-                        if liquid.is_alcoholized is True and self.double is True:
-                            bottle.pour(2 * self.ingredients.get(liquid))
-                        # If the liquid is the filler and the drink is doubled, the quantity of filler needs to be
-                        # reduced by the extra volume added to have the same drink volume
-                        elif liquid.is_filler is True and self.double is True:
-                            volume_to_remove = self.__alcohol_volume()
-                            poured_ounces = self.ingredients.get(liquid) - volume_to_remove
-                            bottle.pour(poured_ounces)
-                        else:
-                            bottle.pour(self.ingredients.get(liquid))
-        self.__make_normal()
+
+                # Check for match in bottle liquid and drink ingredients + check if not already poured
+                if bottle.get_liquid_name() == liquid.string_name and liquid.string_name in poured_liquids:
+                    poured_liquids.append(liquid.string_name)
+
+                    # Move to the slot if their is liquid to pour
+                    if not (liquid.is_alcoholized and is_virgin):
+
+                        # Move to the slot
+                        instructions.append(GCodeGenerator.move_to_slot(bottle.get_slot_number()))
+
+                        # Pour necessary amount of liquid
+                        instructions.append(self.__compute_ounces_to_pour(drink, liquid, is_double, is_virgin))
+
+        # Move to slot 0 and get the cup out of the machine
+        instructions.append(GCodeGenerator.serve_cup())
+        return instructions
+
+    def __compute_ounces_to_pour(self, drink, liquid, is_double=False, is_virgin=False):
+        instructions = []
+
+        # If the drink is double, the alcohol content is doubled and the filler is reduced accordingly
+        if is_double:
+            if liquid.is_alcoholized:
+                instructions.append(GCodeGenerator.pour(2 * drink.ingredients.get(liquid.string_name)))
+            elif liquid.is_filler:
+                volume_to_remove = drink.alcohol_volume()
+                instructions.append(GCodeGenerator.pour(drink.ingredients.get(liquid) - volume_to_remove))
+
+        elif is_virgin and liquid.is_filler:
+            volume_to_add = drink.alcohol_volume()
+            instructions.append(GCodeGenerator.pour(drink.ingredients.get(liquid) + volume_to_add))
+
+        else:
+            instructions.append(GCodeGenerator.pour(drink.ingredients.get(liquid.string_name)))
+
+        return instructions
 
     # Returns the order in which the ingredients should be added to minimize distance
     def sort_ingredients_by_slot_numbers(self, drink):

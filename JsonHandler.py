@@ -4,6 +4,9 @@ from Enums import *
 
 
 class JsonHandler:
+    """
+    Class responsible to read and write in the json persistence files
+    """
     def __init__(self, bottle_file_path, drink_file_path):
         self.bottle_file_path = bottle_file_path
         self.drink_file_path = drink_file_path
@@ -42,6 +45,9 @@ class JsonHandler:
 
 
 class LiquidEncoder(json.JSONEncoder):
+    """
+    Class that overrides the default JSONEncoder to allow encoding of Liquid enum class
+    """
     def default(self, obj):
         if type(obj) is Liquid:
             return {"__enum__": str(obj)}
@@ -49,6 +55,9 @@ class LiquidEncoder(json.JSONEncoder):
 
 
 def as_enum(d):
+    """
+    Method used as hook when reading json files to decode Liquid enum class
+    """
     if "__enum__" in d:
         name, member = d["__enum__"].split(".")
         return getattr(Liquid[member], member)

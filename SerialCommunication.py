@@ -3,6 +3,9 @@ import threading
 
 
 class SerialSynchroniser:
+    """
+    Class responsible to communicate with the motor controller board by serial port
+    """
     serial_port = None
     instruction_done = threading.Condition()
     read = False
@@ -16,29 +19,29 @@ class SerialSynchroniser:
         self.serial_port = serial.Serial(port_string, baudrate=9600, timeout=0.5)
 
     def start_writer_thread(self, instructions):
-        self.writer_thread = threading.Thread(name="SerialWriter", target=self.send_instructions(instructions))
-        self.start_reading_thread()
+        self.writer_thread = threading.Thread(name="SerialWriter", target=self.__send_instructions, args=instructions)
+        self.__start_reading_thread()
         self.writer_thread.start()
 
-    def send_instructions(self, instructions):
+    def __send_instructions(self, instructions):
         if self.serial_port is None:
             raise Exception("Unable to send instructions, no serial port opened")
 
         for instruction in instructions:
-            self.send_instruction(instruction)
+            self.__send_instruction(instruction)
             self.instruction_done.wait()
 
         self.read = False
 
-    def send_instruction(self, instruction):
+    def __send_instruction(self, instruction):
         for string in instruction:
             self.serial_port.write(string)
 
-    def start_reading_thread(self):
-        self.reader_thread = threading.Thread(name="SerialReader", target=self.read_from_serial)
+    def __start_reading_thread(self):
+        self.reader_thread = threading.Thread(name="SerialReader", target=self.__read_from_serial)
         self.reader_thread.start()
 
-    def read_from_serial(self):
+    def __read_from_serial(self):
         while self.read:
             # TODO validate if lines can be read more than once
             if self.serial_port.readline() == "Instruction completed":
@@ -46,14 +49,25 @@ class SerialSynchroniser:
 
 
 class GCodeGenerator:
+    """
+    Class responsible to generate g-code instructions to execute when making a drink
+    """
     @staticmethod
     def move_to_slot(index):
+        """
+        :param index: (int) slot under which the cup should move to
+        :return: List of instructions to move the cup under the specified slot
+        """
         # TODO define actual positions of slots
         position = index * 100
         return ["G1 X%d Y0 Z0\n" % position, "M400\n", "M118 Instruction completed\n"]
 
     @staticmethod
     def pour(ounces):
+        """
+        :param ounces: (int) Number of ounces to pour in the cup
+        :return: List of instructions to pour the specified amount of ounces in the cup
+        """
         # TODO define actual z movement to pour
         z_movement = 100
         instructions = []
@@ -73,16 +87,23 @@ class GCodeGenerator:
 
     @staticmethod
     def insert_cup():
-        # Retract y axis to insert cup in the machine
+        """
+        :return: List of instructions to retract the cup in the machine
+        """
         position = 0
         return ["G1 X0 Y%d Z0\n" % position, "M400\n", "M118 Instruction completed\n"]
 
     @staticmethod
     def serve_cup():
-        # Deploy y axis to get the cup out of the machine
-        # TODO define actual maximum position of y axis
-        position = 100
-        return ["G1 X0 Y%d Z0\n" % position, "M400\n", "M118 Instruction completed\n"]
+        """
+        :return: List of instructions to get the cup out of the machine
+        """
+        # TODO define actual maximum y_position of y axis
+        instructions = []
+        instructions.append(GCodeGenerator.move_to_slot(0))
+        y_position = 100
+        instructions.append(["G1 X0 Y%d Z0\n" % y_position, "M400\n", "M118 Instruction completed\n"])
+        return instructions
 
 
 if __name__ == '__main__':

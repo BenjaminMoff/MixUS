@@ -2,16 +2,20 @@ from PyQt5 import QtWidgets, uic, QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QComboBox, QMenu, QApplication, QLabel, QMainWindow, QDialog, QStackedWidget, QPushButton, \
     QHBoxLayout, QVBoxLayout
-from Enums import *
+from Enums import Paths
 from DataModel import *
 from JsonHandler import *
 import sys
 
 
 class BottleLayout(QHBoxLayout):
+    """
+    Layout to allow modification of liquid type and volume of bottles on the machine
+    ComboBoxes are used to get user input
+    """
     slot_number = None
-    liquid_type = None
-    volume_left = None
+    liquid_type_combo_box = None
+    volume_left_combo_box = None
 
     def __init__(self, temp_bottle):
         super().__init__()
@@ -26,11 +30,11 @@ class BottleLayout(QHBoxLayout):
         super().addWidget(self.slot_number)
 
     def __init_liquid_type(self, liquid_type_name):
-        self.liquid_type = QComboBox()
-        self.liquid_type.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        self.__init_combo_box(self.liquid_type, liquid_type_name, Liquid.list())
-        self.liquid_type.activated.connect(self.new_liquid_type_selected)
-        super().addWidget(self.liquid_type)
+        self.liquid_type_combo_box = QComboBox()
+        self.liquid_type_combo_box.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.__init_combo_box(self.liquid_type_combo_box, liquid_type_name, Liquid.list())
+        self.liquid_type_combo_box.activated.connect(self.new_liquid_type_selected)
+        super().addWidget(self.liquid_type_combo_box)
 
     def __init_volume_left(self, volume):
         self.volume_left = QComboBox()
@@ -48,21 +52,29 @@ class BottleLayout(QHBoxLayout):
                 combo_box.addItem(item)
 
     def new_liquid_type_selected(self):
-        self.bottle.set_liquid(Liquid.get_liquid_from_string_name(self.liquid_type.currentText()))
+        self.bottle.set_liquid(Liquid.get_liquid_from_string_name(self.liquid_type_combo_box.currentText()))
 
     def new_volume_selected(self):
         self.bottle.set_volume_left(int(self.volume_left.currentText()))
 
     def update_layout(self, new_bottle):
+        """
+        Update the layout to display status of new_bottle
+        :param new_bottle: bottle used to update combo boxes
+        :return:
+        """
         self.bottle = new_bottle
-        self.liquid_type.clear()
+        self.liquid_type_combo_box.clear()
         self.volume_left.clear()
 
-        self.__init_combo_box(self.liquid_type, self.bottle.get_liquid_name(), Liquid.list())
+        self.__init_combo_box(self.liquid_type_combo_box, self.bottle.get_liquid_name(), Liquid.list())
         self.__init_combo_box(self.volume_left, str(self.bottle.get_volume_left()), BottleSize.list())
 
 
 class BottleMenu(QDialog):
+    """
+    Menu to update the software when bottles are changed on the machine
+    """
     name = "BottleMenu"
     bottle_manager = []
     temp_bottles = []
@@ -71,7 +83,7 @@ class BottleMenu(QDialog):
 
     def __init__(self, window_manager, bottle_manager):
         super(BottleMenu, self).__init__()
-        uic.loadUi('BottleMenu.ui', self)
+        uic.loadUi(Paths.BOTTLE_MENU.value, self)
         self.manager = window_manager
 
         self.scroll_layout = QVBoxLayout(self.scrollAreaWidgetContents)
@@ -97,6 +109,11 @@ class BottleMenu(QDialog):
         self.manager.switch_window("MainMenu")
 
     def update_layout(self):
+        """
+        Method called when the bottle menu is loaded
+        Updates each bottle layout with the current content of bottle manager
+        :return:
+        """
         self.temp_bottles.clear()
         for bottle in self.bottle_manager.get_bottles():
             temp_bottle = bottle.copy()
@@ -109,7 +126,7 @@ class MixingMenu(QDialog):
 
     def __init__(self, window_manager):
         super(MixingMenu, self).__init__()
-        uic.loadUi('MixingMenu.ui', self)
+        uic.loadUi(Paths.MIXING_MENU.value, self)
 
         self.pushButton_return.released.connect(lambda: window_manager.switch_window("MainMenu"))
         # TODO Transfert de commandes gcodes(ici ou DrinkOptionMenu) + update status et afficher dans widgets
@@ -121,7 +138,7 @@ class DrinkOptionMenu(QDialog):
 
     def __init__(self, window_manager, drink_manager):
         super(DrinkOptionMenu, self).__init__()
-        uic.loadUi('DrinkOptionMenu.ui', self)
+        uic.loadUi(Paths.DRINK_OPTION_MENU.value, self)
 
         self.window_manager = window_manager
         self.drink_manager = drink_manager
@@ -135,6 +152,11 @@ class DrinkOptionMenu(QDialog):
         # TODO lancer algorithme de generation de gcode + lancement commandes?
 
     def update_layout(self, drink):
+        """
+
+        :param drink: selected drink
+        :return:
+        """
         self.drink = drink
         self.label_title.setText(drink.name)
 
@@ -160,7 +182,7 @@ class MaintenanceMenu(QDialog):
 
     def __init__(self, window_manager):
         super(MaintenanceMenu, self).__init__()
-        uic.loadUi('MaintenanceMenu.ui', self)
+        uic.loadUi(Paths.MAINTENANCE_MENU.value, self)
 
         self.pushButton_return.released.connect(lambda: window_manager.switch_window("MainMenu"))
         self.pushButton_bottle.released.connect(lambda: window_manager.switch_window("BottleMenu"))
@@ -172,7 +194,7 @@ class MainMenu(QMainWindow):
 
     def __init__(self, window_manager, drink_manager):
         super(MainMenu, self).__init__()
-        uic.loadUi('MainMenu.ui', self)
+        uic.loadUi(Paths.MAIN_MENU.value, self)
         self.window_manager = window_manager
         self.drink_manager = drink_manager
 
@@ -206,6 +228,9 @@ class DrinkButton(QPushButton):
 
 
 class WindowManager:
+    """
+    Class responsible to switch between menus and update layouts
+    """
     windows = {}
     stack = None
 

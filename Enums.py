@@ -61,6 +61,16 @@ class BottleSize(Enum):
 # Paths to persistence files
 class Paths(Enum):
     BOTTLES = os.path.join(os.path.dirname(__file__),
-                           "persistance/bottles.json")
+                           "persistence/bottles.json")
     DRINKS = os.path.join(os.path.dirname(__file__),
-                          "persistance/drinks.json")
+                          "persistence/drinks.json")
+    MAIN_MENU = os.path.join(os.path.dirname(__file__),
+                           "ui/MainMenu.ui")
+    BOTTLE_MENU = os.path.join(os.path.dirname(__file__),
+                               "ui/BottleMenu.ui")
+    DRINK_OPTION_MENU = os.path.join(os.path.dirname(__file__),
+                               "ui/DrinkOptionMenu.ui")
+    MAINTENANCE_MENU = os.path.join(os.path.dirname(__file__),
+                               "ui/MaintenanceMenu.ui")
+    MIXING_MENU = os.path.join(os.path.dirname(__file__),
+                               "ui/MixingMenu.ui")
