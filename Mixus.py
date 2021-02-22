@@ -2,7 +2,6 @@ from PyQt5 import QtWidgets, uic, QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QComboBox, QMenu, QApplication, QLabel, QMainWindow, QDialog, QStackedWidget, QPushButton, \
     QHBoxLayout, QVBoxLayout
-from Enums import Paths
 from DataModel import *
 from JsonHandler import *
 import sys
