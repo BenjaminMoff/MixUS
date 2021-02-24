@@ -3,7 +3,9 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QComboBox, QMenu, QApplication, QLabel, QMainWindow, QDialog, QStackedWidget, QPushButton, \
     QHBoxLayout, QVBoxLayout
 from DataModel import *
-from JsonHandler import *
+from JsonHandler import JsonHandler
+from Enums import *
+from SerialCommunication import SerialSynchroniser
 import sys
 
 
@@ -126,9 +128,33 @@ class MixingMenu(QDialog):
     def __init__(self, window_manager):
         super(MixingMenu, self).__init__()
         uic.loadUi(Paths.MIXING_MENU.value, self)
-
         self.pushButton_return.released.connect(lambda: window_manager.switch_window("MainMenu"))
-        # TODO Transfert de commandes gcodes(ici ou DrinkOptionMenu) + update status et afficher dans widgets
+
+    def update_layout(self, instructions, drink):
+        """
+        Method called when the MixingMenu is loaded
+        Updates the ingredients and the progressBar for the current drink
+        :param instructions: List of instructions to pass to the serial port
+        :param drink: Drink that is going to be made
+        :return: 
+        """""
+        self.label_title.setText(drink.name)
+        for i in range(0, self.verticalLayout_waiting.count()):
+            self.verticalLayout_waiting.itemAt(i).widget().deleteLater()
+        ingredient_labels = []
+
+        for ingredient in drink.liquids:
+            ingredient_label = QLabel()
+            ingredient_label.setText(ingredient.string_name)
+            ingredient_labels.append(QLabel)
+            self.verticalLayout_waiting.addWidget(ingredient_label)
+        self.setup_progress_bar(instructions)
+
+    def setup_progress_bar(self, instructions):
+        self.progressBar.setMaximum(len(instructions))
+
+    def update_progress_bar(self, value):
+        self.progressBar.setValue(value)
 
 
 class DrinkOptionMenu(QDialog):
@@ -147,7 +173,7 @@ class DrinkOptionMenu(QDialog):
         self.radioButton_virgin.toggled.connect(self.is_current_setting_valid)
 
         self.pushButton_return.released.connect(lambda: window_manager.switch_window("MainMenu"))
-        self.pushButton_confirm.released.connect(lambda: self.window_manager.switch_window("MixingMenu"))
+
         # TODO lancer algorithme de generation de gcode + lancement commandes?
 
     def update_layout(self, drink):
@@ -158,15 +184,15 @@ class DrinkOptionMenu(QDialog):
         """
         self.drink = drink
         self.label_title.setText(drink.name)
-
         self.radioButton_normal.setChecked(True)
+        self.pushButton_confirm.released.connect(lambda: self.get_instructions_and_run())
         # TODO setup image + ingredients
 
     # Disable confirm button if the drink cant be made with current settings
     def is_current_setting_valid(self):
         is_valid = (self.radioButton_double.isChecked() and self.is_double_available()) or \
                    (self.radioButton_virgin.isChecked() and self.is_virgin_available()) or \
-                    self.radioButton_normal.isChecked()
+                   self.radioButton_normal.isChecked()
         self.pushButton_confirm.setEnabled(is_valid)
 
     def is_double_available(self):
@@ -174,6 +200,11 @@ class DrinkOptionMenu(QDialog):
 
     def is_virgin_available(self):
         return self.drink_manager.is_virgin_available(self.drink)
+
+    def get_instructions_and_run(self):
+        instructions = self.drink_manager.get_instructions(self.drink, self.radioButton_double.isChecked(),
+                                                           self.radioButton_virgin.isChecked())
+        self.window_manager.switch_window("MixingMenu", self.drink, instructions)
 
 
 class MaintenanceMenu(QDialog):
@@ -215,7 +246,8 @@ class MainMenu(QMainWindow):
             button = DrinkButton(self.scrollAreaWidgetContents, drink)
             button.setFixedSize(300, 600)
             self.scroll_layout.addWidget(button)
-            button.released.connect(lambda button_drink=button.drink: self.window_manager.switch_window("DrinkOptionMenu", button_drink))
+            button.released.connect(
+                lambda button_drink=button.drink: self.window_manager.switch_window("DrinkOptionMenu", button_drink))
             # TODO passer un drink plutot que le bouton (drink devrait etre un attribut dun drinkButton)
 
 
@@ -241,13 +273,15 @@ class WindowManager:
         window_index = self.stack.count() - 1
         self.windows.update({self.stack.widget(window_index).name: window_index})
 
-    def switch_window(self, window_name, drink=None):
+    def switch_window(self, window_name, drink=None, instructions=None):
         if window_name == "DrinkOptionMenu":
             self.stack.widget(self.windows.get(window_name)).update_layout(drink)
         elif window_name == "MainMenu":
             self.stack.widget(self.windows.get(window_name)).update_layout()
         elif window_name == "BottleMenu":
             self.stack.widget(self.windows.get(window_name)).update_layout()
+        elif window_name == "MixingMenu":
+            self.stack.widget(self.windows.get(window_name)).update_layout(instructions, drink)
         self.stack.setCurrentIndex(self.windows.get(window_name))
 
 
