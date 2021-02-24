@@ -5,7 +5,7 @@ from Enums import *
 
 class JsonHandler:
     """
-    Class responsible to read and write in the json persistence files
+    Class responsible to __read and write in the json persistence files
     """
     def __init__(self, bottle_file_path, drink_file_path):
         self.bottle_file_path = bottle_file_path

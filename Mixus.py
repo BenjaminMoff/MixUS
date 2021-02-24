@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, uic, QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QComboBox, QMenu, QApplication, QLabel, QMainWindow, QDialog, QStackedWidget, QPushButton, \
+from PyQt5.QtWidgets import QComboBox, QLabel, QMainWindow, QDialog, QStackedWidget, QPushButton, \
     QHBoxLayout, QVBoxLayout
 from DataModel import *
 from JsonHandler import JsonHandler
