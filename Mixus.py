@@ -228,27 +228,35 @@ class MainMenu(QMainWindow):
         self.window_manager = window_manager
         self.drink_manager = drink_manager
 
-        self.pushButton_exit.released.connect(lambda: sys.exit(app.exec_()))
-        # TODO Updater les fichiers de persistance a la fermeture
-        self.pushButton_maintenance.released.connect(lambda: window_manager.switch_window("MaintenanceMenu"))
-
-        self.scrollArea_drinklist.setWidgetResizable(True)
         self.scroll_layout = QHBoxLayout(self.scrollAreaWidgetContents)
+        self.scroll_area_init()
+        self.connect_buttons()
+        # TODO Updater les fichiers de persistance a la fermeture
+
+    def aesthetics(self):
+        pass
+
+    def scroll_area_init(self):
+        self.scrollArea_drinklist.setWidgetResizable(True)
         self.scroll_layout.setSpacing(10)
         self.scroll_layout.setObjectName("scroll_layout")
         self.scroll_layout.setContentsMargins(5, 5, 5, 5)
         self.update_layout()
+        self.scrollArea_drinklist.setStyleSheet(GUI.layout_contour_color.value)
+
+    def connect_buttons(self):
+        self.pushButton_exit.released.connect(lambda: sys.exit(app.exec_()))
+        self.pushButton_maintenance.released.connect(lambda: self.window_manager.switch_window("MaintenanceMenu"))
 
     def update_layout(self):
         for i in reversed(range(self.scroll_layout.count())):
             self.scroll_layout.itemAt(i).widget().setParent(None)
         for drink in self.drink_manager.get_available_drinks():
             button = DrinkButton(self.scrollAreaWidgetContents, drink)
-            button.setFixedSize(300, 600)
+            button.setFixedSize(GUI.drink_image_size.value)
             self.scroll_layout.addWidget(button)
             button.released.connect(
                 lambda button_drink=button.drink: self.window_manager.switch_window("DrinkOptionMenu", button_drink))
-            # TODO passer un drink plutot que le bouton (drink devrait etre un attribut dun drinkButton)
 
 
 class DrinkButton(QPushButton):
@@ -299,7 +307,7 @@ def init_app_ui():
     window_manager.append_window(MixingMenu(window_manager))
     window_manager.append_window(BottleMenu(window_manager, bottle_manager))
 
-    stack.resize(1920, 1080)
+    stack.resize(1024, 600)
     stack.show()
 
 

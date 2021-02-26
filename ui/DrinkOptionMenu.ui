@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1920</width>
-    <height>1080</height>
+    <width>1024</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,10 +16,10 @@
   <widget class="QLabel" name="label_title">
    <property name="geometry">
     <rect>
-     <x>410</x>
-     <y>50</y>
-     <width>1271</width>
-     <height>111</height>
+     <x>160</x>
+     <y>30</y>
+     <width>741</width>
+     <height>91</height>
     </rect>
    </property>
    <property name="text">
@@ -32,9 +32,9 @@
   <widget class="QPushButton" name="pushButton_return">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>50</y>
-     <width>131</width>
+     <x>20</x>
+     <y>510</y>
+     <width>211</width>
      <height>71</height>
     </rect>
    </property>
@@ -42,26 +42,13 @@
     <string>Cancel</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_drinkImage">
-   <property name="geometry">
-    <rect>
-     <x>1400</x>
-     <y>170</y>
-     <width>471</width>
-     <height>701</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Mettre image ici</string>
-   </property>
-  </widget>
   <widget class="QPushButton" name="pushButton_confirm">
    <property name="geometry">
     <rect>
-     <x>710</x>
-     <y>860</y>
-     <width>561</width>
-     <height>181</height>
+     <x>790</x>
+     <y>510</y>
+     <width>211</width>
+     <height>71</height>
     </rect>
    </property>
    <property name="text">
@@ -71,10 +58,10 @@
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>330</y>
-     <width>421</width>
-     <height>371</height>
+     <x>50</x>
+     <y>150</y>
+     <width>161</width>
+     <height>241</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_options">
@@ -104,13 +91,26 @@
   <widget class="QWidget" name="verticalLayoutWidget_2">
    <property name="geometry">
     <rect>
-     <x>770</x>
-     <y>320</y>
-     <width>401</width>
-     <height>401</height>
+     <x>230</x>
+     <y>150</y>
+     <width>241</width>
+     <height>241</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_ingredients"/>
+  </widget>
+  <widget class="QLabel" name="label_drinkImage">
+   <property name="geometry">
+    <rect>
+     <x>630</x>
+     <y>80</y>
+     <width>311</width>
+     <height>391</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Mettre image ici</string>
+   </property>
   </widget>
  </widget>
  <resources/>

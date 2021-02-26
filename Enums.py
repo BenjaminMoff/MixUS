@@ -1,4 +1,6 @@
 from enum import Enum
+from PyQt5 import QtCore
+from PyQt5.QtCore import QSize
 import os
 
 
@@ -65,12 +67,21 @@ class Paths(Enum):
     DRINKS = os.path.join(os.path.dirname(__file__),
                           "persistence/drinks.json")
     MAIN_MENU = os.path.join(os.path.dirname(__file__),
-                           "ui/MainMenu.ui")
+                             "ui/MainMenu.ui")
     BOTTLE_MENU = os.path.join(os.path.dirname(__file__),
                                "ui/BottleMenu.ui")
     DRINK_OPTION_MENU = os.path.join(os.path.dirname(__file__),
-                               "ui/DrinkOptionMenu.ui")
+                                     "ui/DrinkOptionMenu.ui")
     MAINTENANCE_MENU = os.path.join(os.path.dirname(__file__),
-                               "ui/MaintenanceMenu.ui")
+                                    "ui/MaintenanceMenu.ui")
     MIXING_MENU = os.path.join(os.path.dirname(__file__),
                                "ui/MixingMenu.ui")
+
+
+class GUI(Enum):
+    background_color = "background-color: rgb(0, 167, 89);"
+    button_color = "background-color: rgb(255, 255, 255);"
+    layout_contour_color = "border: 1px solid;" \
+                           "border-color: rgb(252, 197, 32)"
+
+    drink_image_size = QSize(200, 350)
