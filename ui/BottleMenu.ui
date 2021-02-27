@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1920</width>
-    <height>1080</height>
+    <width>1024</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,10 +16,10 @@
   <widget class="QLabel" name="label_title">
    <property name="geometry">
     <rect>
-     <x>400</x>
-     <y>20</y>
-     <width>1131</width>
-     <height>121</height>
+     <x>70</x>
+     <y>10</y>
+     <width>821</width>
+     <height>111</height>
     </rect>
    </property>
    <property name="text">
@@ -32,10 +32,10 @@
   <widget class="QScrollArea" name="scrollArea_bottles">
    <property name="geometry">
     <rect>
-     <x>100</x>
-     <y>160</y>
-     <width>1701</width>
-     <height>851</height>
+     <x>20</x>
+     <y>120</y>
+     <width>951</width>
+     <height>341</height>
     </rect>
    </property>
    <property name="widgetResizable">
@@ -46,8 +46,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1699</width>
-      <height>849</height>
+      <width>949</width>
+      <height>339</height>
      </rect>
     </property>
    </widget>
@@ -55,8 +55,8 @@
   <widget class="QPushButton" name="pushButton_return">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>40</y>
+     <x>10</x>
+     <y>510</y>
      <width>241</width>
      <height>71</height>
     </rect>
@@ -68,8 +68,8 @@
   <widget class="QPushButton" name="pushButton_confirm">
    <property name="geometry">
     <rect>
-     <x>1570</x>
-     <y>40</y>
+     <x>740</x>
+     <y>500</y>
      <width>241</width>
      <height>71</height>
     </rect>

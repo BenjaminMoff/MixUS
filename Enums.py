@@ -79,9 +79,10 @@ class Paths(Enum):
 
 
 class GUI(Enum):
-    background_color = "background-color: rgb(0, 167, 89);"
+    window_background_color = "background-color: rgb(0, 167, 89);"
     button_color = "background-color: rgb(255, 255, 255);"
     layout_contour_color = "border: 1px solid;" \
-                           "border-color: rgb(252, 197, 32)"
+                           "border-color: rgb(0, 0, 0);"
+    layout_background_color = "background-color: rgb(0, 0, 0);"
 
     drink_image_size = QSize(200, 350)

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1920</width>
-    <height>1080</height>
+    <width>1024</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,9 +17,9 @@
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>30</y>
-     <width>131</width>
-     <height>81</height>
+     <y>470</y>
+     <width>161</width>
+     <height>91</height>
     </rect>
    </property>
    <property name="text">
@@ -29,10 +29,10 @@
   <widget class="QSlider" name="horizontalSlider">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>590</y>
-     <width>1601</width>
-     <height>22</height>
+     <x>50</x>
+     <y>280</y>
+     <width>851</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="orientation">
@@ -42,10 +42,10 @@
   <widget class="QSlider" name="horizontalSlider_2">
    <property name="geometry">
     <rect>
-     <x>160</x>
-     <y>640</y>
-     <width>1601</width>
-     <height>22</height>
+     <x>50</x>
+     <y>340</y>
+     <width>851</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="orientation">
@@ -55,10 +55,10 @@
   <widget class="QSlider" name="horizontalSlider_3">
    <property name="geometry">
     <rect>
-     <x>159</x>
-     <y>700</y>
-     <width>1601</width>
-     <height>22</height>
+     <x>50</x>
+     <y>400</y>
+     <width>851</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="orientation">
@@ -68,10 +68,10 @@
   <widget class="QLabel" name="label_title">
    <property name="geometry">
     <rect>
-     <x>440</x>
-     <y>20</y>
-     <width>1091</width>
-     <height>171</height>
+     <x>140</x>
+     <y>30</y>
+     <width>611</width>
+     <height>71</height>
     </rect>
    </property>
    <property name="text">
@@ -84,10 +84,10 @@
   <widget class="QPushButton" name="pushButton_home">
    <property name="geometry">
     <rect>
-     <x>430</x>
-     <y>270</y>
+     <x>70</x>
+     <y>140</y>
      <width>281</width>
-     <height>111</height>
+     <height>101</height>
     </rect>
    </property>
    <property name="text">
@@ -97,10 +97,10 @@
   <widget class="QPushButton" name="pushButton_bottle">
    <property name="geometry">
     <rect>
-     <x>1220</x>
-     <y>270</y>
-     <width>271</width>
-     <height>111</height>
+     <x>590</x>
+     <y>140</y>
+     <width>281</width>
+     <height>101</height>
     </rect>
    </property>
    <property name="text">

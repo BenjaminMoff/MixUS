@@ -234,7 +234,7 @@ class MainMenu(QMainWindow):
         # TODO Updater les fichiers de persistance a la fermeture
 
     def aesthetics(self):
-        pass
+        self
 
     def scroll_area_init(self):
         self.scrollArea_drinklist.setWidgetResizable(True)
