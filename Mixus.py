@@ -1,4 +1,5 @@
 from PyQt5 import QtWidgets, uic, QtGui
+from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QComboBox, QLabel, QMainWindow, QDialog, QStackedWidget, QPushButton, \
     QHBoxLayout, QVBoxLayout
@@ -227,33 +228,68 @@ class MainMenu(QMainWindow):
         uic.loadUi(Paths.MAIN_MENU.value, self)
         self.window_manager = window_manager
         self.drink_manager = drink_manager
-
         self.scroll_layout = QHBoxLayout(self.scrollAreaWidgetContents)
-        self.scroll_area_init()
-        self.connect_buttons()
+
+        self.widgets()
         # TODO Updater les fichiers de persistance a la fermeture
 
-    def aesthetics(self):
-        self
+    def widgets(self):
+        # Title_label
+        self.label_MainTitle.setGeometry(0, 0, get_screen_resolution()[0],
+                                         int(round(get_screen_resolution()[1] * 0.15, 0)))
+        self.label_MainTitle.setStyleSheet(GUI.window_background_color.value)
+        self.label_MainTitle.setText("Mixus")
+        self.label_MainTitle.setFont(QFont("Times", 30, QFont.Bold))
 
-    def scroll_area_init(self):
+        # Scroll_area
+        self.scrollArea_drinklist.setGeometry(0, int(round(get_screen_resolution()[1] * 0.15, 0)),
+                                              get_screen_resolution()[0],
+                                              int(round(get_screen_resolution()[1] * 2 / 3, 0)))
         self.scrollArea_drinklist.setWidgetResizable(True)
+        self.scrollArea_drinklist.setStyleSheet(GUI.layout_contour_color.value)
+
         self.scroll_layout.setSpacing(10)
         self.scroll_layout.setObjectName("scroll_layout")
         self.scroll_layout.setContentsMargins(5, 5, 5, 5)
-        self.update_layout()
-        self.scrollArea_drinklist.setStyleSheet(GUI.layout_contour_color.value)
 
-    def connect_buttons(self):
-        self.pushButton_exit.released.connect(lambda: sys.exit(app.exec_()))
-        self.pushButton_maintenance.released.connect(lambda: self.window_manager.switch_window("MaintenanceMenu"))
+        # PushButton_maintenance
+        self.pushButton_maintenance.setGeometry(int(round(get_screen_resolution()[0] / 30, 0)),
+                                                int(round(get_screen_resolution()[1] * 5 / 6, 0)),
+                                                int(round(get_screen_resolution()[0] / 5, 0)),
+                                                int(round(get_screen_resolution()[1] / 8, 0)))
+        self.pushButton_maintenance.setStyleSheet(GUI.button_color.value)
+        self.pushButton_maintenance.pressed.connect(
+            lambda: self.pushButton_maintenance.setStyleSheet(GUI.button_color_pressed.value))
+
+        self.pushButton_maintenance.clicked.connect(lambda: self.window_manager.switch_window("MaintenanceMenu"))
+        self.pushButton_maintenance.released.connect(
+            lambda: self.pushButton_maintenance.setStyleSheet(GUI.button_color.value))
+        self.pushButton_maintenance.setFont(QFont("Times", 15, QFont.Bold))
+
+        # PushButton_quit
+        self.pushButton_exit.setGeometry(
+            int(round(get_screen_resolution()[0] - (get_screen_resolution()[0] / 30 + get_screen_resolution()[0] / 5))),
+            int(round(get_screen_resolution()[1] * 5 / 6, 0)),
+            int(round(get_screen_resolution()[0] / 5, 0)),
+            int(round(get_screen_resolution()[1] / 8, 0)))
+        self.pushButton_exit.setStyleSheet(GUI.button_color.value)
+        self.pushButton_exit.pressed.connect(lambda: self.pushButton_exit.setStyleSheet(GUI.button_color_pressed.value))
+        self.pushButton_exit.clicked.connect(lambda: sys.exit(app.exec_()))
+        self.pushButton_exit.released.connect(
+            lambda: self.pushButton_exit.setStyleSheet(GUI.button_color.value))
+        self.pushButton_exit.setFont(QFont("Times", 15, QFont.Bold))
+        # bottom_screen_label
+        self.label_bottom_screen.setGeometry(0, int(round(get_screen_resolution()[1] * 49 / 60, 0)),
+                                             get_screen_resolution()[0],
+                                             int(round(get_screen_resolution()[1] * 11 / 60, 0)))
+        self.label_bottom_screen.setStyleSheet(GUI.window_background_color.value)
+        self.update_layout()
 
     def update_layout(self):
         for i in reversed(range(self.scroll_layout.count())):
             self.scroll_layout.itemAt(i).widget().setParent(None)
         for drink in self.drink_manager.get_available_drinks():
             button = DrinkButton(self.scrollAreaWidgetContents, drink)
-            button.setFixedSize(GUI.drink_image_size.value)
             self.scroll_layout.addWidget(button)
             button.released.connect(
                 lambda button_drink=button.drink: self.window_manager.switch_window("DrinkOptionMenu", button_drink))
@@ -263,7 +299,12 @@ class DrinkButton(QPushButton):
     def __init__(self, scroll_area_widget_contents, drink):
         super(DrinkButton, self).__init__(scroll_area_widget_contents)
         self.drink = drink
-        self.setText(self.drink.name)
+        self.setStyleSheet(GUI.drink_button.value)
+        self.setFixedSize(GUI.drink_image_size.value)
+        self.setStyleSheet("QPushButton{ background-image: url(ressources/rhum_and_coke.jpg); }")
+        # self.setIcon(QIcon("ressources/rhum_and_coke.jpg"))
+        #
+        # self.setIconSize(GUI.drink_image_size.value)
 
 
 class WindowManager:
@@ -293,7 +334,7 @@ class WindowManager:
         self.stack.setCurrentIndex(self.windows.get(window_name))
 
 
-def init_app_ui():
+def init_app_ui(app):
     stack = QStackedWidget()
     window_manager = WindowManager(stack)
     json_handler = JsonHandler(Paths.BOTTLES.value, Paths.DRINKS.value)
@@ -306,14 +347,22 @@ def init_app_ui():
     window_manager.append_window(DrinkOptionMenu(window_manager, drink_manager))
     window_manager.append_window(MixingMenu(window_manager))
     window_manager.append_window(BottleMenu(window_manager, bottle_manager))
+    stack.resize(get_screen_resolution()[0], get_screen_resolution()[1])
+    stack.show()  # FullScreen()
 
-    stack.resize(1024, 600)
-    stack.show()
+
+def get_screen_resolution():
+    # sc_res = app.desktop().screenGeometry()
+    sc_res = []
+    sc_res.append(1024)
+    sc_res.append(600)
+
+    return sc_res
 
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
 
-    init_app_ui()
+    init_app_ui(app)
 
     sys.exit(app.exec_())
