@@ -26,11 +26,30 @@
     <string>return</string>
    </property>
   </widget>
-  <widget class="QSlider" name="horizontalSlider">
+  <widget class="QSlider" name="Slider_x">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>250</y>
+     <width>921</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <property name="invertedAppearance">
+    <bool>false</bool>
+   </property>
+   <property name="invertedControls">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QSlider" name="Slider_y">
    <property name="geometry">
     <rect>
      <x>50</x>
-     <y>280</y>
+     <y>330</y>
      <width>851</width>
      <height>41</height>
     </rect>
@@ -39,20 +58,7 @@
     <enum>Qt::Horizontal</enum>
    </property>
   </widget>
-  <widget class="QSlider" name="horizontalSlider_2">
-   <property name="geometry">
-    <rect>
-     <x>50</x>
-     <y>340</y>
-     <width>851</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-  </widget>
-  <widget class="QSlider" name="horizontalSlider_3">
+  <widget class="QSlider" name="Slider_z">
    <property name="geometry">
     <rect>
      <x>50</x>
@@ -65,7 +71,7 @@
     <enum>Qt::Horizontal</enum>
    </property>
   </widget>
-  <widget class="QLabel" name="label_title">
+  <widget class="QLabel" name="label_Title">
    <property name="geometry">
     <rect>
      <x>140</x>
@@ -85,7 +91,7 @@
    <property name="geometry">
     <rect>
      <x>70</x>
-     <y>140</y>
+     <y>120</y>
      <width>281</width>
      <height>101</height>
     </rect>
@@ -98,7 +104,7 @@
    <property name="geometry">
     <rect>
      <x>590</x>
-     <y>140</y>
+     <y>110</y>
      <width>281</width>
      <height>101</height>
     </rect>
@@ -107,6 +113,41 @@
     <string>pushButton_bottle</string>
    </property>
   </widget>
+  <widget class="QLabel" name="label_bottom_screen">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>480</y>
+     <width>501</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_send">
+   <property name="geometry">
+    <rect>
+     <x>750</x>
+     <y>470</y>
+     <width>201</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>PushButton</string>
+   </property>
+  </widget>
+  <zorder>label_bottom_screen</zorder>
+  <zorder>pushButton_return</zorder>
+  <zorder>Slider_x</zorder>
+  <zorder>Slider_y</zorder>
+  <zorder>Slider_z</zorder>
+  <zorder>label_Title</zorder>
+  <zorder>pushButton_home</zorder>
+  <zorder>pushButton_bottle</zorder>
+  <zorder>pushButton_send</zorder>
  </widget>
  <resources/>
  <connections/>

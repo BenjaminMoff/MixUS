@@ -79,7 +79,9 @@ class Paths(Enum):
 
 
 class GUI(Enum):
-    window_background_color = "background-color: rgb(0, 167, 89);"
+    label_background_color = "border: 1px solid;" \
+                             "border-color: rgb(0, 0, 0);" \
+                             "background-color: rgb(0, 167, 89);"
     button_color = "border-radius: 15px;" \
                    "background-color: rgb(255, 255, 255);"
     button_color_pressed = "border-radius: 15px;" \

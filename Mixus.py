@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets, uic, QtGui
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QComboBox, QLabel, QMainWindow, QDialog, QStackedWidget, QPushButton, \
-    QHBoxLayout, QVBoxLayout
+    QHBoxLayout, QVBoxLayout, QGroupBox
 from DataModel import *
 from JsonHandler import JsonHandler
 from Enums import *
@@ -165,9 +165,10 @@ class DrinkOptionMenu(QDialog):
     def __init__(self, window_manager, drink_manager):
         super(DrinkOptionMenu, self).__init__()
         uic.loadUi(Paths.DRINK_OPTION_MENU.value, self)
-
         self.window_manager = window_manager
         self.drink_manager = drink_manager
+
+        self.widgets()
 
         self.radioButton_normal.toggled.connect(self.is_current_setting_valid)
         self.radioButton_double.toggled.connect(self.is_current_setting_valid)
@@ -175,7 +176,59 @@ class DrinkOptionMenu(QDialog):
 
         self.pushButton_return.released.connect(lambda: window_manager.switch_window("MainMenu"))
 
+
         # TODO lancer algorithme de generation de gcode + lancement commandes?
+
+    def widgets(self):
+        # Title label
+        self.label_Title.setGeometry(0, 0, get_screen_resolution()[0],
+                                     int(round(get_screen_resolution()[1] * 0.15, 0)))
+        self.label_Title.setStyleSheet(GUI.label_background_color.value)
+        self.label_Title.setFont(QFont("Times", 30, QFont.Bold))
+
+        # groupBox_options
+        self.groupBox_options.setGeometry(int(round(get_screen_resolution()[0] / 30)),
+                                          int(round(get_screen_resolution()[1] / 2 - get_screen_resolution()[1]/4)),
+                                          int(round(get_screen_resolution()[0] / 6)),
+                                          int(round(get_screen_resolution()[1] / 2)))
+
+        self.groupBox_options.setLayout(self.verticalLayout_options)
+
+        # pushButton_return
+        self.pushButton_return.setGeometry(int(round(get_screen_resolution()[0] / 30, 0)),
+                                           int(round(get_screen_resolution()[1] * 5.05 / 6, 0)),
+                                           int(round(get_screen_resolution()[0] / 5, 0)),
+                                           int(round(get_screen_resolution()[1] / 8, 0)))
+
+        self.pushButton_return.setStyleSheet(GUI.button_color.value)
+        self.pushButton_return.pressed.connect(
+            lambda: self.pushButton_return.setStyleSheet(GUI.button_color_pressed.value))
+        self.pushButton_return.released.connect(
+            lambda: self.pushButton_return.setStyleSheet(GUI.button_color.value))
+        self.pushButton_return.setFont(QFont("Times", 15, QFont.Bold))
+        self.pushButton_return.setText("Annuler")
+        self.pushButton_return.clicked.connect(lambda: self.window_manager.switch_window("MainMenu"))
+
+        # pushButton_confirm
+        self.pushButton_confirm.setGeometry(
+            int(round(get_screen_resolution()[0] - (get_screen_resolution()[0] / 30 + get_screen_resolution()[0] / 5))),
+            int(round(get_screen_resolution()[1] * 5.05 / 6, 0)),
+            int(round(get_screen_resolution()[0] / 5, 0)),
+            int(round(get_screen_resolution()[1] / 8, 0)))
+        self.pushButton_confirm.setStyleSheet(GUI.button_color.value)
+        self.pushButton_confirm.pressed.connect(lambda: self.pushButton_confirm.setStyleSheet(GUI.button_color_pressed.value))
+        # TODO faire lenvoi des positions des sliders avec un connect lambda
+        self.pushButton_confirm.released.connect(
+            lambda: self.pushButton_confirm.setStyleSheet(GUI.button_color.value))
+        self.pushButton_confirm.setFont(QFont("Times", 15, QFont.Bold))
+        self.pushButton_confirm.setText("Confirmer")
+
+        # bottom_screen_label
+        self.label_bottom_screen.setGeometry(0, int(round(get_screen_resolution()[1] * 49 / 60, 0)),
+                                             get_screen_resolution()[0],
+                                             int(round(get_screen_resolution()[1] * 11 / 60, 0)))
+        self.label_bottom_screen.setStyleSheet(GUI.label_background_color.value)
+
 
     def update_layout(self, drink):
         """
@@ -184,7 +237,7 @@ class DrinkOptionMenu(QDialog):
         :return:
         """
         self.drink = drink
-        self.label_title.setText(drink.name)
+        self.label_Title.setText(self.drink.name)
         self.radioButton_normal.setChecked(True)
         self.pushButton_confirm.released.connect(lambda: self.get_instructions_and_run())
         # TODO setup image + ingredients
@@ -214,10 +267,86 @@ class MaintenanceMenu(QDialog):
     def __init__(self, window_manager):
         super(MaintenanceMenu, self).__init__()
         uic.loadUi(Paths.MAINTENANCE_MENU.value, self)
+        self.window_manager = window_manager
+        self.widgets()
 
-        self.pushButton_return.released.connect(lambda: window_manager.switch_window("MainMenu"))
-        self.pushButton_bottle.released.connect(lambda: window_manager.switch_window("BottleMenu"))
         # TODO update les combobox de bottle menu lors de louverture
+
+    def widgets(self):
+        # Title_label
+        self.label_Title.setGeometry(0, 0, get_screen_resolution()[0],
+                                     int(round(get_screen_resolution()[1] * 0.15, 0)))
+        self.label_Title.setStyleSheet(GUI.label_background_color.value)
+        self.label_Title.setText("Maintenance")
+        self.label_Title.setFont(QFont("Times", 30, QFont.Bold))
+
+        # pushButton_home
+        self.pushButton_home.setGeometry(int(round(get_screen_resolution()[0] / 20, 0)),
+                                         int(round(get_screen_resolution()[1] / 5, 0)),
+                                         int(round(get_screen_resolution()[0] / 4, 0)),
+                                         int(round(get_screen_resolution()[1] / 6, 0)))
+        self.pushButton_home.setStyleSheet(GUI.button_color.value)
+        self.pushButton_home.setText("Home")
+        self.pushButton_home.setFont(QFont("Times", 15, QFont.Bold))
+
+        # pushButton_bottle
+        self.pushButton_bottle.setGeometry(
+            int(round(get_screen_resolution()[0] - (get_screen_resolution()[0] / 20 + get_screen_resolution()[0] / 4))),
+            int(round(get_screen_resolution()[1] / 5, 0)),
+            int(round(get_screen_resolution()[0] / 4, 0)),
+            int(round(get_screen_resolution()[1] / 6, 0)))
+        self.pushButton_bottle.setStyleSheet(GUI.button_color.value)
+        self.pushButton_bottle.setText("Bouteilles")
+        self.pushButton_bottle.setFont(QFont("Times", 15, QFont.Bold))
+        self.pushButton_bottle.released.connect(lambda: self.window_manager.switch_window("BottleMenu"))
+
+        # sliders
+        self.Slider_x.setGeometry(int(round(get_screen_resolution()[0] / 20)),
+                                  int(round(get_screen_resolution()[1] * 5 / 12)),
+                                  int(round(get_screen_resolution()[0] * 0.9)),
+                                  int(round(get_screen_resolution()[1] / 12)))
+        self.Slider_y.setGeometry(int(round(get_screen_resolution()[0] / 20)),
+                                  int(round(get_screen_resolution()[1] * 6.5 / 12)),
+                                  int(round(get_screen_resolution()[0] * 0.9)),
+                                  int(round(get_screen_resolution()[1] / 12)))
+        self.Slider_z.setGeometry(int(round(get_screen_resolution()[0] / 20)),
+                                  int(round(get_screen_resolution()[1] * 8 / 12)),
+                                  int(round(get_screen_resolution()[0] * 0.9)),
+                                  int(round(get_screen_resolution()[1] / 12)))
+        # pushButton_return
+        self.pushButton_return.setGeometry(int(round(get_screen_resolution()[0] / 30, 0)),
+                                           int(round(get_screen_resolution()[1] * 5.05 / 6, 0)),
+                                           int(round(get_screen_resolution()[0] / 5, 0)),
+                                           int(round(get_screen_resolution()[1] / 8, 0)))
+
+        self.pushButton_return.setStyleSheet(GUI.button_color.value)
+        self.pushButton_return.pressed.connect(
+            lambda: self.pushButton_return.setStyleSheet(GUI.button_color_pressed.value))
+        self.pushButton_return.released.connect(
+            lambda: self.pushButton_return.setStyleSheet(GUI.button_color.value))
+        self.pushButton_return.setFont(QFont("Times", 15, QFont.Bold))
+        self.pushButton_return.setText("retour")
+        self.pushButton_return.clicked.connect(lambda: self.window_manager.switch_window("MainMenu"))
+
+        # pushButton_send
+        self.pushButton_send.setGeometry(
+            int(round(get_screen_resolution()[0] - (get_screen_resolution()[0] / 30 + get_screen_resolution()[0] / 5))),
+            int(round(get_screen_resolution()[1] * 5.05 / 6, 0)),
+            int(round(get_screen_resolution()[0] / 5, 0)),
+            int(round(get_screen_resolution()[1] / 8, 0)))
+        self.pushButton_send.setStyleSheet(GUI.button_color.value)
+        self.pushButton_send.pressed.connect(lambda: self.pushButton_send.setStyleSheet(GUI.button_color_pressed.value))
+        # TODO faire lenvoi des positions des sliders avec un connect lambda
+        self.pushButton_send.released.connect(
+            lambda: self.pushButton_send.setStyleSheet(GUI.button_color.value))
+        self.pushButton_send.setFont(QFont("Times", 15, QFont.Bold))
+        self.pushButton_send.setText("envoyer")
+
+        # bottom_screen_label
+        self.label_bottom_screen.setGeometry(0, int(round(get_screen_resolution()[1] * 49 / 60, 0)),
+                                             get_screen_resolution()[0],
+                                             int(round(get_screen_resolution()[1] * 11 / 60, 0)))
+        self.label_bottom_screen.setStyleSheet(GUI.label_background_color.value)
 
 
 class MainMenu(QMainWindow):
@@ -231,22 +360,23 @@ class MainMenu(QMainWindow):
         self.scroll_layout = QHBoxLayout(self.scrollAreaWidgetContents)
 
         self.widgets()
+        self.update_layout()
         # TODO Updater les fichiers de persistance a la fermeture
 
     def widgets(self):
         # Title_label
         self.label_MainTitle.setGeometry(0, 0, get_screen_resolution()[0],
                                          int(round(get_screen_resolution()[1] * 0.15, 0)))
-        self.label_MainTitle.setStyleSheet(GUI.window_background_color.value)
+        self.label_MainTitle.setStyleSheet(GUI.label_background_color.value)
         self.label_MainTitle.setText("Mixus")
         self.label_MainTitle.setFont(QFont("Times", 30, QFont.Bold))
 
         # Scroll_area
-        self.scrollArea_drinklist.setGeometry(0, int(round(get_screen_resolution()[1] * 0.15, 0)),
-                                              get_screen_resolution()[0],
+        self.scrollArea_drinklist.setGeometry(-2, int(round(get_screen_resolution()[1] * 0.15, 0)),
+                                              get_screen_resolution()[0] + 4,
                                               int(round(get_screen_resolution()[1] * 2 / 3, 0)))
         self.scrollArea_drinklist.setWidgetResizable(True)
-        self.scrollArea_drinklist.setStyleSheet(GUI.layout_contour_color.value)
+        # self.scrollArea_drinklist.setStyleSheet(GUI.layout_contour_color.value)
 
         self.scroll_layout.setSpacing(10)
         self.scroll_layout.setObjectName("scroll_layout")
@@ -254,7 +384,7 @@ class MainMenu(QMainWindow):
 
         # PushButton_maintenance
         self.pushButton_maintenance.setGeometry(int(round(get_screen_resolution()[0] / 30, 0)),
-                                                int(round(get_screen_resolution()[1] * 5 / 6, 0)),
+                                                int(round(get_screen_resolution()[1] * 5.05 / 6, 0)),
                                                 int(round(get_screen_resolution()[0] / 5, 0)),
                                                 int(round(get_screen_resolution()[1] / 8, 0)))
         self.pushButton_maintenance.setStyleSheet(GUI.button_color.value)
@@ -269,7 +399,7 @@ class MainMenu(QMainWindow):
         # PushButton_quit
         self.pushButton_exit.setGeometry(
             int(round(get_screen_resolution()[0] - (get_screen_resolution()[0] / 30 + get_screen_resolution()[0] / 5))),
-            int(round(get_screen_resolution()[1] * 5 / 6, 0)),
+            int(round(get_screen_resolution()[1] * 5.05 / 6, 0)),
             int(round(get_screen_resolution()[0] / 5, 0)),
             int(round(get_screen_resolution()[1] / 8, 0)))
         self.pushButton_exit.setStyleSheet(GUI.button_color.value)
@@ -282,8 +412,7 @@ class MainMenu(QMainWindow):
         self.label_bottom_screen.setGeometry(0, int(round(get_screen_resolution()[1] * 49 / 60, 0)),
                                              get_screen_resolution()[0],
                                              int(round(get_screen_resolution()[1] * 11 / 60, 0)))
-        self.label_bottom_screen.setStyleSheet(GUI.window_background_color.value)
-        self.update_layout()
+        self.label_bottom_screen.setStyleSheet(GUI.label_background_color.value)
 
     def update_layout(self):
         for i in reversed(range(self.scroll_layout.count())):
@@ -302,9 +431,6 @@ class DrinkButton(QPushButton):
         self.setStyleSheet(GUI.drink_button.value)
         self.setFixedSize(GUI.drink_image_size.value)
         self.setStyleSheet("QPushButton{ background-image: url(ressources/rhum_and_coke.jpg); }")
-        # self.setIcon(QIcon("ressources/rhum_and_coke.jpg"))
-        #
-        # self.setIconSize(GUI.drink_image_size.value)
 
 
 class WindowManager:
@@ -334,7 +460,7 @@ class WindowManager:
         self.stack.setCurrentIndex(self.windows.get(window_name))
 
 
-def init_app_ui(app):
+def init_app_ui():
     stack = QStackedWidget()
     window_manager = WindowManager(stack)
     json_handler = JsonHandler(Paths.BOTTLES.value, Paths.DRINKS.value)
@@ -363,6 +489,6 @@ def get_screen_resolution():
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
 
-    init_app_ui(app)
+    init_app_ui()
 
     sys.exit(app.exec_())
