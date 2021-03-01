@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>return</string>
+    <string>Retour</string>
    </property>
   </widget>
   <widget class="QSlider" name="Slider_x">
@@ -97,7 +97,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>pushButton_home</string>
+    <string>Home</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_bottle">
@@ -110,7 +110,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>pushButton_bottle</string>
+    <string>Bouteilles</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_bottom_screen">
@@ -136,7 +136,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>PushButton</string>
+    <string>Envoyer</string>
    </property>
   </widget>
   <zorder>label_bottom_screen</zorder>

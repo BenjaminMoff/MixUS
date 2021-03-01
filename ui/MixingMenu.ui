@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QLabel" name="label_title">
+  <widget class="QLabel" name="label_Title">
    <property name="geometry">
     <rect>
      <x>260</x>
@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>TextLabel</string>
+    <string>MixingMenu</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -34,7 +34,7 @@
     <rect>
      <x>30</x>
      <y>520</y>
-     <width>631</width>
+     <width>951</width>
      <height>31</height>
     </rect>
    </property>
@@ -58,17 +58,6 @@
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QWidget" name="verticalLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>190</y>
-     <width>211</width>
-     <height>271</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout_waiting"/>
-  </widget>
   <widget class="QPushButton" name="pushButton_return">
    <property name="geometry">
     <rect>
@@ -82,17 +71,76 @@
     <string>Annuler</string>
    </property>
   </widget>
-  <widget class="QWidget" name="verticalLayoutWidget_2">
+  <widget class="QLabel" name="label_bottom_screen">
    <property name="geometry">
     <rect>
-     <x>240</x>
-     <y>190</y>
+     <x>480</x>
+     <y>450</y>
      <width>211</width>
-     <height>271</height>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <widget class="QWidget" name="verticalLayoutWidget_3">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>230</y>
+     <width>181</width>
+     <height>181</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_waiting"/>
+  </widget>
+  <widget class="QWidget" name="verticalLayoutWidget_4">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>230</y>
+     <width>181</width>
+     <height>181</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_done"/>
   </widget>
+  <widget class="QGroupBox" name="groupBox_wating">
+   <property name="geometry">
+    <rect>
+     <x>710</x>
+     <y>300</y>
+     <width>239</width>
+     <height>239</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>En attente</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_done">
+   <property name="geometry">
+    <rect>
+     <x>440</x>
+     <y>160</y>
+     <width>191</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Terminé</string>
+   </property>
+  </widget>
+  <zorder>label_bottom_screen</zorder>
+  <zorder>label_Title</zorder>
+  <zorder>progressBar</zorder>
+  <zorder>label_drinkImage</zorder>
+  <zorder>pushButton_return</zorder>
+  <zorder>verticalLayoutWidget_3</zorder>
+  <zorder>verticalLayoutWidget_4</zorder>
+  <zorder>groupBox_wating</zorder>
+  <zorder>groupBox_done</zorder>
  </widget>
  <resources/>
  <connections/>

@@ -20,7 +20,7 @@
    <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="label_MainTitle">
+   <widget class="QLabel" name="label_Title">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -102,7 +102,7 @@
     </property>
    </widget>
    <zorder>label_bottom_screen</zorder>
-   <zorder>label_MainTitle</zorder>
+   <zorder>label_Title</zorder>
    <zorder>pushButton_exit</zorder>
    <zorder>pushButton_maintenance</zorder>
    <zorder>scrollArea_drinklist</zorder>
