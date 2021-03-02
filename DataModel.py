@@ -55,8 +55,8 @@ class Drink:
     """
     def __init__(self, name=None, ingredients_dict=None, image_path=None):
         self.name = name
-        self.ingredients = ingredients_dict  # self.ingredients is a dictionnary of Liquid.string_name:Volume tuples
-        self.image_path = image_path  # Path to the image for diplay use
+        self.ingredients = ingredients_dict  # self.ingredients is a dictionary of Liquid.string_name:Volume tuples
+        self.image_path = image_path  # Path to the image for display use
         self.liquids = []
         if self.ingredients is not None:
             for ingredient in list(self.ingredients):

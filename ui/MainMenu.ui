@@ -6,21 +6,27 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1920</width>
-    <height>1080</height>
+    <width>1024</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLabel" name="label_MainTitle">
+   <widget class="QLabel" name="label_Title">
     <property name="geometry">
      <rect>
-      <x>570</x>
-      <y>20</y>
-      <width>761</width>
-      <height>121</height>
+      <x>0</x>
+      <y>0</y>
+      <width>401</width>
+      <height>90</height>
      </rect>
     </property>
     <property name="text">
@@ -33,23 +39,23 @@
    <widget class="QPushButton" name="pushButton_exit">
     <property name="geometry">
      <rect>
-      <x>1670</x>
-      <y>950</y>
-      <width>151</width>
-      <height>51</height>
+      <x>840</x>
+      <y>490</y>
+      <width>150</width>
+      <height>75</height>
      </rect>
     </property>
     <property name="text">
-     <string>Exit</string>
+     <string>Quitter</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_maintenance">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>950</y>
-      <width>151</width>
-      <height>51</height>
+      <x>20</x>
+      <y>500</y>
+      <width>150</width>
+      <height>75</height>
      </rect>
     </property>
     <property name="text">
@@ -59,10 +65,10 @@
    <widget class="QScrollArea" name="scrollArea_drinklist">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>170</y>
-      <width>1751</width>
-      <height>651</height>
+      <x>10</x>
+      <y>90</y>
+      <width>941</width>
+      <height>370</height>
      </rect>
     </property>
     <property name="mouseTracking">
@@ -76,27 +82,34 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>1749</width>
-       <height>649</height>
+       <width>939</width>
+       <height>368</height>
       </rect>
      </property>
     </widget>
    </widget>
+   <widget class="QLabel" name="label_bottom_screen">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>460</y>
+      <width>1021</width>
+      <height>141</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <zorder>label_bottom_screen</zorder>
+   <zorder>label_Title</zorder>
+   <zorder>pushButton_exit</zorder>
+   <zorder>pushButton_maintenance</zorder>
+   <zorder>scrollArea_drinklist</zorder>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1920</width>
-     <height>21</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources>
-  <include location="ressources.qrc"/>
+  <include location="../ressources/resources.qrc"/>
  </resources>
  <connections/>
 </ui>

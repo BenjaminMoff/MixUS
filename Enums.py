@@ -1,4 +1,6 @@
 from enum import Enum
+from PyQt5 import QtCore
+from PyQt5.QtCore import QSize
 import os
 
 
@@ -65,12 +67,39 @@ class Paths(Enum):
     DRINKS = os.path.join(os.path.dirname(__file__),
                           "persistence/drinks.json")
     MAIN_MENU = os.path.join(os.path.dirname(__file__),
-                           "ui/MainMenu.ui")
+                             "ui/MainMenu.ui")
     BOTTLE_MENU = os.path.join(os.path.dirname(__file__),
                                "ui/BottleMenu.ui")
     DRINK_OPTION_MENU = os.path.join(os.path.dirname(__file__),
-                               "ui/DrinkOptionMenu.ui")
+                                     "ui/DrinkOptionMenu.ui")
     MAINTENANCE_MENU = os.path.join(os.path.dirname(__file__),
-                               "ui/MaintenanceMenu.ui")
+                                    "ui/MaintenanceMenu.ui")
     MIXING_MENU = os.path.join(os.path.dirname(__file__),
                                "ui/MixingMenu.ui")
+
+
+class GUI(Enum):
+    label_background_color = "border: 1px solid;" \
+                             "border-color: rgb(0, 0, 0);" \
+                             "background-color: rgb(0, 167, 89);"
+    button_color = "border-radius: 15px;" \
+                   "background-color: rgb(255, 255, 255);"
+    button_color_pressed = "border-radius: 15px;" \
+                   "background-color: rgb(200, 200, 200);"
+
+    layout_contour_color = "border: 1px solid;" \
+                           "border-color: rgb(0, 0, 0);"
+
+    drink_button = "border: 1px solid;"\
+                   "border-radius: 20px;" \
+                   "border-color: rgb(0, 0, 0);"
+
+    combo_box = "border: 1px solid;" \
+                "border-color: rgb(0, 0, 0);" \
+                "background-color: rgb(240, 240, 240);"
+
+    layout_background_color = "background-color: rgb(255, 255, 255);"
+
+    combo_box_size = QSize(400, 59)
+    drink_image_size = QSize(200, 350)
+    menu_button_size = QSize(150, 75)

@@ -6,24 +6,24 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1920</width>
-    <height>1080</height>
+    <width>1024</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QLabel" name="label_title">
+  <widget class="QLabel" name="label_Title">
    <property name="geometry">
     <rect>
-     <x>400</x>
-     <y>20</y>
-     <width>1131</width>
-     <height>121</height>
+     <x>70</x>
+     <y>10</y>
+     <width>821</width>
+     <height>111</height>
     </rect>
    </property>
    <property name="text">
-    <string>TextLabel</string>
+    <string>Bouteilles</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -32,10 +32,10 @@
   <widget class="QScrollArea" name="scrollArea_bottles">
    <property name="geometry">
     <rect>
-     <x>100</x>
-     <y>160</y>
-     <width>1701</width>
-     <height>851</height>
+     <x>20</x>
+     <y>120</y>
+     <width>951</width>
+     <height>341</height>
     </rect>
    </property>
    <property name="widgetResizable">
@@ -46,8 +46,8 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>1699</width>
-      <height>849</height>
+      <width>949</width>
+      <height>339</height>
      </rect>
     </property>
    </widget>
@@ -55,29 +55,47 @@
   <widget class="QPushButton" name="pushButton_return">
    <property name="geometry">
     <rect>
-     <x>70</x>
-     <y>40</y>
+     <x>10</x>
+     <y>510</y>
      <width>241</width>
      <height>71</height>
     </rect>
    </property>
    <property name="text">
-    <string>Return</string>
+    <string>Retour</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_confirm">
    <property name="geometry">
     <rect>
-     <x>1570</x>
-     <y>40</y>
+     <x>740</x>
+     <y>500</y>
      <width>241</width>
      <height>71</height>
     </rect>
    </property>
    <property name="text">
-    <string>Confirm</string>
+    <string>Confirmer</string>
    </property>
   </widget>
+  <widget class="QLabel" name="label_bottom_screen">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>480</y>
+     <width>961</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
+  <zorder>label_bottom_screen</zorder>
+  <zorder>label_Title</zorder>
+  <zorder>scrollArea_bottles</zorder>
+  <zorder>pushButton_return</zorder>
+  <zorder>pushButton_confirm</zorder>
  </widget>
  <resources/>
  <connections/>
