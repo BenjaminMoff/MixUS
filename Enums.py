@@ -94,7 +94,12 @@ class GUI(Enum):
                    "border-radius: 20px;" \
                    "border-color: rgb(0, 0, 0);"
 
+    combo_box = "border: 1px solid;" \
+                "border-color: rgb(0, 0, 0);" \
+                "background-color: rgb(240, 240, 240);"
+
     layout_background_color = "background-color: rgb(255, 255, 255);"
 
+    combo_box_size = QSize(400, 59)
     drink_image_size = QSize(200, 350)
     menu_button_size = QSize(150, 75)
