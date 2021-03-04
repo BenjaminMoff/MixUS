@@ -93,7 +93,8 @@ class UIManager:
         :return:
         """
         groupbox.setGeometry(int(self.res.width() * (1 / 15 + 1 / 4 * (pos - 1))),
-                             int(self.res.height() * (1 / 2 - 1 / 4)), int(self.res.width() / 5),
+                             int(self.res.height() * (1 / 2 - 1 / 4)),
+                             int(self.res.width() / 5),
                              int(self.res.height() / 2))
         groupbox.setLayout(layout)
 
@@ -232,6 +233,7 @@ def get_screen_resolution(app):
     :param app: current app
     :return: QRect(0, 0, sc_res.width(), sc_res.height())
     """
+    # TODO : Use desktop.screenGeometry to make display app in fullscreen
     sc_res = app.desktop().screenGeometry()
     sc_res = QRect(0, 0, 1024, 600)
     return sc_res

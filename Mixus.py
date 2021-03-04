@@ -326,7 +326,7 @@ def init_app_ui(app):
 
     stack.resize(ui_manager.res.width(), ui_manager.res.height())
 
-    stack.show()  # FullScreen()
+    stack.show()  # TODO : put in full screen
 
 
 if __name__ == '__main__':

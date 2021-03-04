@@ -1,6 +1,6 @@
-from DataModel import Bottle, Drink
-from Enums import Paths, Liquid
-from JsonHandler import JsonHandler
+from MixUS.DataModel import Bottle
+from MixUS.Enums import Paths, Liquid
+from MixUS.JsonHandler import JsonHandler
 
 if __name__ == '__main__':
     json_handler = JsonHandler(Paths.BOTTLES.value, Paths.DRINKS.value)

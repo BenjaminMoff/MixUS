@@ -1,5 +1,6 @@
-from Enums import Liquid
-from SerialCommunication import GCodeGenerator
+from MixUS.Enums import Liquid
+from MixUS.SerialCommunication import GCodeGenerator
+
 
 class Bottle:
     """
@@ -9,6 +10,11 @@ class Bottle:
         self.__slot_number = slot_number
         self.__liquid = liquid
         self.__volume_left = volume_left  # In ounces
+
+    def __eq__(self, other):
+        return self.__slot_number == other.get_slot_number() and \
+               self.__liquid.string_name == other.get_liquid_name() and \
+               self.__volume_left == other.get_volume_left()
 
     # Method that keeps tracks of the remaining liquid in the bottle when poured
     def pour(self, ounces=1):
@@ -55,12 +61,18 @@ class Drink:
     """
     def __init__(self, name=None, ingredients_dict=None, image_path=None):
         self.name = name
-        self.ingredients = ingredients_dict  # self.ingredients is a dictionary of Liquid.string_name:Volume tuples
+        self.ingredients = ingredients_dict  # self.ingredients is a dictionary of Liquid.string_name:Volume
         self.image_path = image_path  # Path to the image for display use
         self.liquids = []
         if self.ingredients is not None:
             for ingredient in list(self.ingredients):
                 self.liquids.append(Liquid.get_liquid_from_string_name(ingredient))
+
+    def __eq__(self, other):
+        return self.name == other.name and \
+               self.ingredients == other.ingredients and \
+               self.image_path == other.image_path and \
+               self.liquids == other.liquids
 
     def is_available(self, bottles):
         """
@@ -216,7 +228,7 @@ class DrinkManager:
         poured_liquids = []
 
         # Move the cup in the machine
-        instructions.append(GCodeGenerator.insert_cup())
+        instructions.extend(GCodeGenerator.insert_cup())
 
         # TODO handle multiple fillers
         # Find bottles that match the drink ingredients in their order of apparition in the slots
@@ -224,41 +236,39 @@ class DrinkManager:
             for liquid in drink.liquids:
 
                 # Check for match in bottle liquid and drink ingredients + check if not already poured
-                if bottle.get_liquid_name() == liquid.string_name and liquid.string_name in poured_liquids:
+                if bottle.get_liquid_name() == liquid.string_name and liquid.string_name not in poured_liquids:
                     poured_liquids.append(liquid.string_name)
 
                     # Move to the slot if their is liquid to pour
                     if not (liquid.is_alcoholized and is_virgin):
 
                         # Move to the slot
-                        instructions.append(GCodeGenerator.move_to_slot(bottle.get_slot_number()))
+                        instructions.extend(GCodeGenerator.move_to_slot(bottle.get_slot_number()))
 
                         # Pour necessary amount of liquid
-                        instructions.append(self.__compute_ounces_to_pour(drink, liquid, is_double, is_virgin))
+                        self.__compute_ounces_to_pour(instructions, drink, liquid, is_double, is_virgin)
 
         # Move to slot 0 and get the cup out of the machine
-        instructions.append(GCodeGenerator.serve_cup())
+        instructions.extend(GCodeGenerator.serve_cup())
         return instructions
 
-    def __compute_ounces_to_pour(self, drink, liquid, is_double=False, is_virgin=False):
-        instructions = []
+    def __compute_ounces_to_pour(self, instructions,  drink, liquid, is_double=False, is_virgin=False):
 
         # If the drink is double, the alcohol content is doubled and the filler is reduced accordingly
         if is_double:
             if liquid.is_alcoholized:
-                instructions.append(GCodeGenerator.pour(2 * drink.ingredients.get(liquid.string_name)))
+                instructions.extend(GCodeGenerator.pour(2 * drink.ingredients.get(liquid.string_name)))
             elif liquid.is_filler:
                 volume_to_remove = drink.alcohol_volume()
-                instructions.append(GCodeGenerator.pour(drink.ingredients.get(liquid) - volume_to_remove))
+                instructions.extend(GCodeGenerator.pour(drink.ingredients.get(liquid.string_name) - volume_to_remove))
 
+        # If the drink is virgin, the alcohol content is removed and the filler is increased accordingly
         elif is_virgin and liquid.is_filler:
             volume_to_add = drink.alcohol_volume()
-            instructions.append(GCodeGenerator.pour(drink.ingredients.get(liquid) + volume_to_add))
+            instructions.extend(GCodeGenerator.pour(drink.ingredients.get(liquid.string_name) + volume_to_add))
 
         else:
-            instructions.append(GCodeGenerator.pour(drink.ingredients.get(liquid.string_name)))
-
-        return instructions
+            instructions.extend(GCodeGenerator.pour(drink.ingredients.get(liquid.string_name)))
 
     # Returns the order in which the ingredients should be added to minimize distance
     def sort_ingredients_by_slot_numbers(self, drink):

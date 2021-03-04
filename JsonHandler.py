@@ -1,6 +1,6 @@
 import json
-from DataModel import *
-from Enums import *
+from MixUS.DataModel import *
+from MixUS.Enums import *
 
 
 class JsonHandler:
@@ -22,7 +22,7 @@ class JsonHandler:
 
         for item in item_list:
             serialized_list.append(item.__dict__)
-        with open(path, 'w') as outfile:  # Clears the bottle file
+        with open(path, 'w') as outfile:
             json.dump(serialized_list, outfile, cls=LiquidEncoder)
 
     def load_bottles(self):
@@ -49,9 +49,12 @@ class LiquidEncoder(json.JSONEncoder):
     Class that overrides the default JSONEncoder to allow encoding of Liquid enum class
     """
     def default(self, obj):
-        if type(obj) is Liquid:
-            return {"__enum__": str(obj)}
-        return json.JSONEncoder.default(self, obj)
+        return {"__enum__": str(obj)}
+
+        # TODO : Fix if statement below
+        # if type(obj) is Liquid:
+        #     return {"__enum__": str(obj)}
+        # return json.JSONEncoder.default(self, obj)
 
 
 def as_enum(d):
@@ -63,23 +66,3 @@ def as_enum(d):
         return getattr(Liquid[member], member)
     else:
         return d
-
-
-if __name__ == '__main__':
-    bottle_list = [Bottle(1, Liquid.RUM, 25), Bottle(2, Liquid.VODKA, 16),
-                   Bottle(3, Liquid.TEQUILA, 12), Bottle(4, Liquid.COKE, 32)]
-
-    drink_list = [Drink("Rhum_and_coke", {Liquid.RUM.string_name: 3, Liquid.COKE.string_name: 9}, "test"),
-                  Drink("Vodka_jus_canneberge", {Liquid.VODKA.string_name: 3, Liquid.CRANBERRY_JUICE.string_name: 9},
-                        "test")]
-
-    Json = JsonHandler(Paths.BOTTLES.value, Paths.DRINKS.value)
-    Json.save_data(bottle_list)
-    bottle_list2 = Json.load_bottles()
-    Json.save_data(drink_list)
-    drink_list2 = Json.load_drinks()
-
-    butt_manager = BottleManager(Json)
-    drink_manager = DrinkManager(Json, butt_manager)
-    print(drink_manager.get_available_drinks())
-    pass
