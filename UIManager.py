@@ -93,7 +93,8 @@ class UIManager:
         :return:
         """
         groupbox.setGeometry(int(self.res.width() * (1 / 15 + 1 / 4 * (pos - 1))),
-                             int(self.res.height() * (1 / 2 - 1 / 4)), int(self.res.width() / 5),
+                             int(self.res.height() * (1 / 2 - 1 / 4)),
+                             int(self.res.width() / 5),
                              int(self.res.height() / 2))
         groupbox.setLayout(layout)
 
