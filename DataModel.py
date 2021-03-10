@@ -1,5 +1,5 @@
-from MixUS.Enums import Liquid
-from MixUS.SerialCommunication import GCodeGenerator
+from Enums import Liquid
+from SerialCommunication import GCodeGenerator
 
 
 class Bottle:
