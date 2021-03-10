@@ -7,7 +7,7 @@ from DataModel import *
 from JsonHandler import JsonHandler
 from Enums import *
 from UIManager import *
-from SerialCommunication import SerialSynchroniser
+from SerialCommunication import SerialSynchroniser, ProgressTracker
 import sys
 
 
@@ -121,11 +121,12 @@ class MixingMenu(QDialog):
         self.pushButton_return.released.connect(lambda: window_manager.switch_window("MainMenu"))
         self.ui_manager.mixing_menu_setup(self)
 
-    def update_layout(self, instructions, drink):
+    def update_layout(self, instructions, checkpoints, drink):
         """
         Method called when the MixingMenu is loaded
         Updates the ingredients and the progressBar for the current drink
         :param instructions: List of instructions to pass to the serial port
+        :param checkpoints: Checkpoints of the instruction list to update ingredients 
         :param drink: Drink that is going to be made
         :return: 
         """""
@@ -141,13 +142,32 @@ class MixingMenu(QDialog):
             L.setFont(QFont("Times", 12))
             ingredient_labels.append(QLabel)
             self.verticalLayout_waiting.addWidget(L)
-        self.setup_progress_bar(instructions)
+        self.start_mixing(instructions, checkpoints)
 
-    def setup_progress_bar(self, instructions):
-        self.progressBar.setMaximum(len(instructions))
+    def start_mixing(self, instructions, checkpoints):
+        # TODO : Take serial port from maintenance menu + add verification on serial port
+        serial_synchroniser = SerialSynchroniser("COM4")
+        progress_tracker = ProgressTracker(self.progressBar)
 
-    def update_progress_bar(self, value):
-        self.progressBar.setValue(value)
+        if serial_synchroniser.can_start_communication():
+            progress_tracker.start_tracking(serial_synchroniser.progress_notifier, checkpoints, len(instructions))
+            progress_tracker.completed.connect(self.drink_completed)
+            progress_tracker.checkpoint_reached.connect(self.update_ingredients)
+            serial_synchroniser.begin_communication(instructions)
+        else:
+            self.serial_port_error()
+
+    def update_ingredients(self, liquid):
+        # TODO : update verticalLayout waiting/done, specified liquid should be removed from waiting and added to done
+        pass
+
+    def drink_completed(self):
+        # TODO : popup/whatever to indicate that the drink is ready
+        pass
+
+    def serial_port_error(self):
+        # TODO : popup/whatever to indicate that the serial port should be set in maintenance menu or check connection
+        pass
 
 
 class DrinkOptionMenu(QDialog):
@@ -168,7 +188,7 @@ class DrinkOptionMenu(QDialog):
         self.radioButton_virgin.toggled.connect(self.is_current_setting_valid)
 
         self.pushButton_return.clicked.connect(lambda: self.window_manager.switch_window("MainMenu"))
-        self.pushButton_confirm.released.connect(lambda: self.get_instructions_and_run())
+        self.pushButton_confirm.released.connect(self.load_mixing_menu)
 
         # TODO lancer algorithme de generation de gcode + lancement commandes?
 
@@ -206,10 +226,15 @@ class DrinkOptionMenu(QDialog):
     def is_virgin_available(self):
         return self.drink_manager.is_virgin_available(self.drink)
 
-    def get_instructions_and_run(self):
-        instructions = self.drink_manager.get_instructions(self.drink, self.radioButton_double.isChecked(),
-                                                           self.radioButton_virgin.isChecked())
-        self.window_manager.switch_window("MixingMenu", self.drink, instructions)
+    def load_mixing_menu(self):
+        instructions, liquid_checkpoints = self.drink_manager.get_instructions(self.drink,
+                                                                               self.radioButton_double.isChecked(),
+                                                                               self.radioButton_virgin.isChecked())
+
+        self.window_manager.switch_window("MixingMenu",
+                                          drink=self.drink,
+                                          instructions=instructions,
+                                          checkpoints=liquid_checkpoints)
 
 
 class MaintenanceMenu(QDialog):
@@ -249,7 +274,8 @@ class MainMenu(QMainWindow):
             button = DrinkButton(self.scrollAreaWidgetContents, drink)
             self.scroll_layout.addWidget(button)
             button.released.connect(
-                lambda button_drink=button.drink: self.window_manager.switch_window("DrinkOptionMenu", button_drink))
+                lambda button_drink=button.drink: self.window_manager.switch_window("DrinkOptionMenu",
+                                                                                    drink=button_drink))
 
     def connect_buttons(self):
         self.pushButton_maintenance.clicked.connect(lambda: self.window_manager.switch_window("MaintenanceMenu"))
@@ -260,8 +286,8 @@ class DrinkButton(QPushButton):
     def __init__(self, scroll_area_widget_contents, drink):
         super(DrinkButton, self).__init__(scroll_area_widget_contents)
         self.drink = drink
-        self.setStyleSheet(GUI.drink_button.value)
-        self.setFixedSize(GUI.drink_image_size.value)
+        self.setStyleSheet(Style.drink_button.value)
+        self.setFixedSize(Style.drink_image_size.value)
         self.setStyleSheet("QPushButton{ background-image: url(" + self.drink.image_path + "); }")
 
 
@@ -285,12 +311,13 @@ class WindowManager:
         window_index = self.stack.count() - 1
         self.windows.update({self.stack.widget(window_index).name: window_index})
 
-    def switch_window(self, window_name, drink=None, instructions=None):
+    def switch_window(self, window_name, drink=None, instructions=None, checkpoints=None):
         """
         Switch the window to the given window_name
         :param window_name: Name of the window to switch
         :param drink: Drink object if needed
         :param instructions: Instruction list if needed
+        :param checkpoints: Checkpoints of instruction list if needed
         :return:
         """
         if window_name == "DrinkOptionMenu":
@@ -300,7 +327,7 @@ class WindowManager:
         elif window_name == "BottleMenu":
             self.stack.widget(self.windows.get(window_name)).update_layout()
         elif window_name == "MixingMenu":
-            self.stack.widget(self.windows.get(window_name)).update_layout(instructions, drink)
+            self.stack.widget(self.windows.get(window_name)).update_layout(instructions, checkpoints, drink)
         self.stack.setCurrentIndex(self.windows.get(window_name))
 
 

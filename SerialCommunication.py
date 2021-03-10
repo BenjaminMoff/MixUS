@@ -1,11 +1,13 @@
 import serial
+import serial.tools.list_ports
 from serial import *
-from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtCore import pyqtSignal, pyqtSlot
 import threading
 from PyQt5.QtCore import QObject
 
 
 class SerialSynchroniser(QObject):
+    # TODO : add method to kill thread
     """
     Class responsible to communicate with the motor controller board by serial port
     """
@@ -23,10 +25,11 @@ class SerialSynchroniser(QObject):
     def set_serial_port(self, port_string):
         if self.serial_port is not None:
             self.serial_port.close()
-        self.serial_port = Serial(port_string, baudrate=9600, timeout=0.1)
+        self.serial_port = Serial(port_string, baudrate=250000, timeout=0.1)
 
     def begin_communication(self, instructions):
-        self.__serial_communication_thread = threading.Thread(name="SerialCommunication", target=self.__send_instructions, args=(instructions,))
+        self.__serial_communication_thread = threading.Thread(name="SerialCommunication",
+                                                              target=self.__send_instructions, args=(instructions,))
         self.__serial_communication_thread.start()
 
     def wait_end_of_communication(self):
@@ -35,42 +38,49 @@ class SerialSynchroniser(QObject):
     def can_start_communication(self):
         if self.serial_port is None:
             return False
-
-        ports = [tuple(p) for p in list(serial.tools.list_ports.comports())]
-        return self.serial_port in ports
+        ports = []
+        for p in list(serial.tools.list_ports.comports()):
+            ports.extend(tuple(p))
+        return self.serial_port.portstr in ports
 
     def __send_instructions(self, instructions):
         if self.serial_port is None:
             raise Exception("Unable to send instructions, no serial port opened")
 
+        self.__read_from_serial("echo:  M907 X135 Y135 Z135 E135 135")
+
         for index, instruction in enumerate(instructions):
             self.__send_instruction(instruction)
-            self.__read_from_serial()
+            self.__read_from_serial("Instruction completed\r\n")
             self.progress_notifier.emit(index)
 
     def __send_instruction(self, instruction):
         for string in instruction:
             time.sleep(1)
+            print("msg envoye: " + string)
             self.serial_port.write(str.encode(string, "utf-8"))
 
-    def __read_from_serial(self):
+    def __read_from_serial(self, trigger_msg):
         self.__instruction_done = False
         while not self.__instruction_done:
             message = self.serial_port.readline().decode("utf-8")
-            if message == "Instruction completed\n":
+            print(message)
+            if message == trigger_msg:
                 self.__instruction_done = True
 
 
-class ProgressTracker:
+class ProgressTracker(QObject):
+    completed = pyqtSignal()
+    checkpoint_reached = pyqtSignal(str)
 
     def __init__(self, progress_bar):
+        super().__init__()
         self.progress_bar = progress_bar
-        self.completed = pyqtSignal()
 
     def start_tracking(self, signal, checkpoints, max_value):
         """
         :param signal: signal emitted when tracking value updated
-        :param checkpoints: dict of significant values and object to be emitted when they're reached
+        :param checkpoints: dict of significant values and string to be emitted when they're reached
         :param max_value: value at which the progress is completed
 
         Updates the progress_bar when provided signal is emitted
@@ -80,11 +90,10 @@ class ProgressTracker:
         self.checkpoints = checkpoints
         self.max_value = max_value
 
-        self.checkpoint_reached = pyqtSignal(type(list(checkpoints.values())[0]))
-        signal.connect(self.__accept_signal)
+        signal.connect(self.accept_signal)
 
-    def __accept_signal(self, value):
-        self.progress_bar.setValue(value / self.max_value * 100)
+    def accept_signal(self, value):
+        self.progress_bar.setValue(value / self.max_value)
         if value in list(self.checkpoints.keys()):
             self.checkpoint_reached.emit(self.checkpoints.get(value))
         if value is self.max_value:
@@ -95,6 +104,9 @@ class GCodeGenerator:
     """
     Class responsible to generate g-code instructions to execute when making a drink
     """
+
+    # TODO : method for homing at application startup
+
     @staticmethod
     def move_to_slot(index):
         """
@@ -103,7 +115,9 @@ class GCodeGenerator:
         """
         # TODO define actual positions of slots
         position = index * 100
-        return [["G1 X%d\n" % position, "M400\n", "M118 Instruction completed\n"]]
+        if index != 0:
+            return [["G1 X%d\n" % position, "M400\n", "M118 Instruction completed\n"]]
+        return [["G28 X\n", "M400\n", "M118 Instruction completed\n"]]
 
     @staticmethod
     def pour(ounces):
@@ -112,7 +126,7 @@ class GCodeGenerator:
         :return: List of instructions to pour the specified amount of ounces in the cup
         """
         # TODO define actual z movement to pour
-        z_movement = 100
+        z_movement = 15
         instructions = []
         for i in range(ounces):
             # Raise z axis to activate dispenser
@@ -122,7 +136,7 @@ class GCodeGenerator:
             instructions.append(["G4 S3\n", "M400\n", "M118 Instruction completed\n"])
 
             # Retract z axis to allow dispenser to recharge
-            instructions.append(["G1 Z%d\n" % 0, "M400\n", "M118 Instruction completed\n"])
+            instructions.append(["G28 Z\n", "M400\n", "M118 Instruction completed\n"])
 
             # TODO determine if their should be a waiting time to allow dispenser to recharge
 
@@ -133,8 +147,10 @@ class GCodeGenerator:
         """
         :return: List of instructions to retract the cup in the machine
         """
-        position = 0
-        return [["G1 Y%d\n" % position, "M400\n", "M118 Instruction completed\n"]]
+        instructions = [["G28 Y\n", "M400\n", "M118 Instruction completed\n"],
+                        ["G28 X\n", "M400\n", "M118 Instruction completed\n"],
+                        ["G28 Z\n", "M400\n", "M118 Instruction completed\n"]]
+        return instructions
 
     @staticmethod
     def serve_cup():
@@ -144,6 +160,6 @@ class GCodeGenerator:
         # TODO define actual maximum y_position of y axis
         instructions = []
         instructions.extend(GCodeGenerator.move_to_slot(0))
-        y_position = 100
+        y_position = 120
         instructions.append(["G1 Y%d\n" % y_position, "M400\n", "M118 Instruction completed\n"])
         return instructions

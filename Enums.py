@@ -78,7 +78,7 @@ class Paths(Enum):
                                "ui/MixingMenu.ui")
 
 
-class GUI(Enum):
+class Style(Enum):
     label_background_color = "border: 1px solid;" \
                              "border-color: rgb(0, 0, 0);" \
                              "background-color: rgb(0, 167, 89);"

@@ -1,6 +1,6 @@
 import json
-from MixUS.DataModel import *
-from MixUS.Enums import *
+from DataModel import *
+from Enums import *
 
 
 class JsonHandler:

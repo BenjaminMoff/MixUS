@@ -1,5 +1,5 @@
-from MixUS.Enums import Liquid
-from MixUS.SerialCommunication import GCodeGenerator
+from Enums import Liquid
+from SerialCommunication import GCodeGenerator
 
 
 class Bottle:
@@ -226,6 +226,7 @@ class DrinkManager:
         """
         instructions = []
         poured_liquids = []
+        liquid_checkpoints = {}
 
         # Move the cup in the machine
         instructions.extend(GCodeGenerator.insert_cup())
@@ -247,10 +248,11 @@ class DrinkManager:
 
                         # Pour necessary amount of liquid
                         self.__compute_ounces_to_pour(instructions, drink, liquid, is_double, is_virgin)
+                        liquid_checkpoints.update({len(instructions): liquid.string_name})
 
         # Move to slot 0 and get the cup out of the machine
         instructions.extend(GCodeGenerator.serve_cup())
-        return instructions
+        return instructions, liquid_checkpoints
 
     def __compute_ounces_to_pour(self, instructions,  drink, liquid, is_double=False, is_virgin=False):
 
