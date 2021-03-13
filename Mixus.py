@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets, uic, QtGui
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QComboBox, QLabel, QMainWindow, QDialog, QStackedWidget, QPushButton, \
-    QHBoxLayout
+    QHBoxLayout, QLayout
 from DataModel import *
 from JsonHandler import JsonHandler
 from Enums import *
@@ -163,9 +163,9 @@ class DrinkOptionMenu(QDialog):
 
         ui_manager.drink_option_menu_setup(self)
 
-        self.radioButton_normal.toggled.connect(self.is_current_setting_valid)
-        self.radioButton_double.toggled.connect(self.is_current_setting_valid)
-        self.radioButton_virgin.toggled.connect(self.is_current_setting_valid)
+        self.radioButton_normal.toggled.connect(self.update_ingredients)
+        self.radioButton_double.toggled.connect(self.update_ingredients)
+        self.radioButton_virgin.toggled.connect(self.update_ingredients)
 
         self.pushButton_return.clicked.connect(lambda: self.window_manager.switch_window("MainMenu"))
         self.pushButton_confirm.released.connect(lambda: self.get_instructions_and_run())
@@ -173,25 +173,46 @@ class DrinkOptionMenu(QDialog):
         # TODO lancer algorithme de generation de gcode + lancement commandes?
 
     def update_layout(self, drink):
-        """
-
-        :param drink: selected drink
-        :return:
-        """
         self.drink = drink
         self.label_Title.setText(self.drink.name)
         self.radioButton_normal.setChecked(True)
-
         self.ui_manager.image_setup(self.label_drinkImage, self.drink.image_path)
+        self.update_ingredients()
+
+    def update_ingredients(self):
+        self.is_current_setting_valid()
 
         for i in range(0, self.verticalLayout_ingredients.count()):
             self.verticalLayout_ingredients.itemAt(i).widget().deleteLater()
 
-        for liquid in self.drink.liquids:
-            L = QLabel()
-            L.setText(str(self.drink.ingredients.get(liquid.string_name)) + " onces de " + liquid.string_name)
-            L.setFont(QFont("Times", 12))
-            self.verticalLayout_ingredients.addWidget(L)
+        flag = 0
+        for liquid in list(self.drink.liquids):
+            L = LiquidLabel(liquid, self.drink.ingredients.get(liquid.string_name))
+            vol = self.drink.ingredients.get(L.liquid.string_name)
+            if self.radioButton_normal.isChecked():
+                L.update_volume(vol)
+            elif self.radioButton_double.isChecked():
+                if L.liquid.is_alcoholized:
+                    L.update_volume(vol * 2)
+                elif L.liquid.is_filler:
+                    volume_to_remove = self.drink.alcohol_volume()
+                    L.update_volume(
+                        vol - volume_to_remove)
+                else:
+                    L.update_volume(vol)
+            elif self.radioButton_virgin.isChecked():
+                if L.liquid.is_alcoholized:
+                    flag = 1
+                elif L.liquid.is_filler:
+                    volume_to_add = self.drink.alcohol_volume()
+                    L.update_volume(vol + volume_to_add)
+                else:
+                    L.update_volume(vol)
+
+            if flag == 0:
+                self.verticalLayout_ingredients.addWidget(L)
+            else:
+                flag = 0
 
     # Disable confirm button if the drink cant be made with current settings
     def is_current_setting_valid(self):
@@ -263,6 +284,19 @@ class DrinkButton(QPushButton):
         self.setStyleSheet(GUI.drink_button.value)
         self.setFixedSize(GUI.drink_image_size.value)
         self.setStyleSheet("QPushButton{ background-image: url(" + self.drink.image_path + "); }")
+
+
+class LiquidLabel(QLabel):
+    def __init__(self, liquid, volume):
+        super(LiquidLabel, self).__init__()
+        self.liquid = liquid
+        self.volume = volume
+        self.setText(str(volume) + " onces de " + self.liquid.string_name)
+        self.setFont(QFont("Times", 12))
+
+    def update_volume(self, volume):
+        self.volume = volume
+        self.setText(str(volume) + " onces de " + self.liquid.string_name)
 
 
 class WindowManager:
