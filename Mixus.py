@@ -1,13 +1,13 @@
 from PyQt5 import QtWidgets, uic, QtGui
 from PyQt5.QtGui import QFont, QIcon
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QComboBox, QLabel, QMainWindow, QDialog, QStackedWidget, QPushButton, \
     QHBoxLayout
 from DataModel import *
 from JsonHandler import JsonHandler
 from Enums import *
 from UIManager import *
-from SerialCommunication import SerialSynchroniser, ProgressTracker
+from SerialCommunication import SerialSynchroniser
 import sys
 
 
@@ -113,12 +113,19 @@ class BottleMenu(QDialog):
 
 class MixingMenu(QDialog):
     name = "MixingMenu"
+    progress = pyqtSignal(int)
+    checkpoint_reached = pyqtSignal(str)
+    drink_completed = pyqtSignal()
 
     def __init__(self, window_manager, ui_manager):
         super(MixingMenu, self).__init__()
         uic.loadUi(Paths.MIXING_MENU.value, self)
         self.ui_manager = ui_manager
-        self.pushButton_return.released.connect(lambda: window_manager.switch_window("MainMenu"))
+        self.window_manager = window_manager
+        self.pushButton_return.released.connect(self.return_button_action)
+        self.progress.connect(self.update_progress_bar)
+        self.checkpoint_reached.connect(self.update_ingredients)
+        self.drink_completed.connect(self.done_mixing)
         self.ui_manager.mixing_menu_setup(self)
 
     def update_layout(self, instructions, checkpoints, drink):
@@ -132,36 +139,45 @@ class MixingMenu(QDialog):
         """""
         self.ui_manager.image_setup(self.label_drinkImage, drink.image_path)
         self.label_Title.setText(drink.name)
+        self.progressBar.setValue(0)
         for i in range(0, self.verticalLayout_waiting.count()):
             self.verticalLayout_waiting.itemAt(i).widget().deleteLater()
-        ingredient_labels = []
+        for i in range(0, self.verticalLayout_done.count()):
+            self.verticalLayout_done.itemAt(i).widget().deleteLater()
+        self.ingredient_labels = {}
 
         for ingredient in drink.liquids:
             L = QLabel()
             L.setText(ingredient.string_name)
             L.setFont(QFont("Times", 12))
-            ingredient_labels.append(QLabel)
+            self.ingredient_labels.update({ingredient.string_name: L})
             self.verticalLayout_waiting.addWidget(L)
         self.start_mixing(instructions, checkpoints)
 
     def start_mixing(self, instructions, checkpoints):
         # TODO : Take serial port from maintenance menu + add verification on serial port
-        serial_synchroniser = SerialSynchroniser("COM4")
-        progress_tracker = ProgressTracker(self.progressBar)
+        self.serial_synchroniser = SerialSynchroniser("COM4")
 
-        if serial_synchroniser.can_start_communication():
-            progress_tracker.start_tracking(serial_synchroniser.progress_notifier, checkpoints, len(instructions))
-            progress_tracker.completed.connect(self.drink_completed)
-            progress_tracker.checkpoint_reached.connect(self.update_ingredients)
-            serial_synchroniser.begin_communication(instructions)
+        if self.serial_synchroniser.can_start_communication():
+            self.serial_synchroniser.track_progress(self, checkpoints, len(instructions))
+            self.serial_synchroniser.begin_communication(instructions)
+
         else:
             self.serial_port_error()
 
-    def update_ingredients(self, liquid):
-        # TODO : update verticalLayout waiting/done, specified liquid should be removed from waiting and added to done
-        pass
+    def return_button_action(self):
+        self.serial_synchroniser.abort_communication()
+        self.window_manager.switch_window("MainMenu")
 
-    def drink_completed(self):
+    def update_progress_bar(self, value):
+        self.progressBar.setValue(value)
+
+    def update_ingredients(self, liquid_name):
+        label = self.ingredient_labels.get(liquid_name)
+        self.verticalLayout_waiting.removeWidget(label)
+        self.verticalLayout_done.addWidget(label)
+
+    def done_mixing(self):
         # TODO : popup/whatever to indicate that the drink is ready
         pass
 

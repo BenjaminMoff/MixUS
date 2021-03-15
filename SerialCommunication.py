@@ -1,9 +1,19 @@
 import serial
 import serial.tools.list_ports
 from serial import *
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
-import threading
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, QThread, Qt
 from PyQt5.QtCore import QObject
+
+
+class Flag:
+    def __init__(self, value):
+        self.value = value
+
+    def set(self, value):
+        self.value = value
+
+    def get(self):
+        return self.value
 
 
 class SerialSynchroniser(QObject):
@@ -13,14 +23,22 @@ class SerialSynchroniser(QObject):
     """
     serial_port = None
     progress_notifier = pyqtSignal(int)
-    __instruction_done = False
-    __read = False
+    parent = None
+    checkpoints = None
     __serial_communication_thread = None
+    singleton = None
+
+    def __new__(cls, port_string=None):
+        if cls.singleton is None:
+            cls.singleton = QObject.__new__(cls, port_string)
+        return cls.singleton
 
     def __init__(self, port_string=None):
         super().__init__()
         if port_string is not None:
             self.set_serial_port(port_string)
+        self.__serial_communication_thread = SerialCommunicator(self)
+        self.singleton = self
 
     def set_serial_port(self, port_string):
         if self.serial_port is not None:
@@ -28,12 +46,32 @@ class SerialSynchroniser(QObject):
         self.serial_port = Serial(port_string, baudrate=250000, timeout=0.1)
 
     def begin_communication(self, instructions):
-        self.__serial_communication_thread = threading.Thread(name="SerialCommunication",
-                                                              target=self.__send_instructions, args=(instructions,))
+        self.communicate = Flag(True)
+        self.__serial_communication_thread.update(self.serial_port, instructions, self.communicate)
         self.__serial_communication_thread.start()
+        self.__serial_communication_thread.wait(1)
+
+    def track_progress(self, parent, checkpoints, max_value):
+        self.parent = parent
+        self.checkpoints = checkpoints
+        self.max_value = max_value
+        self.progress_notifier.connect(self.on_progress)
+
+    @pyqtSlot(int)
+    def on_progress(self, value):
+        self.parent.progress.emit(int(value / self.max_value * 100))
+        if value in list(self.checkpoints.keys()):
+            self.parent.checkpoint_reached.emit(self.checkpoints.get(value))
+        if value is self.max_value:
+            self.parent.drink_completed.emit()
+            self.progress_notifier.disconnect()
 
     def wait_end_of_communication(self):
-        self.__serial_communication_thread.join()
+        self.__serial_communication_thread.wait()
+
+    def abort_communication(self):
+        self.communicate.set(False)
+        self.__serial_communication_thread.wait()
 
     def can_start_communication(self):
         if self.serial_port is None:
@@ -43,61 +81,43 @@ class SerialSynchroniser(QObject):
             ports.extend(tuple(p))
         return self.serial_port.portstr in ports
 
-    def __send_instructions(self, instructions):
-        if self.serial_port is None:
-            raise Exception("Unable to send instructions, no serial port opened")
 
+class SerialCommunicator(QThread):
+    progress_notifier = pyqtSignal(int)
+
+    def __init__(self, parent):
+        super(SerialCommunicator, self).__init__()
+        self.parent = parent
+
+    def update(self, serial_port, instructions, communicate):
+        self.instructions = instructions
+        self.serial_port = serial_port
+        self.communicate = communicate
+
+    def run(self):
+        self.__send_instructions()
+
+    def __send_instructions(self):
         self.__read_from_serial("echo:  M907 X135 Y135 Z135 E135 135")
 
-        for index, instruction in enumerate(instructions):
+        for index, instruction in enumerate(self.instructions):
+            if not self.communicate.get():
+                return
             self.__send_instruction(instruction)
             self.__read_from_serial("Instruction completed\r\n")
-            self.progress_notifier.emit(index)
+            self.progress_notifier.emit(self.parent.progress_notifier.emit(index + 1))
 
     def __send_instruction(self, instruction):
         for string in instruction:
             time.sleep(1)
-            print("msg envoye: " + string)
             self.serial_port.write(str.encode(string, "utf-8"))
 
     def __read_from_serial(self, trigger_msg):
         self.__instruction_done = False
-        while not self.__instruction_done:
+        while not self.__instruction_done and self.communicate.get():
             message = self.serial_port.readline().decode("utf-8")
-            print(message)
             if message == trigger_msg:
                 self.__instruction_done = True
-
-
-class ProgressTracker(QObject):
-    completed = pyqtSignal()
-    checkpoint_reached = pyqtSignal(str)
-
-    def __init__(self, progress_bar):
-        super().__init__()
-        self.progress_bar = progress_bar
-
-    def start_tracking(self, signal, checkpoints, max_value):
-        """
-        :param signal: signal emitted when tracking value updated
-        :param checkpoints: dict of significant values and string to be emitted when they're reached
-        :param max_value: value at which the progress is completed
-
-        Updates the progress_bar when provided signal is emitted
-        Emits signals when checkpoints or max_value are reached
-        """
-        self.progress_bar.setValue(0)
-        self.checkpoints = checkpoints
-        self.max_value = max_value
-
-        signal.connect(self.accept_signal)
-
-    def accept_signal(self, value):
-        self.progress_bar.setValue(value / self.max_value)
-        if value in list(self.checkpoints.keys()):
-            self.checkpoint_reached.emit(self.checkpoints.get(value))
-        if value is self.max_value:
-            self.completed.emit()
 
 
 class GCodeGenerator:
