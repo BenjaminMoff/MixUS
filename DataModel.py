@@ -1,4 +1,4 @@
-from Enums import Liquid
+from Enums import Liquid, BottleSize
 from SerialCommunication import GCodeGenerator
 
 
@@ -6,22 +6,22 @@ class Bottle:
     """
     Class that stores current volume and liquid type of bottles on the machine
     """
-    def __init__(self, slot_number=None, liquid=None, volume_left=None):
+    def __init__(self, slot_number=None, liquid=None, volume_left_ml=None):
         self.__slot_number = slot_number
         self.__liquid = liquid
-        self.__volume_left = volume_left  # In ounces
+        self.__volume_left_ml = volume_left_ml
 
     def __eq__(self, other):
         return self.__slot_number == other.get_slot_number() and \
                self.__liquid.string_name == other.get_liquid_name() and \
-               self.__volume_left == other.get_volume_left()
+               self.__volume_left_ml == other.get_volume_left()
 
     # Method that keeps tracks of the remaining liquid in the bottle when poured
     def pour(self, ounces=1):
-        if self.__volume_left - ounces <= 0:
+        if self.__volume_left_ml - BottleSize.ounces_to_ml(ounces) <= 0:
             return -1
         else:
-            self.__volume_left -= ounces
+            self.__volume_left_ml -= BottleSize.ounces_to_ml(ounces)
 
     # Bunch of methods that sets and gets the attributes of Bottle
     def set_liquid(self, liquid):
@@ -34,10 +34,10 @@ class Bottle:
         return self.__liquid.string_name
 
     def set_volume_left(self, vol_left):
-        self.__volume_left = vol_left
+        self.__volume_left_ml = vol_left
 
     def get_volume_left(self):
-        return self.__volume_left
+        return self.__volume_left_ml
 
     def set_slot_number(self, slot_number):
         self.__slot_number = slot_number
@@ -52,7 +52,7 @@ class Bottle:
         return self.__liquid.is_filler
 
     def copy(self):
-        return Bottle(self.__slot_number, self.__liquid, self.__volume_left)
+        return Bottle(self.__slot_number, self.__liquid, self.__volume_left_ml)
 
 
 class Drink:
@@ -84,10 +84,10 @@ class Drink:
         for liquid in self.liquids:
             for bottle in bottles:
                 # If the remaining volume in the bottle is enough to make the drink, then the counter increases
-                if bottle.get_liquid_name() == liquid.string_name and bottle._Bottle__volume_left >= self.ingredients. \
-                        get(liquid.string_name):
+                if bottle.get_liquid_name() == liquid.string_name \
+                        and bottle.get_volume_left() >= \
+                        BottleSize.ounces_to_ml(self.ingredients.get(liquid.string_name)):
                     counter += 1
-                    break
         # If the counter is equal to the number of ingredients, then the drink is available for the user
         if counter == len(self.ingredients):
             return True
@@ -180,6 +180,13 @@ class BottleManager:
             self.bottles_dict.update({bottle.get_slot_number(): bottle})
 
         # Updates persistence file every time a modification is made
+        self.save_data()
+
+    def pour(self, liquid_name, ounces):
+        for bottle in self.bottles_dict.values():
+            if bottle.get_liquid_name() == liquid_name:
+                bottle.pour(ounces)
+                break
         self.save_data()
 
     def get_bottles(self):

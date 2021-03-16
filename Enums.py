@@ -59,6 +59,14 @@ class BottleSize(Enum):
     def list():
         return list(map(lambda c: str(c.value), BottleSize))
 
+    @staticmethod
+    def ounces_to_ml(ounces):
+        return 30*ounces
+
+    @staticmethod
+    def ml_to_ounces(ml):
+        return int(ml/30)
+
 
 # Paths to persistence files
 class Paths(Enum):

@@ -117,16 +117,18 @@ class MixingMenu(QDialog):
     checkpoint_reached = pyqtSignal(str)
     drink_completed = pyqtSignal()
 
-    def __init__(self, window_manager, ui_manager):
+    def __init__(self, window_manager, ui_manager, bottle_manager):
         super(MixingMenu, self).__init__()
         uic.loadUi(Paths.MIXING_MENU.value, self)
         self.ui_manager = ui_manager
         self.window_manager = window_manager
+        self.bottle_manager = bottle_manager
         self.pushButton_return.released.connect(self.return_button_action)
         self.progress.connect(self.update_progress_bar)
         self.checkpoint_reached.connect(self.update_ingredients)
         self.drink_completed.connect(self.done_mixing)
         self.ui_manager.mixing_menu_setup(self)
+        self.drink = None
 
     def update_layout(self, instructions, checkpoints, drink):
         """
@@ -139,12 +141,14 @@ class MixingMenu(QDialog):
         """""
         self.ui_manager.image_setup(self.label_drinkImage, drink.image_path)
         self.label_Title.setText(drink.name)
+        self.drink = drink
         self.progressBar.setValue(0)
+        self.ingredient_labels = {}
+
         for i in range(0, self.verticalLayout_waiting.count()):
             self.verticalLayout_waiting.itemAt(i).widget().deleteLater()
         for i in range(0, self.verticalLayout_done.count()):
             self.verticalLayout_done.itemAt(i).widget().deleteLater()
-        self.ingredient_labels = {}
 
         for ingredient in drink.liquids:
             L = QLabel()
@@ -176,6 +180,7 @@ class MixingMenu(QDialog):
         label = self.ingredient_labels.get(liquid_name)
         self.verticalLayout_waiting.removeWidget(label)
         self.verticalLayout_done.addWidget(label)
+        self.bottle_manager.pour(liquid_name, self.drink.ingredients.get(liquid_name))
 
     def done_mixing(self):
         # TODO : popup/whatever to indicate that the drink is ready
@@ -364,7 +369,7 @@ def init_app_ui(app):
     window_manager.append_window(MainMenu(window_manager, ui_manager, drink_manager))
     window_manager.append_window(MaintenanceMenu(window_manager, ui_manager))
     window_manager.append_window(DrinkOptionMenu(window_manager, ui_manager, drink_manager))
-    window_manager.append_window(MixingMenu(window_manager, ui_manager))
+    window_manager.append_window(MixingMenu(window_manager, ui_manager, bottle_manager))
     window_manager.append_window(BottleMenu(window_manager, ui_manager, bottle_manager))
 
     stack.resize(ui_manager.res.width(), ui_manager.res.height())
