@@ -85,12 +85,12 @@ class Style(Enum):
     button_color = "border-radius: 15px;" \
                    "background-color: rgb(255, 255, 255);"
     button_color_pressed = "border-radius: 15px;" \
-                   "background-color: rgb(200, 200, 200);"
+                           "background-color: rgb(200, 200, 200);"
 
     layout_contour_color = "border: 1px solid;" \
                            "border-color: rgb(0, 0, 0);"
 
-    drink_button = "border: 1px solid;"\
+    drink_button = "border: 1px solid;" \
                    "border-radius: 20px;" \
                    "border-color: rgb(0, 0, 0);"
 

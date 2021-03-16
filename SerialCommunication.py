@@ -51,11 +51,14 @@ class SerialSynchroniser(QObject):
         self.__serial_communication_thread.start()
         self.__serial_communication_thread.wait(1)
 
-    def track_progress(self, parent, checkpoints, max_value):
+    def track_progress(self, parent, checkpoints=None, max_value=None):
         self.parent = parent
-        self.checkpoints = checkpoints
-        self.max_value = max_value
-        self.progress_notifier.connect(self.on_progress)
+        if checkpoints is not None and max_value is not None:
+            self.checkpoints = checkpoints
+            self.max_value = max_value
+            self.progress_notifier.connect(self.on_progress)
+        else:
+            self.__serial_communication_thread.finished.connect(self.on_end_of_communication)
 
     @pyqtSlot(int)
     def on_progress(self, value):
@@ -65,6 +68,10 @@ class SerialSynchroniser(QObject):
         if value is self.max_value:
             self.parent.drink_completed.emit()
             self.progress_notifier.disconnect()
+
+    @pyqtSlot()
+    def on_end_of_communication(self):
+        self.parent.instruction_completed.emit()
 
     def wait_end_of_communication(self):
         self.__serial_communication_thread.wait()
@@ -124,6 +131,9 @@ class GCodeGenerator:
     """
     Class responsible to generate g-code instructions to execute when making a drink
     """
+    max_x = 700
+    max_y = 120
+    max_z = 30
 
     # TODO : method for homing at application startup
 
@@ -146,11 +156,11 @@ class GCodeGenerator:
         :return: List of instructions to pour the specified amount of ounces in the cup
         """
         # TODO define actual z movement to pour
-        z_movement = 15
+
         instructions = []
         for i in range(ounces):
             # Raise z axis to activate dispenser
-            instructions.append(["G1 Z%d\n" % z_movement, "M400\n", "M118 Instruction completed\n"])
+            instructions.append(["G1 Z%d\n" % GCodeGenerator.max_z, "M400\n", "M118 Instruction completed\n"])
 
             # Wait 3 seconds to allow the liquid to escape dispenser
             instructions.append(["G4 S3\n", "M400\n", "M118 Instruction completed\n"])
@@ -180,6 +190,29 @@ class GCodeGenerator:
         # TODO define actual maximum y_position of y axis
         instructions = []
         instructions.extend(GCodeGenerator.move_to_slot(0))
-        y_position = 120
-        instructions.append(["G1 Y%d\n" % y_position, "M400\n", "M118 Instruction completed\n"])
+        instructions.append(["G1 Y%d\n" % GCodeGenerator.max_y, "M400\n", "M118 Instruction completed\n"])
+        instructions.append(["G1 Z%d\n" % GCodeGenerator.max_z, "M400\n", "M118 Instruction completed\n"])
+        return instructions
+
+    @staticmethod
+    def home():
+        """
+        Method that homes each axis
+        :return:
+        """
+        instructions = [["G28 Z\n", "M400\n", "M118 Instruction completed\n"],
+                        ["G28 Y\n", "M400\n", "M118 Instruction completed\n"],
+                        ["G28 X\n", "M400\n", "M118 Instruction completed\n"]]
+        return instructions
+
+    @staticmethod
+    def move_axis(pos, axis):
+        """
+        :param pos:
+        :param axis:
+        :return:
+        """
+        if (axis == "X" and pos and GCodeGenerator.max_x) or (axis == "Y" and pos > GCodeGenerator.max_y) or (axis == "Z" and pos > GCodeGenerator.max_z):
+            raise ValueError("position given for the current axis is greater than the max distance on the physical axis")
+        instructions = [["G1 " + str(axis) + "%d" % pos + "\n", "M400\n", "M118 Instruction completed\n"]]
         return instructions
