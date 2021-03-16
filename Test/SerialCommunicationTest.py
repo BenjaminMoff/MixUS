@@ -12,7 +12,7 @@ class SerialCommunicationTest(unittest.TestCase):
         To run this test, an Arduino Mega 2560 must be running test_serial_com.ino and be connected to port COM4
         The test can also be ran with the actuak machine board
         """
-        serial_synchroniser = SerialSynchroniser("COM4")
+        serial_synchroniser = SerialSynchroniser("COM3")
         serial_synchroniser.progress_notifier.connect(self.accept_progress_notification)
         instructions = []
         instructions.extend(GCodeGenerator.insert_cup())
