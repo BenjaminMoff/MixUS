@@ -1,9 +1,9 @@
 import unittest
 import os
-from MixUS.JsonHandler import *
-from MixUS.SerialCommunication import GCodeGenerator
-from MixUS.Enums import Liquid
-from MixUS.DataModel import *
+from JsonHandler import *
+from SerialCommunication import GCodeGenerator
+from Enums import Liquid
+from DataModel import *
 
 
 class GCodeTest(unittest.TestCase):
@@ -27,34 +27,61 @@ class GCodeTest(unittest.TestCase):
 
     def test_get_rum_and_coke_instructions(self):
         expected_instructions = []
+        expected_checkpoints = {}
+
         expected_instructions.extend(GCodeGenerator.insert_cup())
         expected_instructions.extend(GCodeGenerator.move_to_slot(1))
         expected_instructions.extend(GCodeGenerator.pour(3))
+
+        expected_checkpoints.update({len(expected_instructions): Liquid.RUM.string_name})
+
         expected_instructions.extend(GCodeGenerator.move_to_slot(4))
         expected_instructions.extend(GCodeGenerator.pour(9))
+
+        expected_checkpoints.update({len(expected_instructions): Liquid.COKE.string_name})
+
         expected_instructions.extend(GCodeGenerator.serve_cup())
 
-        self.assertEqual(self.drink_manager.get_instructions(self.rum_and_coke), expected_instructions)
+        actual_instructions, actual_checkpoints = self.drink_manager.get_instructions(self.rum_and_coke)
+        self.assertEqual(actual_instructions, expected_instructions)
+        self.assertEqual(actual_checkpoints, expected_checkpoints)
 
     def test_get_rum_and_coke_virgin_instructions(self):
         expected_instructions = []
+        expected_checkpoints = {}
+
         expected_instructions.extend(GCodeGenerator.insert_cup())
         expected_instructions.extend(GCodeGenerator.move_to_slot(4))
         expected_instructions.extend(GCodeGenerator.pour(12))
+
+        expected_checkpoints.update({len(expected_instructions): Liquid.COKE.string_name})
+
         expected_instructions.extend(GCodeGenerator.serve_cup())
 
-        self.assertEqual(self.drink_manager.get_instructions(self.rum_and_coke, is_virgin=True), expected_instructions)
+        actual_instructions, actual_checkpoints = self.drink_manager.get_instructions(self.rum_and_coke, is_virgin=True)
+        self.assertEqual(actual_instructions, expected_instructions)
+        self.assertEqual(actual_checkpoints, expected_checkpoints)
 
     def test_get_rum_and_coke_double_instructions(self):
         expected_instructions = []
+        expected_checkpoints = {}
+
         expected_instructions.extend(GCodeGenerator.insert_cup())
         expected_instructions.extend(GCodeGenerator.move_to_slot(1))
         expected_instructions.extend(GCodeGenerator.pour(6))
+
+        expected_checkpoints.update({len(expected_instructions): Liquid.RUM.string_name})
+
         expected_instructions.extend(GCodeGenerator.move_to_slot(4))
         expected_instructions.extend(GCodeGenerator.pour(6))
+
+        expected_checkpoints.update({len(expected_instructions): Liquid.COKE.string_name})
+
         expected_instructions.extend(GCodeGenerator.serve_cup())
 
-        self.assertEqual(self.drink_manager.get_instructions(self.rum_and_coke, is_double=True), expected_instructions)
+        actual_instructions, actual_checkpoints = self.drink_manager.get_instructions(self.rum_and_coke, is_double=True)
+        self.assertEqual(actual_instructions, expected_instructions)
+        self.assertEqual(actual_checkpoints, expected_checkpoints)
 
 
 if __name__ == '__main__':

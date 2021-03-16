@@ -17,7 +17,7 @@ class UIManager:
         """
         title.setGeometry(-2, 0, self.res.width() + 4, int(round(self.res.height() * 0.15, 0)))
         title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet(GUI.label_background_color.value)
+        title.setStyleSheet(Style.label_background_color.value)
         title.setFont(QFont("Times", 30, QFont.Bold))
 
     def bottom_right_button_setup(self, button):
@@ -48,7 +48,7 @@ class UIManager:
         """
         label.setGeometry(-2, int(self.res.height() * 0.85), self.res.width() + 4, int(self.res.height() * 0.15))
 
-        label.setStyleSheet(GUI.label_background_color.value)
+        label.setStyleSheet(Style.label_background_color.value)
 
     def image_setup(self, label, path):
         """
@@ -58,19 +58,28 @@ class UIManager:
         :return:
         """
         label.setGeometry(int(self.res.width() * 2 / 3),
-                          int(self.res.height() / 2) - GUI.drink_image_size.value.height() / 2,
-                          GUI.drink_image_size.value.width(), GUI.drink_image_size.value.height())
+                          int(self.res.height() / 2) - Style.drink_image_size.value.height() / 2,
+                          Style.drink_image_size.value.width(), Style.drink_image_size.value.height())
         label.setPixmap(QPixmap(path))
 
-    def sliders_setup(self, slider, pos):
+    def slider_setup(self, slider):
         """
-        Sets the slider for the maintenanceMenu given the wanted position
+        Sets the slider for the maintenanceMenu
         :param slider: QSlider of the menu
-        :param pos: Index of the slider (1, 2 or 3)
         :return:
         """
-        slider.setGeometry(int(self.res.width() / 20), int(self.res.height() * (5 + 1.5 * (pos - 1)) / 12),
-                           int(self.res.width() * 0.9), int(self.res.height() / 12))
+        slider.setGeometry(int(self.res.width() / 20), int(self.res.height() * 1 / 2),
+                           int(self.res.width() * 0.9), int(self.res.height() / 6))
+
+    def comboBox_axis_setup(self, comboBox):
+        """
+        Sets the comboBox for the maintenanceMenu
+        :param comboBox:
+        :return:
+        """
+        comboBox.setGeometry(int(self.res.width() * (1/2 - 1/8)), int(self.res.height() * (5.18/6)),
+                             int(self.res.width() / 4), int(self.res.height() / 8))
+        comboBox.setStyleSheet(Style.combo_box.value)
 
     def push_button_setup(self, button):
         """
@@ -78,10 +87,10 @@ class UIManager:
         :param button: QPushButton of the menu
         :return:
         """
-        button.setStyleSheet(GUI.button_color.value)
-        button.pressed.connect(lambda: button.setStyleSheet(GUI.button_color_pressed.value))
+        button.setStyleSheet(Style.button_color.value)
+        button.pressed.connect(lambda: button.setStyleSheet(Style.button_color_pressed.value))
         button.released.connect(
-            lambda: button.setStyleSheet(GUI.button_color.value))
+            lambda: button.setStyleSheet(Style.button_color.value))
         button.setFont(QFont("Times", 15, QFont.Bold))
 
     def group_box_setup(self, groupbox, layout, pos):
@@ -136,10 +145,8 @@ class UIManager:
         self.bottom_background_setup(maintenance_menu.label_bottom_screen)
         self.bottom_left_button_setup(maintenance_menu.pushButton_return)
         self.bottom_right_button_setup(maintenance_menu.pushButton_send)
-        self.sliders_setup(maintenance_menu.Slider_x, 1)
-        self.sliders_setup(maintenance_menu.Slider_y, 2)
-        self.sliders_setup(maintenance_menu.Slider_z, 3)
-
+        self.slider_setup(maintenance_menu.slider)
+        self.comboBox_axis_setup(maintenance_menu.comboBox_axis)
         maintenance_menu.pushButton_home.setGeometry(int(self.res.width() / 20), int(self.res.height() / 5),
                                                      int(self.res.width() / 4), int(self.res.height() / 6))
         self.push_button_setup(maintenance_menu.pushButton_home)
@@ -202,8 +209,8 @@ class UIManager:
 
     def __init_liquid_type(self, bottle_layout):
         bottle_layout.liquid_type_combo_box = QComboBox()
-        bottle_layout.liquid_type_combo_box.setStyleSheet(GUI.combo_box.value)
-        bottle_layout.liquid_type_combo_box.setFixedSize(GUI.combo_box_size.value)
+        bottle_layout.liquid_type_combo_box.setStyleSheet(Style.combo_box.value)
+        bottle_layout.liquid_type_combo_box.setFixedSize(Style.combo_box_size.value)
         bottle_layout.liquid_type_combo_box.setFont(QFont("Times", 15, QFont.Bold))
         bottle_layout.liquid_type_combo_box.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         bottle_layout.init_combo_box(bottle_layout.liquid_type_combo_box, bottle_layout.bottle.get_liquid_name(),
@@ -213,11 +220,12 @@ class UIManager:
 
     def __init_volume_left(self, bottle_layout):
         bottle_layout.volume_left_combo_box = QComboBox()
-        bottle_layout.volume_left_combo_box.setStyleSheet(GUI.combo_box.value)
-        bottle_layout.volume_left_combo_box.setFixedSize(GUI.combo_box_size.value)
+        bottle_layout.volume_left_combo_box.setStyleSheet(Style.combo_box.value)
+        bottle_layout.volume_left_combo_box.setFixedSize(Style.combo_box_size.value)
         bottle_layout.volume_left_combo_box.setFont(QFont("Times", 15, QFont.Bold))
         bottle_layout.volume_left_combo_box.view().setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        bottle_layout.init_combo_box(bottle_layout.volume_left_combo_box, str(bottle_layout.bottle.get_volume_left()), BottleSize.list())
+        bottle_layout.init_combo_box(bottle_layout.volume_left_combo_box, str(bottle_layout.bottle.get_volume_left()),
+                                     BottleSize.list())
         bottle_layout.volume_left_combo_box.activated.connect(bottle_layout.new_volume_selected)
         bottle_layout.add_widget_to_superclass(bottle_layout.volume_left_combo_box)
 
@@ -233,7 +241,6 @@ def get_screen_resolution(app):
     :param app: current app
     :return: QRect(0, 0, sc_res.width(), sc_res.height())
     """
-    # TODO : Use desktop.screenGeometry to make display app in fullscreen
     sc_res = app.desktop().screenGeometry()
     sc_res = QRect(0, 0, 1024, 600)
     return sc_res
