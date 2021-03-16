@@ -127,6 +127,7 @@ class MixingMenu(QDialog):
         self.checkpoint_reached.connect(self.update_ingredients)
         self.drink_completed.connect(self.done_mixing)
         self.ui_manager.mixing_menu_setup(self)
+        self.serial_synchroniser = SerialSynchroniser("COM3")
 
     def update_layout(self, instructions, checkpoints, drink):
         """
@@ -156,7 +157,7 @@ class MixingMenu(QDialog):
 
     def start_mixing(self, instructions, checkpoints):
         # TODO : Take serial port from maintenance menu + add verification on serial port
-        self.serial_synchroniser = SerialSynchroniser("COM4")
+
 
         if self.serial_synchroniser.can_start_communication():
             self.serial_synchroniser.track_progress(self, checkpoints, len(instructions))
@@ -203,7 +204,7 @@ class DrinkOptionMenu(QDialog):
         self.radioButton_double.toggled.connect(self.is_current_setting_valid)
         self.radioButton_virgin.toggled.connect(self.is_current_setting_valid)
 
-        self.pushButton_return.clicked.connect(lambda: self.window_manager.switch_window("MainMenu"))
+        self.pushButton_return.released.connect(lambda: self.window_manager.switch_window("MainMenu"))
         self.pushButton_confirm.released.connect(self.load_mixing_menu)
 
         # TODO lancer algorithme de generation de gcode + lancement commandes?
@@ -255,16 +256,71 @@ class DrinkOptionMenu(QDialog):
 
 class MaintenanceMenu(QDialog):
     name = "MaintenanceMenu"
+    instruction_completed = pyqtSignal()
 
     def __init__(self, window_manager, ui_manager):
         super(MaintenanceMenu, self).__init__()
         uic.loadUi(Paths.MAINTENANCE_MENU.value, self)
         self.window_manager = window_manager
+        self.serial_synchroniser = SerialSynchroniser("COM3")
+        self.instruction_completed.connect(self.on_instruction_completed)
         self.pushButton_return.clicked.connect(lambda: self.window_manager.switch_window("MainMenu"))
         self.pushButton_bottle.clicked.connect(lambda: self.window_manager.switch_window("BottleMenu"))
+        self.pushButton_send.clicked.connect(self.send_button_action)
+        self.pushButton_home.clicked.connect(self.home)
+        self.slider.valueChanged.connect(self.label_axis_update)
+        self.comboBox_axis.currentIndexChanged.connect(lambda: self.slider_update(self.comboBox_axis.currentText()))
+        self.comboBox_axis_setup()
 
         ui_manager.maintenance_menu_setup(self)
         # TODO faire lenvoi des positions des sliders avec un connect lambda
+
+    def comboBox_axis_setup(self):
+        self.comboBox_axis.addItem('X')
+        self.comboBox_axis.addItem('Y')
+        self.comboBox_axis.addItem('Z')
+        self.label_axis.setText('0')
+
+    def slider_update(self, axis):
+        if axis == 'X':
+            self.slider.setMaximum(GCodeGenerator.max_x)
+        elif axis == 'Y':
+            self.slider.setMaximum(GCodeGenerator.max_y)
+        elif axis == 'Z':
+            self.slider.setMaximum(GCodeGenerator.max_z)
+        else:
+            raise ValueError("Axis given was not X, Y or Z")
+        self.slider.setValue(0)
+
+    def label_axis_update(self):
+        self.label_axis.setText(str(self.slider.value()))
+
+    def send_button_action(self):
+        instructions = GCodeGenerator.move_axis(int(self.label_axis.text()), self.comboBox_axis.currentText)
+        self.__send_command(instructions)
+
+    def on_instruction_completed(self):
+        self.pushButton_send.setEnabled(True)
+        self.pushButton_home.setEnabled(True)
+        self.pushButton_return.setEnabled(True)
+        self.pushButton_bottle.setEnabled(True)
+
+    def home(self):
+        instructions = GCodeGenerator.home()
+        self.__send_command(instructions)
+
+    def __send_command(self, instructions):
+        if self.serial_synchroniser.can_start_communication():
+            self.pushButton_send.setEnabled(False)
+            self.pushButton_home.setEnabled(False)
+            self.pushButton_return.setEnabled(False)
+            self.pushButton_bottle.setEnabled(False)
+            self.serial_synchroniser.track_progress(self)
+            self.serial_synchroniser.begin_communication(instructions)
+
+
+
+
 
 
 class MainMenu(QMainWindow):
@@ -369,7 +425,7 @@ def init_app_ui(app):
 
     stack.resize(ui_manager.res.width(), ui_manager.res.height())
 
-    stack.show()  # TODO : put in full screen
+    stack.show()#FullScreen()
 
 
 if __name__ == '__main__':
