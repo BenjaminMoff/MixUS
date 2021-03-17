@@ -61,11 +61,11 @@ class BottleSize(Enum):
 
     @staticmethod
     def ounces_to_ml(ounces):
-        return 30*ounces
+        return 30 * ounces
 
     @staticmethod
     def ml_to_ounces(ml):
-        return int(ml/30)
+        return int(ml / 30)
 
 
 # Paths to persistence files
@@ -111,3 +111,7 @@ class Style(Enum):
     combo_box_size = QSize(400, 59)
     drink_image_size = QSize(200, 350)
     menu_button_size = QSize(150, 75)
+
+
+class HardwareConfig(Enum):
+    limit_switch_pin = 5
