@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets, uic, QtGui
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QComboBox, QLabel, QMainWindow, QDialog, QStackedWidget, QPushButton, \
-    QHBoxLayout, QLayout
+    QHBoxLayout, QLayout, QMessageBox
 from DataModel import *
 from JsonHandler import JsonHandler
 from Enums import *
@@ -56,6 +56,32 @@ class BottleLayout(QHBoxLayout):
 
         self.init_combo_box(self.liquid_type_combo_box, self.bottle.get_liquid_name(), Liquid.list())
         self.init_combo_box(self.volume_left_combo_box, str(self.bottle.get_volume_left()), BottleSize.list())
+
+
+class Popup:
+
+    @staticmethod
+    def drink_completed(close_action):
+        # TODO: Replace button with limit switch(close when cup removed)
+        msg = QMessageBox()
+        msg.setWindowTitle("Mixus")
+        msg.setText("Bonne swince!")
+        msg.setStandardButtons(QMessageBox.Ok)
+        msg.buttonClicked.connect(close_action)
+        msg.setModal(True)
+        msg.exec_()
+
+    @staticmethod
+    def serial_port_error(close_action):
+        # TODO: Replace button with limit switch(close when cup removed)
+        msg = QMessageBox()
+        msg.setWindowTitle("Mixus")
+        msg.setText("Connection avec le barman est perdue")
+        msg.setIcon(QMessageBox.Critical)
+        msg.setStandardButtons(QMessageBox.Ok)
+        msg.buttonClicked.connect(close_action)
+        msg.setModal(True)
+        msg.exec_()
 
 
 class BottleMenu(QDialog):
@@ -184,6 +210,7 @@ class MixingMenu(QDialog):
 
     def done_mixing(self):
         # TODO : popup/whatever to indicate that the drink is ready
+        Popup.drink_completed(self.return_button_action)
         pass
 
     def serial_port_error(self):
