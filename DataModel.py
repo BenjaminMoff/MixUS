@@ -80,16 +80,20 @@ class Drink:
         :param bottles:
         :return:
         """
-        counter = 0
-        for liquid in self.liquids:
+        available_liquid = []
+        required_liquids = list(self.ingredients.keys())
+
+        for liquid in required_liquids:
             for bottle in bottles:
                 # If the remaining volume in the bottle is enough to make the drink, then the counter increases
-                if bottle.get_liquid_name() == liquid.string_name \
+                if bottle.get_liquid_name() == liquid \
                         and bottle.get_volume_left() >= \
-                        BottleSize.ounces_to_ml(self.ingredients.get(liquid.string_name)):
-                    counter += 1
+                        BottleSize.ounces_to_ml(self.ingredients.get(liquid)):
+                    available_liquid.append(bottle.get_liquid_name())
         # If the counter is equal to the number of ingredients, then the drink is available for the user
-        if counter == len(self.ingredients):
+        required_liquids.sort()
+        available_liquid.sort()
+        if available_liquid == required_liquids:
             return True
         else:
             return False

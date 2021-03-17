@@ -17,7 +17,6 @@ class Flag:
 
 
 class SerialSynchroniser(QObject):
-    # TODO : add method to kill thread
     """
     Class responsible to communicate with the motor controller board by serial port
     """

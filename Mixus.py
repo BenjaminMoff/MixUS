@@ -128,7 +128,7 @@ class MixingMenu(QDialog):
         self.checkpoint_reached.connect(self.update_ingredients)
         self.drink_completed.connect(self.done_mixing)
         self.ui_manager.mixing_menu_setup(self)
-        self.serial_synchroniser = SerialSynchroniser("COM3")
+        self.serial_synchroniser = SerialSynchroniser("COM4")
         self.drink = None
 
     def update_layout(self, instructions, checkpoints, drink):
@@ -161,7 +161,6 @@ class MixingMenu(QDialog):
 
     def start_mixing(self, instructions, checkpoints):
         # TODO : Take serial port from maintenance menu + add verification on serial port
-
 
         if self.serial_synchroniser.can_start_communication():
             self.serial_synchroniser.track_progress(self, checkpoints, len(instructions))
@@ -288,7 +287,7 @@ class MaintenanceMenu(QDialog):
         super(MaintenanceMenu, self).__init__()
         uic.loadUi(Paths.MAINTENANCE_MENU.value, self)
         self.window_manager = window_manager
-        self.serial_synchroniser = SerialSynchroniser("COM3")
+        self.serial_synchroniser = SerialSynchroniser("COM4")
         self.instruction_completed.connect(self.on_instruction_completed)
         self.pushButton_return.clicked.connect(lambda: self.window_manager.switch_window("MainMenu"))
         self.pushButton_bottle.clicked.connect(lambda: self.window_manager.switch_window("BottleMenu"))
