@@ -68,8 +68,18 @@ class UIManager:
         :param slider: QSlider of the menu
         :return:
         """
-        slider.setGeometry(int(self.res.width() / 20), int(self.res.height() * 1 / 2),
+        slider.setGeometry(int(self.res.width() / 20), int(self.res.height() / 2),
                            int(self.res.width() * 0.9), int(self.res.height() / 6))
+
+    def axis_label_setup(self, label):
+        """
+        Sets the label for the axis slider
+        :param label:
+        :return:
+        """
+        label.setGeometry(int(self.res.width() * 0.48), int(self.res.height() * 0.35),
+                          int(self.res.width() * 0.9), int(self.res.height() / 6))
+        label.setFont(QFont("Times", 15, QFont.Bold))
 
     def comboBox_axis_setup(self, comboBox):
         """
@@ -113,7 +123,9 @@ class UIManager:
         :param progressbar: QProgressBar of the menu
         :return:
         """
-        progressbar.setGeometry(int(self.res.width() * 0.3), int(self.res.height() * 0.9), int(self.res.width() * 0.65),
+        progressbar.setGeometry(int(self.res.width() * 0.3),
+                                int(self.res.height() * 0.9),
+                                int(self.res.width() * 0.65),
                                 int(self.res.height() * 0.05))
 
     def main_layout_setup(self, layout):
@@ -145,6 +157,7 @@ class UIManager:
         self.bottom_background_setup(maintenance_menu.label_bottom_screen)
         self.bottom_left_button_setup(maintenance_menu.pushButton_return)
         self.bottom_right_button_setup(maintenance_menu.pushButton_send)
+        self.axis_label_setup(maintenance_menu.label_axis)
         self.slider_setup(maintenance_menu.slider)
         self.comboBox_axis_setup(maintenance_menu.comboBox_axis)
         maintenance_menu.pushButton_home.setGeometry(int(self.res.width() / 20), int(self.res.height() / 5),
