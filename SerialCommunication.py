@@ -1,5 +1,6 @@
 import serial
 import serial.tools.list_ports
+import time
 from serial import *
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QThread, Qt
 from PyQt5.QtCore import QObject
@@ -16,6 +17,39 @@ class Flag:
         return self.value
 
 
+class ListUSB:
+
+    def get_usb_devices(self):
+        ports = []
+        for p in list(serial.tools.list_ports.comports()):
+            ports.append(list(p))
+
+        com_port = []
+        for port in ports:
+            com_port.append(port[0])
+
+        return com_port
+
+    def findusbdevice(self):
+        ports = self.get_usb_devices()
+        string = "M118 marlin_detected\n"
+        for port in ports:
+            ser = serial.Serial(port, 250000, 8, 'N', 1, timeout=1)
+            time.sleep(1)
+            ser.flushInput()
+            ser.write(str.encode(string, 'utf-8'))
+
+            elapsed_time = 0
+            start_time = time.time()
+
+            while elapsed_time < 2000:
+                message = ser.readline().decode(errors='replace')
+                if message == "marlin_detected\r\n":
+                    return port
+                elapsed_time = time.time() - start_time
+        return None
+
+
 class SerialSynchroniser(QObject):
     """
     Class responsible to communicate with the motor controller board by serial port
@@ -27,21 +61,22 @@ class SerialSynchroniser(QObject):
     __serial_communication_thread = None
     singleton = None
 
-    def __new__(cls, port_string=None):
+    def __new__(cls):
         if cls.singleton is None:
-            cls.singleton = QObject.__new__(cls, port_string)
+            cls.singleton = QObject.__new__(cls)
         return cls.singleton
 
-    def __init__(self, port_string=None):
+    def __init__(self):
         super().__init__()
-        if port_string is not None:
-            self.set_serial_port(port_string)
+        self.set_serial_port()
         self.__serial_communication_thread = SerialCommunicator(self)
         self.singleton = self
 
-    def set_serial_port(self, port_string):
+    def set_serial_port(self):
         if self.serial_port is not None:
             self.serial_port.close()
+        list_usb = ListUSB()
+        port_string = list_usb.findusbdevice()
         self.serial_port = Serial(port_string, baudrate=250000, timeout=0.1)
 
     def begin_communication(self, instructions):
@@ -92,7 +127,6 @@ class SerialSynchroniser(QObject):
 
 class SerialCommunicator(QThread):
     progress_notifier = pyqtSignal(int)
-    is_first_connection = True
 
     def __init__(self, parent):
         super(SerialCommunicator, self).__init__()
@@ -107,11 +141,6 @@ class SerialCommunicator(QThread):
         self.__send_instructions()
 
     def __send_instructions(self):
-        # TODO : trigger message at init might change + message should be handled when searching port
-        if self.is_first_connection:
-            self.__read_from_serial("echo:  M907 X135 Y135 Z135 E135 135")
-            self.is_first_connection = False
-
         for index, instruction in enumerate(self.instructions):
             if not self.communicate.get():
                 return
@@ -128,7 +157,6 @@ class SerialCommunicator(QThread):
         self.__instruction_done = False
         while not self.__instruction_done and self.communicate.get():
             message = self.serial_port.readline().decode("utf-8")
-            print(message)
             if message == trigger_msg:
                 self.__instruction_done = True
 

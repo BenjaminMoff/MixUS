@@ -7,6 +7,7 @@ from DataModel import *
 from JsonHandler import JsonHandler
 from Enums import *
 from UIManager import *
+from LimitSwitch import LimitSwitch
 from SerialCommunication import SerialSynchroniser
 import sys
 
@@ -89,13 +90,14 @@ class Popup:
         msg.exec_()
 
     @staticmethod
-    def no_cup_error(close_action):
+    def no_cup_error(cup_detected_action):
         # TODO : close with button + cup detection (start thread that reads cup captor here)
         msg = Popup.__default_popup()
         msg.setText("Veuillez insérer un verre")
         msg.setIcon(QMessageBox.Information)
-        msg.setStandardButtons(QMessageBox.Ok)
-        msg.buttonClicked.connect(close_action)
+        msg.setStandardButtons(QMessageBox.Cancel)
+        msg.buttonClicked.connect(LimitSwitch().cancel())
+        LimitSwitch().execute_when_activated(cup_detected_action)
         msg.exec_()
 
     @staticmethod
@@ -178,7 +180,7 @@ class MixingMenu(QDialog):
         self.checkpoint_reached.connect(self.update_ingredients)
         self.drink_completed.connect(self.done_mixing)
         self.ui_manager.mixing_menu_setup(self)
-        self.serial_synchroniser = SerialSynchroniser("COM4")
+        self.serial_synchroniser = SerialSynchroniser()
         self.drink = None
 
     def update_layout(self, instructions, checkpoints, drink):
@@ -253,7 +255,8 @@ class DrinkOptionMenu(QDialog):
         self.window_manager = window_manager
         self.drink_manager = drink_manager
         self.ui_manager = ui_manager
-        self.serial_synchroniser = SerialSynchroniser("COM4")
+        self.serial_synchroniser = SerialSynchroniser()
+        self.cup_switch = LimitSwitch()
 
         ui_manager.drink_option_menu_setup(self)
 
@@ -327,6 +330,12 @@ class DrinkOptionMenu(QDialog):
     def is_virgin_available(self):
         return self.drink_manager.is_virgin_available(self.drink)
 
+    def confirm_button_action(self):
+        if self.cup_switch.is_activated():
+            self.load_mixing_menu()
+        else:
+            Popup.no_cup_error(self.load_mixing_menu)
+
     def load_mixing_menu(self):
         instructions, liquid_checkpoints = self.drink_manager.get_instructions(self.drink,
                                                                                self.radioButton_double.isChecked(),
@@ -347,7 +356,7 @@ class MaintenanceMenu(QDialog):
         super(MaintenanceMenu, self).__init__()
         uic.loadUi(Paths.MAINTENANCE_MENU.value, self)
         self.window_manager = window_manager
-        self.serial_synchroniser = SerialSynchroniser("COM4")
+        self.serial_synchroniser = SerialSynchroniser()
         self.instruction_completed.connect(self.on_instruction_completed)
         self.pushButton_return.clicked.connect(lambda: self.change_window("MainMenu"))
         self.pushButton_bottle.clicked.connect(lambda: self.change_window("BottleMenu"))
@@ -531,13 +540,12 @@ def init_app_ui(app):
 
 
 def init_hardware():
-    SerialSynchroniser("COM4").begin_communication(GCodeGenerator.home())
+    SerialSynchroniser().begin_communication(GCodeGenerator.home())
 
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     init_app_ui(app)
     init_hardware()
-    Popup.home_before_leaving(lambda: print("BWAK"))
     sys.exit(app.exec_())
 
