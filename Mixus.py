@@ -61,26 +61,52 @@ class BottleLayout(QHBoxLayout):
 class Popup:
 
     @staticmethod
-    def drink_completed(close_action):
-        # TODO: Replace button with limit switch(close when cup removed)
+    def __default_popup():
         msg = QMessageBox()
         msg.setWindowTitle("Mixus")
+        msg.setModal(True)
+        msg.setStyleSheet("QLabel{min-width: 200px; min-height: 100px;}")
+        msg.setFont(QFont("Times", 15, QFont.Bold))
+        return msg
+
+    @staticmethod
+    def drink_completed(close_action):
+        # TODO: Replace button with limit switch(close when cup removed)
+        msg = Popup.__default_popup()
         msg.setText("Bonne swince!")
         msg.setStandardButtons(QMessageBox.Ok)
         msg.buttonClicked.connect(close_action)
-        msg.setModal(True)
         msg.exec_()
 
     @staticmethod
     def serial_port_error(close_action):
         # TODO: Replace button with limit switch(close when cup removed)
-        msg = QMessageBox()
-        msg.setWindowTitle("Mixus")
-        msg.setText("Connection avec le barman est perdue")
+        msg = Popup.__default_popup()
+        msg.setText("Connection avec le barman perdue")
         msg.setIcon(QMessageBox.Critical)
+        msg.setStandardButtons(QMessageBox.Retry)
+        msg.buttonClicked.connect(close_action)
+        msg.exec_()
+
+    @staticmethod
+    def no_cup_error(close_action):
+        # TODO : close with button + cup detection (start thread that reads cup captor here)
+        msg = Popup.__default_popup()
+        msg.setText("Veuillez insérer un verre")
+        msg.setIcon(QMessageBox.Information)
         msg.setStandardButtons(QMessageBox.Ok)
         msg.buttonClicked.connect(close_action)
-        msg.setModal(True)
+        msg.exec_()
+
+    @staticmethod
+    def home_before_leaving(home_action):
+        msg = Popup.__default_popup()
+        msg.setText("Veuillez home avant de quitter ce menu")
+        msg.setIcon(QMessageBox.Warning)
+        home_button = QPushButton('Home')
+        msg.addButton(home_button, QMessageBox.YesRole)
+        msg.setStandardButtons(QMessageBox.Cancel)
+        home_button.clicked.connect(home_action)
         msg.exec_()
 
 
@@ -115,8 +141,6 @@ class BottleMenu(QDialog):
     def connect_buttons(self):
         self.pushButton_return.released.connect(lambda: self.window_manager.switch_window("MaintenanceMenu"))
         self.pushButton_confirm.released.connect(self.confirm_button_released)
-
-    # TODO ecriture dans persistance
 
     def confirm_button_released(self):
         # save changes done in the menu to the bottle list accessible by other menus
@@ -197,6 +221,8 @@ class MixingMenu(QDialog):
 
     def return_button_action(self):
         self.serial_synchroniser.abort_communication()
+        self.serial_synchroniser.begin_communication(GCodeGenerator.serve_cup())
+        self.done_mixing()
         self.window_manager.switch_window("MainMenu")
 
     def update_progress_bar(self, value):
@@ -209,12 +235,11 @@ class MixingMenu(QDialog):
         self.bottle_manager.pour(liquid_name, self.drink.ingredients.get(liquid_name))
 
     def done_mixing(self):
-        # TODO : popup/whatever to indicate that the drink is ready
         Popup.drink_completed(self.return_button_action)
-        pass
 
     def serial_port_error(self):
         # TODO : popup/whatever to indicate that the serial port should be set in maintenance menu or check connection
+        Popup.serial_port_error()
         pass
 
 
@@ -228,6 +253,7 @@ class DrinkOptionMenu(QDialog):
         self.window_manager = window_manager
         self.drink_manager = drink_manager
         self.ui_manager = ui_manager
+        self.serial_synchroniser = SerialSynchroniser("COM4")
 
         ui_manager.drink_option_menu_setup(self)
 
@@ -235,17 +261,23 @@ class DrinkOptionMenu(QDialog):
         self.radioButton_double.toggled.connect(self.update_ingredients)
         self.radioButton_virgin.toggled.connect(self.update_ingredients)
 
-        self.pushButton_return.released.connect(lambda: self.window_manager.switch_window("MainMenu"))
+        self.pushButton_return.released.connect(self.return_button_action)
         self.pushButton_confirm.released.connect(self.load_mixing_menu)
-
-        # TODO lancer algorithme de generation de gcode + lancement commandes?
 
     def update_layout(self, drink):
         self.drink = drink
         self.label_Title.setText(self.drink.name)
         self.radioButton_normal.setChecked(True)
         self.ui_manager.image_setup(self.label_drinkImage, self.drink.image_path)
+        self.request_cup()
         self.update_ingredients()
+
+    def return_button_action(self):
+        self.serial_synchroniser.begin_communication(GCodeGenerator.insert_cup())
+        self.window_manager.switch_window("MainMenu")
+
+    def request_cup(self):
+        self.serial_synchroniser.begin_communication(GCodeGenerator.wait_for_cup())
 
     def update_ingredients(self):
         self.is_current_setting_valid()
@@ -309,6 +341,7 @@ class DrinkOptionMenu(QDialog):
 class MaintenanceMenu(QDialog):
     name = "MaintenanceMenu"
     instruction_completed = pyqtSignal()
+    is_home = True
 
     def __init__(self, window_manager, ui_manager):
         super(MaintenanceMenu, self).__init__()
@@ -316,18 +349,18 @@ class MaintenanceMenu(QDialog):
         self.window_manager = window_manager
         self.serial_synchroniser = SerialSynchroniser("COM4")
         self.instruction_completed.connect(self.on_instruction_completed)
-        self.pushButton_return.clicked.connect(lambda: self.window_manager.switch_window("MainMenu"))
-        self.pushButton_bottle.clicked.connect(lambda: self.window_manager.switch_window("BottleMenu"))
+        self.pushButton_return.clicked.connect(lambda: self.change_window("MainMenu"))
+        self.pushButton_bottle.clicked.connect(lambda: self.change_window("BottleMenu"))
         self.pushButton_send.clicked.connect(self.send_button_action)
-        self.pushButton_home.clicked.connect(self.home)
+        self.pushButton_home.clicked.connect(self.home_button_action)
         self.slider.valueChanged.connect(self.label_axis_update)
         self.comboBox_axis.currentIndexChanged.connect(lambda: self.slider_update(self.comboBox_axis.currentText()))
-        self.comboBox_axis_setup()
+        self.combobox_axis_setup()
 
         ui_manager.maintenance_menu_setup(self)
         # TODO faire lenvoi des positions des sliders avec un connect lambda
 
-    def comboBox_axis_setup(self):
+    def combobox_axis_setup(self):
         self.comboBox_axis.addItem('X')
         self.comboBox_axis.addItem('Y')
         self.comboBox_axis.addItem('Z')
@@ -348,6 +381,7 @@ class MaintenanceMenu(QDialog):
         self.label_axis.setText(str(self.slider.value()))
 
     def send_button_action(self):
+        self.is_home = False
         instructions = GCodeGenerator.move_axis(int(self.label_axis.text()), self.comboBox_axis.currentText)
         self.__send_command(instructions)
 
@@ -357,9 +391,16 @@ class MaintenanceMenu(QDialog):
         self.pushButton_return.setEnabled(True)
         self.pushButton_bottle.setEnabled(True)
 
-    def home(self):
+    def home_button_action(self):
+        self.is_home = True
         instructions = GCodeGenerator.home()
         self.__send_command(instructions)
+
+    def change_window(self, window_name):
+        if not self.is_home:
+            Popup.home_before_leaving(self.home_button_action)
+        else:
+            self.window_manager.switch_window(window_name)
 
     def __send_command(self, instructions):
         if self.serial_synchroniser.can_start_communication():
@@ -369,10 +410,6 @@ class MaintenanceMenu(QDialog):
             self.pushButton_bottle.setEnabled(False)
             self.serial_synchroniser.track_progress(self)
             self.serial_synchroniser.begin_communication(instructions)
-
-
-
-
 
 
 class MainMenu(QMainWindow):
@@ -493,7 +530,14 @@ def init_app_ui(app):
     stack.show()#FullScreen()
 
 
+def init_hardware():
+    SerialSynchroniser("COM4").begin_communication(GCodeGenerator.home())
+
+
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     init_app_ui(app)
+    init_hardware()
+    Popup.home_before_leaving(lambda: print("BWAK"))
     sys.exit(app.exec_())
+
