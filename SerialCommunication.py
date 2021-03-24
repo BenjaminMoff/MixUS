@@ -30,7 +30,7 @@ class ListUSB:
 
         return com_port
 
-    def findusbdevice(self):
+    def find_usb_device(self):
         ports = self.get_usb_devices()
         string = "M118 marlin_detected\n"
         for port in ports:
@@ -76,7 +76,7 @@ class SerialSynchroniser(QObject):
         if self.serial_port is not None:
             self.serial_port.close()
         list_usb = ListUSB()
-        port_string = list_usb.findusbdevice()
+        port_string = list_usb.find_usb_device()
         self.serial_port = Serial(port_string, baudrate=250000, timeout=0.1)
 
     def begin_communication(self, instructions):

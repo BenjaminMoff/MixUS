@@ -2,13 +2,14 @@ from PyQt5 import QtWidgets, uic, QtGui
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QComboBox, QLabel, QMainWindow, QDialog, QStackedWidget, QPushButton, \
-    QHBoxLayout, QLayout, QMessageBox
+    QHBoxLayout, QLayout
 from DataModel import *
 from JsonHandler import JsonHandler
 from Enums import *
 from UIManager import *
 from LimitSwitch import LimitSwitch
 from SerialCommunication import SerialSynchroniser
+from Popup import Popup
 import sys
 
 
@@ -57,59 +58,6 @@ class BottleLayout(QHBoxLayout):
 
         self.init_combo_box(self.liquid_type_combo_box, self.bottle.get_liquid_name(), Liquid.list())
         self.init_combo_box(self.volume_left_combo_box, str(self.bottle.get_volume_left()), BottleSize.list())
-
-
-class Popup:
-
-    @staticmethod
-    def __default_popup():
-        msg = QMessageBox()
-        msg.setWindowTitle("Mixus")
-        msg.setModal(True)
-        msg.setStyleSheet("QLabel{min-width: 200px; min-height: 100px;}")
-        msg.setFont(QFont("Times", 15, QFont.Bold))
-        return msg
-
-    @staticmethod
-    def drink_completed(close_action):
-        # TODO: Replace button with limit switch(close when cup removed)
-        msg = Popup.__default_popup()
-        msg.setText("Bonne swince!")
-        msg.setStandardButtons(QMessageBox.Ok)
-        msg.buttonClicked.connect(close_action)
-        msg.exec_()
-
-    @staticmethod
-    def serial_port_error(close_action):
-        # TODO: Replace button with limit switch(close when cup removed)
-        msg = Popup.__default_popup()
-        msg.setText("Connection avec le barman perdue")
-        msg.setIcon(QMessageBox.Critical)
-        msg.setStandardButtons(QMessageBox.Retry)
-        msg.buttonClicked.connect(close_action)
-        msg.exec_()
-
-    @staticmethod
-    def no_cup_error(cup_detected_action):
-        # TODO : close with button + cup detection (start thread that reads cup captor here)
-        msg = Popup.__default_popup()
-        msg.setText("Veuillez insérer un verre")
-        msg.setIcon(QMessageBox.Information)
-        msg.setStandardButtons(QMessageBox.Cancel)
-        msg.buttonClicked.connect(LimitSwitch().cancel())
-        LimitSwitch().execute_when_activated(cup_detected_action)
-        msg.exec_()
-
-    @staticmethod
-    def home_before_leaving(home_action):
-        msg = Popup.__default_popup()
-        msg.setText("Veuillez home avant de quitter ce menu")
-        msg.setIcon(QMessageBox.Warning)
-        home_button = QPushButton('Home')
-        msg.addButton(home_button, QMessageBox.YesRole)
-        msg.setStandardButtons(QMessageBox.Cancel)
-        home_button.clicked.connect(home_action)
-        msg.exec_()
 
 
 class BottleMenu(QDialog):
@@ -204,28 +152,29 @@ class MixingMenu(QDialog):
             self.verticalLayout_done.itemAt(i).widget().deleteLater()
 
         for ingredient in drink.liquids:
-            L = QLabel()
-            L.setText(ingredient.string_name)
-            L.setFont(QFont("Times", 12))
-            self.ingredient_labels.update({ingredient.string_name: L})
-            self.verticalLayout_waiting.addWidget(L)
+            label = QLabel()
+            label.setText(ingredient.string_name)
+            label.setFont(QFont("Times", 12))
+            self.ingredient_labels.update({ingredient.string_name: label})
+            self.verticalLayout_waiting.addWidget(label)
         self.start_mixing(instructions, checkpoints)
 
     def start_mixing(self, instructions, checkpoints):
-        # TODO : Take serial port from maintenance menu + add verification on serial port
-
         if self.serial_synchroniser.can_start_communication():
             self.serial_synchroniser.track_progress(self, checkpoints, len(instructions))
             self.serial_synchroniser.begin_communication(instructions)
-
         else:
             self.serial_port_error()
 
     def return_button_action(self):
         self.serial_synchroniser.abort_communication()
-        self.serial_synchroniser.begin_communication(GCodeGenerator.serve_cup())
+
+        if self.serial_synchroniser.can_start_communication():
+            self.serial_synchroniser.begin_communication(GCodeGenerator.serve_cup())
+        else:
+            self.serial_port_error()
+
         self.done_mixing()
-        self.window_manager.switch_window("MainMenu")
 
     def update_progress_bar(self, value):
         self.progressBar.setValue(value)
@@ -237,12 +186,10 @@ class MixingMenu(QDialog):
         self.bottle_manager.pour(liquid_name, self.drink.ingredients.get(liquid_name))
 
     def done_mixing(self):
-        Popup.drink_completed(self.return_button_action)
+        Popup.drink_completed(lambda: self.window_manager.switch_window("MainMenu"))
 
     def serial_port_error(self):
-        # TODO : popup/whatever to indicate that the serial port should be set in maintenance menu or check connection
-        Popup.serial_port_error()
-        pass
+        Popup.serial_port_error(self.serial_synchroniser.set_serial_port)
 
 
 class DrinkOptionMenu(QDialog):
@@ -276,11 +223,17 @@ class DrinkOptionMenu(QDialog):
         self.update_ingredients()
 
     def return_button_action(self):
-        self.serial_synchroniser.begin_communication(GCodeGenerator.insert_cup())
+        if self.serial_synchroniser.can_start_communication():
+            self.serial_synchroniser.begin_communication(GCodeGenerator.insert_cup())
+        else:
+            Popup.serial_port_error(self.serial_synchroniser.set_serial_port)
         self.window_manager.switch_window("MainMenu")
 
     def request_cup(self):
-        self.serial_synchroniser.begin_communication(GCodeGenerator.wait_for_cup())
+        if self.serial_synchroniser.can_start_communication():
+            self.serial_synchroniser.begin_communication(GCodeGenerator.wait_for_cup())
+        else:
+            Popup.serial_port_error(self.serial_synchroniser.set_serial_port)
 
     def update_ingredients(self):
         self.is_current_setting_valid()
@@ -290,30 +243,30 @@ class DrinkOptionMenu(QDialog):
 
         flag = 0
         for liquid in list(self.drink.liquids):
-            L = LiquidLabel(liquid, self.drink.ingredients.get(liquid.string_name))
-            vol = self.drink.ingredients.get(L.liquid.string_name)
+            l = LiquidLabel(liquid, self.drink.ingredients.get(liquid.string_name))
+            vol = self.drink.ingredients.get(l.liquid.string_name)
             if self.radioButton_normal.isChecked():
-                L.update_volume(vol)
+                l.update_volume(vol)
             elif self.radioButton_double.isChecked():
-                if L.liquid.is_alcoholized:
-                    L.update_volume(vol * 2)
-                elif L.liquid.is_filler:
+                if l.liquid.is_alcoholized:
+                    l.update_volume(vol * 2)
+                elif l.liquid.is_filler:
                     volume_to_remove = self.drink.alcohol_volume()
-                    L.update_volume(
+                    l.update_volume(
                         vol - volume_to_remove)
                 else:
-                    L.update_volume(vol)
+                    l.update_volume(vol)
             elif self.radioButton_virgin.isChecked():
-                if L.liquid.is_alcoholized:
+                if l.liquid.is_alcoholized:
                     flag = 1
-                elif L.liquid.is_filler:
+                elif l.liquid.is_filler:
                     volume_to_add = self.drink.alcohol_volume()
-                    L.update_volume(vol + volume_to_add)
+                    l.update_volume(vol + volume_to_add)
                 else:
-                    L.update_volume(vol)
+                    l.update_volume(vol)
 
             if flag == 0:
-                self.verticalLayout_ingredients.addWidget(L)
+                self.verticalLayout_ingredients.addWidget(l)
             else:
                 flag = 0
 
@@ -419,6 +372,8 @@ class MaintenanceMenu(QDialog):
             self.pushButton_bottle.setEnabled(False)
             self.serial_synchroniser.track_progress(self)
             self.serial_synchroniser.begin_communication(instructions)
+        else:
+            Popup.serial_port_error(self.serial_synchroniser.set_serial_port)
 
 
 class MainMenu(QMainWindow):
@@ -540,7 +495,20 @@ def init_app_ui(app):
 
 
 def init_hardware():
-    SerialSynchroniser().begin_communication(GCodeGenerator.home())
+    serial_synchroniser = SerialSynchroniser()
+    if serial_synchroniser.can_start_communication():
+        serial_synchroniser.begin_communication(GCodeGenerator.home())
+    else:
+        Popup.serial_port_error(serial_synchroniser.set_serial_port)
+
+
+def connect_and_resend():
+    serial_synchroniser = SerialSynchroniser()
+    serial_synchroniser.set_serial_port()
+    if serial_synchroniser.can_start_communication():
+        serial_synchroniser.begin_communication(GCodeGenerator.home())
+    else:
+        Popup.serial_port_error(serial_synchroniser.set_serial_port)
 
 
 if __name__ == '__main__':

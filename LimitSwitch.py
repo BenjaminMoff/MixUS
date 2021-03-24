@@ -31,16 +31,19 @@ class LimitSwitch:
     def __deactivate(self):
         self.activated = False
 
-    def __loop_until_activated(self, runnable):
-        while self.activated is not True and self.canceled is not True:
+    def __loop_until(self, runnable, activated):
+        while self.activated is not activated and self.canceled is not True:
             sleep(0.1)
         if not self.canceled:
-            runnable
+            runnable()
         else:
             self.canceled = False
 
     def execute_when_activated(self, runnable):
-        Thread(self.__loop_until_activated(runnable), daemon=True).start()
+        Thread(self.__loop_until(runnable, True), daemon=True).start()
+
+    def execute_when_deactivated(self, runnable):
+        Thread(self.__loop_until(runnable, False), daemon=True).start()
 
     def cancel(self):
         self.canceled = True
