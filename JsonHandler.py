@@ -16,6 +16,11 @@ class JsonHandler:
         return obj
 
     def save_data(self, item_list):
+        """
+        save the given data to the appropriate Json file
+        :param item_list: The data to save
+        :return:
+        """
         path = self.bottle_file_path if isinstance(item_list[0], Bottle) else self.drink_file_path
 
         serialized_list = []
@@ -26,6 +31,10 @@ class JsonHandler:
             json.dump(serialized_list, outfile, cls=LiquidEncoder)
 
     def load_bottles(self):
+        """
+        Load the data in the Bottle Json file and returns it
+        :return:
+        """
         with open(self.bottle_file_path, 'r') as infile:
             encrypted_list = json.load(infile, object_hook=as_enum)
 
@@ -35,6 +44,10 @@ class JsonHandler:
         return bottles
 
     def load_drinks(self):
+        """
+        load the data in the Drinks Json file and returns it
+        :return:
+        """
         with open(self.drink_file_path, 'r') as infile:
             encrypted_list = json.load(infile, object_hook=as_enum)
 

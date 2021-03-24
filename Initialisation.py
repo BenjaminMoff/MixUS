@@ -1,15 +1,13 @@
 from __future__ import print_function, unicode_literals
 
-import sys, os
+import os
+import sys
 
-import inquirer as inquirer
+from PyInquirer import style_from_dict, Token, prompt
 
 from DataModel import *
 from Enums import Paths, Liquid
 from JsonHandler import JsonHandler
-
-from PyInquirer import style_from_dict, Token, prompt
-from pprint import pprint
 
 max_volume = 12  # Max volume (in ounces) in a drink
 
@@ -38,6 +36,10 @@ class CmdUI:
 
     @staticmethod
     def action_inquirer():
+        """
+        Get the action of the user
+        :return:
+        """
         action = prompt([
             {
                 'type': 'list',
@@ -53,8 +55,11 @@ class CmdUI:
         print(action)
         return action.startswith('Ajouter')
 
-
     def drink_name_inquirer(self):
+        """
+        Get the name of the new drink from the user
+        :return:
+        """
         self.drink_name = prompt([
             {
                 'type': 'input',
@@ -75,7 +80,10 @@ class CmdUI:
         return self.drink_name
 
     def liquids_inquirer(self):
-
+        """
+        Get the liquids name in the drink from the user
+        :return:
+        """
         self.drink_liquids = prompt([
             {
                 'type': 'checkbox',
@@ -92,6 +100,11 @@ class CmdUI:
         return self.drink_liquids
 
     def quantity_inquirer(self, liquid):
+        """
+        Get the volume in ounces for each liquids in the drink
+        :param liquid:
+        :return:
+        """
         volume = prompt([
             {
                 'type': 'input',
@@ -107,6 +120,10 @@ class CmdUI:
         return int(volume)
 
     def image_path_inquirer(self):
+        """
+        Get the image_path for the drink
+        :return:
+        """
         print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n')
         self.image_path = prompt([
             {
@@ -128,6 +145,10 @@ class CmdUI:
         return self.image_path
 
     def confirm_choice(self):
+        """
+        Get the user confirm to add the new drink to the database
+        :return:
+        """
         display_ingredients = ''
         for ingredient in list(self.ingredient_dict):
             display_ingredients += str(self.ingredient_dict.get(ingredient)) + ' once(s) de ' + str(ingredient) + '\n'
@@ -146,6 +167,10 @@ class CmdUI:
         return confirm
 
     def remove_drink(self):
+        """
+        Get the drink to remove from the database
+        :return:
+        """
         drink_to_remove = prompt([
             {
                 'type': 'list',
@@ -157,6 +182,11 @@ class CmdUI:
         return self.drink_manager.get_drink_from_name(drink_to_remove)
 
     def __verify_drink_name(self, answer):
+        """
+        Verify if the drink_name is at least 4 letters or isn't already used
+        :param answer:
+        :return:
+        """
         if len(answer) < 4:
             return 0
 
@@ -167,6 +197,11 @@ class CmdUI:
 
     @staticmethod
     def __verify_drink_volume(answer):
+        """
+        Verify if the drink volume is not larger than 12 ounces
+        :param answer:
+        :return:
+        """
         try:
             answer = int(answer)
         except ValueError:
@@ -178,6 +213,11 @@ class CmdUI:
         return 2
 
     def __verify_image_path(self, answer):
+        """
+        Verify if the image_path given is valid
+        :param answer:
+        :return:
+        """
         extension = ''.join(list(answer)[-4:])
         if extension != '.jpg' and extension != '.png':
             return 1
@@ -204,6 +244,10 @@ class NewDrink:
         self.get_action()
 
     def get_action(self):
+        """
+        Get the action from the user with the cmd_ui
+        :return:
+        """
         action = self.cmd_ui.action_inquirer()
         if action == 1:
             self.get_drink_parameters()
@@ -211,6 +255,10 @@ class NewDrink:
             self.remove_drink()
 
     def get_drink_parameters(self):
+        """
+        Get all the drink parameters to add to the database afterwards
+        :return:
+        """
         self.name = self.cmd_ui.drink_name_inquirer()
         self.ingredients = self.cmd_ui.liquids_inquirer()
         self.get_volumes()
@@ -222,11 +270,19 @@ class NewDrink:
             self.drink_manager.save_data()
 
     def remove_drink(self):
+        """
+        Get the drink to remove from the database and remove it
+        :return:
+        """
         drink_to_remove = self.cmd_ui.remove_drink()
         self.drink_manager.remove_drink(drink_to_remove)
         self.drink_manager.save_data()
 
     def get_volumes(self):
+        """
+        Get the volumes of all the liquids
+        :return:
+        """
         print('\033[1m' + '\033[4m' + 'Le volume de la boisson dépasse la limite de ' + str(
             max_volume) + ' onces' + '\033[0m')
         vol_tot = 0
@@ -247,9 +303,3 @@ if __name__ == '__main__':
     drink_manager = DrinkManager(json_handler, bottle_manager)
 
     new_drink = NewDrink(CmdUI(drink_manager), drink_manager)
-
-#     json_handler = JsonHandler(Paths.BOTTLES.value, Paths.DRINKS.value)
-#     bottle_list = [Bottle(1, Liquid.RUM, 5), Bottle(2, Liquid.VODKA, 500),
-#                    Bottle(3, Liquid.TEQUILA, 375), Bottle(4, Liquid.CRANBERRY_JUICE, 1000),
-#                    Bottle(5, Liquid.TRIPLE_SEC, 750), Bottle(6, Liquid.ORANGE_JUICE, 1000)]
-#     json_handler.save_data(bottle_list)

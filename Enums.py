@@ -5,7 +5,6 @@ import os
 
 
 class Liquid(Enum):
-
     def __new__(cls, *args, **kwds):
         value = len(cls.__members__) + 2
         obj = object.__new__(cls)

@@ -17,8 +17,13 @@ class Bottle:
                self.__liquid.string_name == other.get_liquid_name() and \
                self.__volume_left_ml == other.get_volume_left()
 
-    # Method that keeps tracks of the remaining liquid in the bottle when poured
+
     def pour(self, ounces=1):
+        """
+        Method that keeps tracks of the remaining liquid in the bottle when poured
+        :param ounces: volume to pour in ounces
+        :return:
+        """
         if self.__volume_left_ml - BottleSize.ounces_to_ml(ounces) <= 0:
             return -1
         else:
@@ -181,6 +186,11 @@ class BottleManager:
         self.update(bottles)
 
     def update(self, bottles):
+        """
+        Update the BottleManager with a new bottle
+        :param bottles: bottle to update the manager with
+        :return:
+        """
         if len(bottles) > self.number_of_bottles:
             raise ValueError("Too many bottle_manager for the number of slots")
         for bottle in bottles:
@@ -190,6 +200,12 @@ class BottleManager:
         self.save_data()
 
     def pour(self, liquid_name, ounces):
+        """
+        Pour ounces of the given liquid
+        :param liquid_name: string_name of the Liquid
+        :param ounces: Volume to pour
+        :return:
+        """
         for bottle in self.bottles_dict.values():
             if bottle.get_liquid_name() == liquid_name:
                 bottle.pour(ounces)
@@ -197,12 +213,25 @@ class BottleManager:
         self.save_data()
 
     def get_bottles(self):
+        """
+        Get a list of the bottles in the manager
+        :return:
+        """
         return list(self.bottles_dict.values())
 
     def remove_bottle(self, slot):
+        """
+        Remove the bottle from the manager at the given slot
+        :param slot:
+        :return:
+        """
         self.bottles_dict.update({slot: None})
 
     def save_data(self):
+        """
+        Save the current manager to the json file
+        :return:
+        """
         self.json_handler.save_data(self.get_bottles())
 
 
@@ -227,29 +256,58 @@ class DrinkManager:
         return available_drinks
 
     def get_drink_from_name(self, name):
+        """
+        Get a drink from a given string
+        :param name: string name of the drink
+        :return:
+        """
         for drink in self.drinks:
             if drink.name == name:
                 return drink
         return None
 
     def add_new_drink(self, drink):
+        """
+        Add a new drink to the manager
+        :param drink: Drink object to add
+        :return:
+        """
         self.drinks.append(drink)
 
     def remove_drink(self, drink):
+        """
+        Remove a drink from the manager
+        :param drink: Drink object to remove
+        :return:
+        """
         self.drinks.remove(drink)
 
     def save_data(self):
+        """
+        Save the manager to the json file
+        :return:
+        """
         self.json_handler.save_data(self.drinks)
 
     def is_double_available(self, drink):
+        """
+        returns true if the current drink can be doubled based on the Liquids in the bottles
+        :param drink: Drink to be doubled
+        :return:
+        """
         return drink.enough_for_double(self.bottle_manager.get_bottles())
 
     def is_virgin_available(self, drink):
+        """
+        returns true if the current drink can be virgin based on the Liquids in the bottles
+        :param drink:
+        :return:
+        """
         return drink.enough_for_virgin(self.bottle_manager.get_bottles())
 
-    # Returns list of g-code instructions for a specific drink
     def get_instructions(self, drink, is_double=False, is_virgin=False):
         """
+        Returns list of g-code instructions for a specific drink
         :param drink: specified drink to make
         :param is_double: specify if the alcohol content should be doubled
         :param is_virgin: specify if the alcohol content should be removed
@@ -285,7 +343,15 @@ class DrinkManager:
         return instructions, liquid_checkpoints
 
     def __compute_ounces_to_pour(self, instructions, drink, liquid, is_double=False, is_virgin=False):
-
+        """
+        Method that computes the ounces to pour based on the type of drink, if it's doubled or virgin.
+        :param instructions: List that is appended with the new instructions
+        :param drink: The drink to be made
+        :param liquid: The liquid to be poured in the drink
+        :param is_double: True if the drink is double
+        :param is_virgin: True if the drink is virgin
+        :return:
+        """
         # If the drink is double, the alcohol content is doubled and the filler is reduced accordingly
         if is_double:
             if liquid.is_alcoholized:
@@ -301,7 +367,3 @@ class DrinkManager:
 
         else:
             instructions.extend(GCodeGenerator.pour(drink.ingredients.get(liquid.string_name)))
-
-    # Returns the order in which the ingredients should be added to minimize distance
-    def sort_ingredients_by_slot_numbers(self, drink):
-        pass
