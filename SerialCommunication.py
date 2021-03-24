@@ -42,7 +42,7 @@ class ListUSB:
             elapsed_time = 0
             start_time = time.time()
 
-            while elapsed_time < 2000:
+            while elapsed_time < 500:
                 message = ser.readline().decode(errors='replace')
                 if message == "marlin_detected\r\n":
                     return port

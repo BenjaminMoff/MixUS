@@ -157,23 +157,26 @@ class MixingMenu(QDialog):
             label.setFont(QFont("Times", 12))
             self.ingredient_labels.update({ingredient.string_name: label})
             self.verticalLayout_waiting.addWidget(label)
-        self.start_mixing(instructions, checkpoints)
+
+        if self.serial_synchroniser.can_start_communication():
+            self.start_mixing(instructions, checkpoints)
+        else:
+            connect_and_retry(lambda: self.start_mixing(instructions, checkpoints))
 
     def start_mixing(self, instructions, checkpoints):
-        if self.serial_synchroniser.can_start_communication():
-            self.serial_synchroniser.track_progress(self, checkpoints, len(instructions))
-            self.serial_synchroniser.begin_communication(instructions)
-        else:
-            self.serial_port_error()
+        self.serial_synchroniser.track_progress(self, checkpoints, len(instructions))
+        self.serial_synchroniser.begin_communication(instructions)
 
     def return_button_action(self):
         self.serial_synchroniser.abort_communication()
 
         if self.serial_synchroniser.can_start_communication():
-            self.serial_synchroniser.begin_communication(GCodeGenerator.serve_cup())
+            self.end_mixing()
         else:
-            self.serial_port_error()
+            connect_and_retry(self.end_mixing)
 
+    def end_mixing(self):
+        self.serial_synchroniser.begin_communication(GCodeGenerator.serve_cup())
         self.done_mixing()
 
     def update_progress_bar(self, value):
@@ -187,9 +190,6 @@ class MixingMenu(QDialog):
 
     def done_mixing(self):
         Popup.drink_completed(lambda: self.window_manager.switch_window("MainMenu"))
-
-    def serial_port_error(self):
-        Popup.serial_port_error(self.serial_synchroniser.set_serial_port)
 
 
 class DrinkOptionMenu(QDialog):
@@ -226,14 +226,14 @@ class DrinkOptionMenu(QDialog):
         if self.serial_synchroniser.can_start_communication():
             self.serial_synchroniser.begin_communication(GCodeGenerator.insert_cup())
         else:
-            Popup.serial_port_error(self.serial_synchroniser.set_serial_port)
+            connect_and_retry(lambda: self.serial_synchroniser.begin_communication(GCodeGenerator.insert_cup()))
         self.window_manager.switch_window("MainMenu")
 
     def request_cup(self):
         if self.serial_synchroniser.can_start_communication():
             self.serial_synchroniser.begin_communication(GCodeGenerator.wait_for_cup())
         else:
-            Popup.serial_port_error(self.serial_synchroniser.set_serial_port)
+            connect_and_retry(lambda: self.serial_synchroniser.begin_communication(GCodeGenerator.wait_for_cup()))
 
     def update_ingredients(self):
         self.is_current_setting_valid()
@@ -345,7 +345,10 @@ class MaintenanceMenu(QDialog):
     def send_button_action(self):
         self.is_home = False
         instructions = GCodeGenerator.move_axis(int(self.label_axis.text()), self.comboBox_axis.currentText)
-        self.__send_command(instructions)
+        if self.serial_synchroniser.can_start_communication():
+            self.__send_command(instructions)
+        else:
+            connect_and_retry(lambda: self.__send_command(instructions))
 
     def on_instruction_completed(self):
         self.pushButton_send.setEnabled(True)
@@ -356,7 +359,7 @@ class MaintenanceMenu(QDialog):
     def home_button_action(self):
         self.is_home = True
         instructions = GCodeGenerator.home()
-        self.__send_command(instructions)
+
 
     def change_window(self, window_name):
         if not self.is_home:
@@ -365,15 +368,12 @@ class MaintenanceMenu(QDialog):
             self.window_manager.switch_window(window_name)
 
     def __send_command(self, instructions):
-        if self.serial_synchroniser.can_start_communication():
-            self.pushButton_send.setEnabled(False)
-            self.pushButton_home.setEnabled(False)
-            self.pushButton_return.setEnabled(False)
-            self.pushButton_bottle.setEnabled(False)
-            self.serial_synchroniser.track_progress(self)
-            self.serial_synchroniser.begin_communication(instructions)
-        else:
-            Popup.serial_port_error(self.serial_synchroniser.set_serial_port)
+        self.pushButton_send.setEnabled(False)
+        self.pushButton_home.setEnabled(False)
+        self.pushButton_return.setEnabled(False)
+        self.pushButton_bottle.setEnabled(False)
+        self.serial_synchroniser.track_progress(self)
+        self.serial_synchroniser.begin_communication(instructions)
 
 
 class MainMenu(QMainWindow):
@@ -499,16 +499,18 @@ def init_hardware():
     if serial_synchroniser.can_start_communication():
         serial_synchroniser.begin_communication(GCodeGenerator.home())
     else:
-        Popup.serial_port_error(serial_synchroniser.set_serial_port)
+        Popup.serial_port_error(lambda:
+                                connect_and_retry(lambda:
+                                                  serial_synchroniser.begin_communication(GCodeGenerator.home())))
 
 
-def connect_and_resend():
+def connect_and_retry(runnable):
     serial_synchroniser = SerialSynchroniser()
     serial_synchroniser.set_serial_port()
     if serial_synchroniser.can_start_communication():
-        serial_synchroniser.begin_communication(GCodeGenerator.home())
+        runnable()
     else:
-        Popup.serial_port_error(serial_synchroniser.set_serial_port)
+        Popup.serial_port_error(lambda: connect_and_retry(runnable))
 
 
 if __name__ == '__main__':

@@ -17,8 +17,9 @@ class Popup:
 
     @staticmethod
     def __execute_action_and_close(popup, action):
-        action()
         popup.done(0)
+        action()
+        pass
 
     @staticmethod
     def drink_completed(cup_removed_action):
@@ -35,8 +36,9 @@ class Popup:
         msg.setText("Connection avec le barman perdue")
         msg.setIcon(QMessageBox.Critical)
         msg.setStandardButtons(QMessageBox.Retry)
-        msg.buttonClicked.connect(retry_action)
-        msg.exec_()
+        #msg.buttonClicked.connect(retry_action)
+        msg.buttonClicked.connect(lambda: Popup.__execute_action_and_close(msg, retry_action))
+        msg.exec()
 
     @staticmethod
     def no_cup_error(cup_detected_action):
