@@ -73,11 +73,13 @@ class SerialSynchroniser(QObject):
         self.parent.instruction_completed.emit()
 
     def wait_end_of_communication(self):
-        self.__serial_communication_thread.wait()
+        if self.__serial_communication_thread is not None:
+            self.__serial_communication_thread.wait()
 
     def abort_communication(self):
-        self.communicate.set(False)
-        self.__serial_communication_thread.wait()
+        if self.__serial_communication_thread is not None:
+            self.communicate.set(False)
+            self.__serial_communication_thread.wait()
 
     def can_start_communication(self):
         if self.serial_port is None:
@@ -90,6 +92,7 @@ class SerialSynchroniser(QObject):
 
 class SerialCommunicator(QThread):
     progress_notifier = pyqtSignal(int)
+    is_first_connection = True
 
     def __init__(self, parent):
         super(SerialCommunicator, self).__init__()
@@ -104,7 +107,10 @@ class SerialCommunicator(QThread):
         self.__send_instructions()
 
     def __send_instructions(self):
-        self.__read_from_serial("echo:  M907 X135 Y135 Z135 E135 135")
+        # TODO : trigger message at init might change + message should be handled when searching port
+        if self.is_first_connection:
+            self.__read_from_serial("echo:  M907 X135 Y135 Z135 E135 135")
+            self.is_first_connection = False
 
         for index, instruction in enumerate(self.instructions):
             if not self.communicate.get():
@@ -122,6 +128,7 @@ class SerialCommunicator(QThread):
         self.__instruction_done = False
         while not self.__instruction_done and self.communicate.get():
             message = self.serial_port.readline().decode("utf-8")
+            print(message)
             if message == trigger_msg:
                 self.__instruction_done = True
 
@@ -176,9 +183,7 @@ class GCodeGenerator:
         """
         :return: List of instructions to retract the cup in the machine
         """
-        instructions = [["G28 Y\n", "M400\n", "M118 Instruction completed\n"],
-                        ["G28 X\n", "M400\n", "M118 Instruction completed\n"],
-                        ["G28 Z\n", "M400\n", "M118 Instruction completed\n"]]
+        instructions = [["G28 Y\n", "M400\n", "M118 Instruction completed\n"]]
         return instructions
 
     @staticmethod
@@ -190,14 +195,19 @@ class GCodeGenerator:
         instructions = []
         instructions.extend(GCodeGenerator.move_to_slot(0))
         instructions.append(["G1 Y%d\n" % GCodeGenerator.max_y, "M400\n", "M118 Instruction completed\n"])
-        instructions.append(["G1 Z%d\n" % GCodeGenerator.max_z, "M400\n", "M118 Instruction completed\n"])
         return instructions
+
+    @staticmethod
+    def wait_for_cup():
+        """
+        :return: List of instructions to deploy y axis in order to get the cup from the user
+        """
+        return [["G1 Y%d\n" % GCodeGenerator.max_y, "M400\n", "M118 Instruction completed\n"]]
 
     @staticmethod
     def home():
         """
-        Method that homes each axis
-        :return:
+        :return: List of instructions to home each axis
         """
         instructions = [["G28 Z\n", "M400\n", "M118 Instruction completed\n"],
                         ["G28 Y\n", "M400\n", "M118 Instruction completed\n"],
