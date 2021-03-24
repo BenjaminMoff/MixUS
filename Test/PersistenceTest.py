@@ -1,9 +1,8 @@
-import unittest
 import os
-from MixUS.JsonHandler import *
-from MixUS.SerialCommunication import GCodeGenerator
-from MixUS.Enums import Liquid
-from MixUS.DataModel import *
+import unittest
+from DataModel import *
+from Enums import Liquid
+from JsonHandler import JsonHandler
 
 
 class PersistenceTest(unittest.TestCase):

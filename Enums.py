@@ -59,6 +59,14 @@ class BottleSize(Enum):
     def list():
         return list(map(lambda c: str(c.value), BottleSize))
 
+    @staticmethod
+    def ounces_to_ml(ounces):
+        return 30 * ounces
+
+    @staticmethod
+    def ml_to_ounces(ml):
+        return int(ml / 30)
+
 
 # Paths to persistence files
 class Paths(Enum):
@@ -78,19 +86,19 @@ class Paths(Enum):
                                "ui/MixingMenu.ui")
 
 
-class GUI(Enum):
+class Style(Enum):
     label_background_color = "border: 1px solid;" \
                              "border-color: rgb(0, 0, 0);" \
                              "background-color: rgb(0, 167, 89);"
     button_color = "border-radius: 15px;" \
                    "background-color: rgb(255, 255, 255);"
     button_color_pressed = "border-radius: 15px;" \
-                   "background-color: rgb(200, 200, 200);"
+                           "background-color: rgb(200, 200, 200);"
 
     layout_contour_color = "border: 1px solid;" \
                            "border-color: rgb(0, 0, 0);"
 
-    drink_button = "border: 1px solid;"\
+    drink_button = "border: 1px solid;" \
                    "border-radius: 20px;" \
                    "border-color: rgb(0, 0, 0);"
 
@@ -103,3 +111,7 @@ class GUI(Enum):
     combo_box_size = QSize(400, 59)
     drink_image_size = QSize(200, 350)
     menu_button_size = QSize(150, 75)
+
+
+class HardwareConfig(Enum):
+    limit_switch_pin = 5

@@ -1,4 +1,4 @@
-from Enums import Liquid
+from Enums import Liquid, BottleSize
 from SerialCommunication import GCodeGenerator
 
 
@@ -6,22 +6,23 @@ class Bottle:
     """
     Class that stores current volume and liquid type of bottles on the machine
     """
-    def __init__(self, slot_number=None, liquid=None, volume_left=None):
+
+    def __init__(self, slot_number=None, liquid=None, volume_left_ml=None):
         self.__slot_number = slot_number
         self.__liquid = liquid
-        self.__volume_left = volume_left  # In ounces
+        self.__volume_left_ml = volume_left_ml
 
     def __eq__(self, other):
         return self.__slot_number == other.get_slot_number() and \
                self.__liquid.string_name == other.get_liquid_name() and \
-               self.__volume_left == other.get_volume_left()
+               self.__volume_left_ml == other.get_volume_left()
 
     # Method that keeps tracks of the remaining liquid in the bottle when poured
     def pour(self, ounces=1):
-        if self.__volume_left - ounces <= 0:
+        if self.__volume_left_ml - BottleSize.ounces_to_ml(ounces) <= 0:
             return -1
         else:
-            self.__volume_left -= ounces
+            self.__volume_left_ml -= BottleSize.ounces_to_ml(ounces)
 
     # Bunch of methods that sets and gets the attributes of Bottle
     def set_liquid(self, liquid):
@@ -34,10 +35,10 @@ class Bottle:
         return self.__liquid.string_name
 
     def set_volume_left(self, vol_left):
-        self.__volume_left = vol_left
+        self.__volume_left_ml = vol_left
 
     def get_volume_left(self):
-        return self.__volume_left
+        return self.__volume_left_ml
 
     def set_slot_number(self, slot_number):
         self.__slot_number = slot_number
@@ -52,13 +53,14 @@ class Bottle:
         return self.__liquid.is_filler
 
     def copy(self):
-        return Bottle(self.__slot_number, self.__liquid, self.__volume_left)
+        return Bottle(self.__slot_number, self.__liquid, self.__volume_left_ml)
 
 
 class Drink:
     """
     Class that stores ingredients for a specific drink and image path for display
     """
+
     def __init__(self, name=None, ingredients_dict=None, image_path=None):
         self.name = name
         self.ingredients = ingredients_dict  # self.ingredients is a dictionary of Liquid.string_name:Volume
@@ -80,16 +82,20 @@ class Drink:
         :param bottles:
         :return:
         """
-        counter = 0
-        for liquid in self.liquids:
+        available_liquid = []
+        required_liquids = list(self.ingredients.keys())
+
+        for liquid in required_liquids:
             for bottle in bottles:
                 # If the remaining volume in the bottle is enough to make the drink, then the counter increases
-                if bottle.get_liquid_name() == liquid.string_name and bottle._Bottle__volume_left >= self.ingredients. \
-                        get(liquid.string_name):
-                    counter += 1
-                    break
+                if bottle.get_liquid_name() == liquid \
+                        and bottle.get_volume_left() >= \
+                        BottleSize.ounces_to_ml(self.ingredients.get(liquid)):
+                    available_liquid.append(bottle.get_liquid_name())
         # If the counter is equal to the number of ingredients, then the drink is available for the user
-        if counter == len(self.ingredients):
+        required_liquids.sort()
+        available_liquid.sort()
+        if available_liquid == required_liquids:
             return True
         else:
             return False
@@ -166,6 +172,7 @@ class BottleManager:
     Class to manage bottles on the machine
     Load data from persistence file at instantiation and saves data when bottle list is modified
     """
+
     def __init__(self, json_handler):
         self.json_handler = json_handler
         bottles = self.json_handler.load_bottles()
@@ -182,6 +189,13 @@ class BottleManager:
         # Updates persistence file every time a modification is made
         self.save_data()
 
+    def pour(self, liquid_name, ounces):
+        for bottle in self.bottles_dict.values():
+            if bottle.get_liquid_name() == liquid_name:
+                bottle.pour(ounces)
+                break
+        self.save_data()
+
     def get_bottles(self):
         return list(self.bottles_dict.values())
 
@@ -193,6 +207,8 @@ class BottleManager:
 
 
 class DrinkManager:
+    drinks = []
+
     def __init__(self, json_handler, bottle_manager):
         self.json_handler = json_handler
         self.drinks = self.json_handler.load_drinks()
@@ -210,6 +226,21 @@ class DrinkManager:
                 available_drinks.append(drink)
         return available_drinks
 
+    def get_drink_from_name(self, name):
+        for drink in self.drinks:
+            if drink.name == name:
+                return drink
+        return None
+
+    def add_new_drink(self, drink):
+        self.drinks.append(drink)
+
+    def remove_drink(self, drink):
+        self.drinks.remove(drink)
+
+    def save_data(self):
+        self.json_handler.save_data(self.drinks)
+
     def is_double_available(self, drink):
         return drink.enough_for_double(self.bottle_manager.get_bottles())
 
@@ -226,6 +257,7 @@ class DrinkManager:
         """
         instructions = []
         poured_liquids = []
+        liquid_checkpoints = {}
 
         # Move the cup in the machine
         instructions.extend(GCodeGenerator.insert_cup())
@@ -241,18 +273,18 @@ class DrinkManager:
 
                     # Move to the slot if their is liquid to pour
                     if not (liquid.is_alcoholized and is_virgin):
-
                         # Move to the slot
                         instructions.extend(GCodeGenerator.move_to_slot(bottle.get_slot_number()))
 
                         # Pour necessary amount of liquid
                         self.__compute_ounces_to_pour(instructions, drink, liquid, is_double, is_virgin)
+                        liquid_checkpoints.update({len(instructions): liquid.string_name})
 
         # Move to slot 0 and get the cup out of the machine
         instructions.extend(GCodeGenerator.serve_cup())
-        return instructions
+        return instructions, liquid_checkpoints
 
-    def __compute_ounces_to_pour(self, instructions,  drink, liquid, is_double=False, is_virgin=False):
+    def __compute_ounces_to_pour(self, instructions, drink, liquid, is_double=False, is_virgin=False):
 
         # If the drink is double, the alcohol content is doubled and the filler is reduced accordingly
         if is_double:
