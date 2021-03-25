@@ -109,7 +109,7 @@ class Style(Enum):
     layout_background_color = "background-color: rgb(255, 255, 255);"
 
     combo_box_size = QSize(400, 59)
-    drink_image_size = QSize(200, 350)
+    drink_button_size = QSize(225, 370)
     menu_button_size = QSize(150, 75)
 
 
