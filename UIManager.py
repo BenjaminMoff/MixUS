@@ -58,8 +58,8 @@ class UIManager:
         :return:
         """
         label.setGeometry(int(self.res.width() * 2 / 3),
-                          int(self.res.height() / 2) - Style.drink_image_size.value.height() / 2,
-                          Style.drink_image_size.value.width(), Style.drink_image_size.value.height())
+                          int(self.res.height() / 2) - Style.drink_button_size.value.height() / 2,
+                          Style.drink_button_size.value.width(), Style.drink_button_size.value.height())
         label.setPixmap(QPixmap(path))
 
     def slider_setup(self, slider):

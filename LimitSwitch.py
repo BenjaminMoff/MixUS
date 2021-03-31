@@ -1,4 +1,3 @@
-from gpiozero import Button, BadPinFactory
 from Enums import HardwareConfig
 from threading import Thread
 from time import sleep
@@ -6,8 +5,6 @@ from time import sleep
 
 class LimitSwitch:
     switch_pin = None
-    button = None
-    activated = False
     singleton = None
     canceled = False
 
@@ -19,11 +16,10 @@ class LimitSwitch:
     def __init__(self):
         self.switch_pin = HardwareConfig.limit_switch_pin.value
         try:
-            self.button = Button(self.switch_pin)
-            self.button.when_activated = self.__activate
-            self.button.when_deactivated = self.__deactivate
-        except BadPinFactory:
-            self.activated = True
+            import RPi.GPIO as GPIO
+            GPIO.setup(self.switch_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        except ModuleNotFoundError:
+            print("Librairie RPi.GPIO indisponible")
 
     def __activate(self):
         self.activated = True
@@ -32,12 +28,17 @@ class LimitSwitch:
         self.activated = False
 
     def __loop_until(self, runnable, activated):
-        while self.activated is not activated and self.canceled is not True:
-            sleep(0.1)
-        if not self.canceled:
+        try:
+            import RPi.GPIO as GPIO
+            while GPIO.input(self.switch_pin) is not activated and self.canceled is not True:
+                sleep(0.1)
+            if not self.canceled:
+                runnable()
+            else:
+                self.canceled = False
+        except ModuleNotFoundError:
+            print("Librairie RPi.GPIO indisponible")
             runnable()
-        else:
-            self.canceled = False
 
     def execute_when_activated(self, runnable):
         Thread(self.__loop_until(runnable, True), daemon=True).start()
@@ -49,4 +50,9 @@ class LimitSwitch:
         self.canceled = True
 
     def is_activated(self):
-        return self.activated
+        try:
+            import RPi.GPIO as GPIO
+            return GPIO.input(self.switch_pin)
+        except ModuleNotFoundError:
+            print("Librairie RPi.GPIO indisponible")
+            return True

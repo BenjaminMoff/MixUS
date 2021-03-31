@@ -2,7 +2,7 @@ from PyQt5 import QtWidgets, uic, QtGui
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QComboBox, QLabel, QMainWindow, QDialog, QStackedWidget, QPushButton, \
-    QHBoxLayout, QLayout
+    QHBoxLayout, QLayout, QWidget
 from DataModel import *
 from JsonHandler import JsonHandler
 from Enums import *
@@ -216,7 +216,7 @@ class DrinkOptionMenu(QDialog):
 
     def update_layout(self, drink):
         self.drink = drink
-        self.label_Title.setText(self.drink.name)
+        self.label_Title.setText(self.drink.name.replace("_", " "))
         self.radioButton_normal.setChecked(True)
         self.ui_manager.image_setup(self.label_drinkImage, self.drink.image_path)
         self.request_cup()
@@ -394,26 +394,39 @@ class MainMenu(QMainWindow):
 
     def update_layout(self):
         for i in reversed(range(self.scroll_layout.count())):
-            self.scroll_layout.itemAt(i).widget().setParent(None)
+            print(i)
+            self.scroll_layout.itemAt(i).widget().deleteLater()
         for drink in self.drink_manager.get_available_drinks():
-            button = DrinkButton(self.scrollAreaWidgetContents, drink)
-            self.scroll_layout.addWidget(button)
-            button.released.connect(
-                lambda button_drink=button.drink: self.window_manager.switch_window("DrinkOptionMenu",
-                                                                                    drink=button_drink))
+            drink_button = DrinkButton(self.scrollAreaWidgetContents, drink)
+            self.scroll_layout.addWidget(drink_button)
+            drink_button.button.released.connect(
+                lambda button_drink=drink_button.drink: self.window_manager.switch_window("DrinkOptionMenu",
+                                                                                                 drink=button_drink))
 
     def connect_buttons(self):
         self.pushButton_maintenance.clicked.connect(lambda: self.window_manager.switch_window("MaintenanceMenu"))
         self.pushButton_exit.clicked.connect(lambda: sys.exit(app.exec_()))
 
 
-class DrinkButton(QPushButton):
+class DrinkButton(QWidget):
     def __init__(self, scroll_area_widget_contents, drink):
         super(DrinkButton, self).__init__(scroll_area_widget_contents)
         self.drink = drink
-        self.setStyleSheet(Style.drink_button.value)
-        self.setFixedSize(Style.drink_image_size.value)
-        self.setStyleSheet("QPushButton{ background-image: url(" + self.drink.image_path + "); }")
+        self.button = QPushButton()
+        self.label = QLabel(drink.name.replace("_", " "))
+
+        self.button.setStyleSheet("QPushButton{ background-image: url(" + self.drink.image_path + "); }")
+        self.button.setFixedSize(Style.drink_button_size.value)
+
+        self.label.setAlignment(Qt.AlignCenter)
+        self.label.setFont(QFont("Times", 9, QFont.Bold))
+
+        self.setFixedSize(Style.drink_button_size.value)
+
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.button)
+        self.layout.addWidget(self.label)
+        self.setLayout(self.layout)
 
 
 class LiquidLabel(QLabel):
@@ -491,7 +504,7 @@ def init_app_ui(app):
 
     stack.resize(ui_manager.res.width(), ui_manager.res.height())
 
-    stack.show()#FullScreen()
+    stack.show()  # FullScreen()
 
 
 def init_hardware():
@@ -518,4 +531,3 @@ if __name__ == '__main__':
     init_app_ui(app)
     init_hardware()
     sys.exit(app.exec_())
-
