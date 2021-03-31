@@ -115,6 +115,7 @@ class MixingMenu(QDialog):
     name = "MixingMenu"
     progress = pyqtSignal(int)
     checkpoint_reached = pyqtSignal(str)
+    instruction_completed = pyqtSignal()
     drink_completed = pyqtSignal()
 
     def __init__(self, window_manager, ui_manager, bottle_manager):
@@ -194,6 +195,10 @@ class MixingMenu(QDialog):
 
 class DrinkOptionMenu(QDialog):
     name = "DrinkOptionMenu"
+    progress = pyqtSignal(int)
+    checkpoint_reached = pyqtSignal(str)
+    instruction_completed = pyqtSignal()
+    in_motion = False
     drink = None
 
     def __init__(self, window_manager, ui_manager, drink_manager):
@@ -213,6 +218,7 @@ class DrinkOptionMenu(QDialog):
 
         self.pushButton_return.released.connect(self.return_button_action)
         self.pushButton_confirm.released.connect(self.load_mixing_menu)
+        self.instruction_completed.connect(self.__on_instruction_completed)
 
     def update_layout(self, drink):
         self.drink = drink
@@ -224,16 +230,28 @@ class DrinkOptionMenu(QDialog):
 
     def return_button_action(self):
         if self.serial_synchroniser.can_start_communication():
-            self.serial_synchroniser.begin_communication(GCodeGenerator.insert_cup())
+            self.load_main_menu()
         else:
-            connect_and_retry(lambda: self.serial_synchroniser.begin_communication(GCodeGenerator.insert_cup()))
-        self.window_manager.switch_window("MainMenu")
+            connect_and_retry(self.load_main_menu)
 
     def request_cup(self):
         if self.serial_synchroniser.can_start_communication():
-            self.serial_synchroniser.begin_communication(GCodeGenerator.wait_for_cup())
+            self.__send_command(GCodeGenerator.wait_for_cup())
         else:
-            connect_and_retry(lambda: self.serial_synchroniser.begin_communication(GCodeGenerator.wait_for_cup()))
+            connect_and_retry(lambda: self.__send_command(GCodeGenerator.wait_for_cup()))
+
+    def __send_command(self, instructions):
+        self.pushButton_return.setEnabled(False)
+        self.pushButton_confirm.setEnabled(False)
+        self.in_motion = True
+        self.serial_synchroniser.track_progress(self)
+        self.serial_synchroniser.begin_communication(instructions)
+
+    def __on_instruction_completed(self):
+        self.pushButton_return.setEnabled(True)
+        self.pushButton_confirm.setEnabled(True)
+        self.in_motion = False
+        self.update_ingredients()
 
     def update_ingredients(self):
         self.is_current_setting_valid()
@@ -272,9 +290,10 @@ class DrinkOptionMenu(QDialog):
 
     # Disable confirm button if the drink cant be made with current settings
     def is_current_setting_valid(self):
-        is_valid = (self.radioButton_double.isChecked() and self.is_double_available()) or \
-                   (self.radioButton_virgin.isChecked() and self.is_virgin_available()) or \
-                   self.radioButton_normal.isChecked()
+        is_valid = not self.in_motion and \
+                   ((self.radioButton_double.isChecked() and self.is_double_available()) or
+                    (self.radioButton_virgin.isChecked() and self.is_virgin_available()) or
+                    self.radioButton_normal.isChecked())
         self.pushButton_confirm.setEnabled(is_valid)
 
     def is_double_available(self):
@@ -299,9 +318,16 @@ class DrinkOptionMenu(QDialog):
                                           instructions=instructions,
                                           checkpoints=liquid_checkpoints)
 
+    def load_main_menu(self):
+        self.serial_synchroniser.track_progress(self.window_manager.get_window("MainMenu"))
+        self.serial_synchroniser.begin_communication(GCodeGenerator.insert_cup())
+        self.window_manager.switch_window("MainMenu", in_motion=True)
+
 
 class MaintenanceMenu(QDialog):
     name = "MaintenanceMenu"
+    progress = pyqtSignal(int)
+    checkpoint_reached = pyqtSignal(str)
     instruction_completed = pyqtSignal()
     is_home = True
 
@@ -320,7 +346,6 @@ class MaintenanceMenu(QDialog):
         self.combobox_axis_setup()
 
         ui_manager.maintenance_menu_setup(self)
-        # TODO faire lenvoi des positions des sliders avec un connect lambda
 
     def combobox_axis_setup(self):
         self.comboBox_axis.addItem('X')
@@ -359,7 +384,10 @@ class MaintenanceMenu(QDialog):
     def home_button_action(self):
         self.is_home = True
         instructions = GCodeGenerator.home()
-
+        if self.serial_synchroniser.can_start_communication():
+            self.__send_command(instructions)
+        else:
+            connect_and_retry(lambda: self.__send_command(instructions))
 
     def change_window(self, window_name):
         if not self.is_home:
@@ -378,6 +406,9 @@ class MaintenanceMenu(QDialog):
 
 class MainMenu(QMainWindow):
     name = "MainMenu"
+    progress = pyqtSignal(int)
+    checkpoint_reached = pyqtSignal(str)
+    instruction_completed = pyqtSignal()
 
     def __init__(self, window_manager, ui_manager, drink_manager):
         super(MainMenu, self).__init__()
@@ -387,25 +418,37 @@ class MainMenu(QMainWindow):
         self.scroll_layout = QHBoxLayout(self.scrollAreaWidgetContents)
 
         self.connect_buttons()
+        self.instruction_completed.connect(self.__on_instruction_completed)
         ui_manager.main_menu_setup(self)
 
         self.update_layout()
-        # TODO Updater les fichiers de persistance a la fermeture
 
-    def update_layout(self):
+    def update_layout(self, in_motion=False):
         for i in reversed(range(self.scroll_layout.count())):
-            print(i)
             self.scroll_layout.itemAt(i).widget().deleteLater()
         for drink in self.drink_manager.get_available_drinks():
             drink_button = DrinkButton(self.scrollAreaWidgetContents, drink)
             self.scroll_layout.addWidget(drink_button)
             drink_button.button.released.connect(
                 lambda button_drink=drink_button.drink: self.window_manager.switch_window("DrinkOptionMenu",
-                                                                                                 drink=button_drink))
+                                                                                          drink=button_drink))
+        if in_motion:
+            self.enable_buttons(False)
 
     def connect_buttons(self):
         self.pushButton_maintenance.clicked.connect(lambda: self.window_manager.switch_window("MaintenanceMenu"))
         self.pushButton_exit.clicked.connect(lambda: sys.exit(app.exec_()))
+
+    def enable_buttons(self, enable=True):
+        self.pushButton_maintenance.setEnabled(enable)
+        self.pushButton_exit.setEnabled(enable)
+
+        drink_buttons = (self.scroll_layout.itemAt(i) for i in range(self.scroll_layout.count()))
+        for drink_button in drink_buttons:
+            drink_button.widget().setEnabled(enable)
+
+    def __on_instruction_completed(self):
+        self.enable_buttons()
 
 
 class DrinkButton(QWidget):
@@ -434,12 +477,12 @@ class LiquidLabel(QLabel):
         super(LiquidLabel, self).__init__()
         self.liquid = liquid
         self.volume = volume
-        self.setText(str(volume) + " onces de " + self.liquid.string_name)
+        self.setText(str(volume) + " onces de " + str.lower(self.liquid.string_name))
         self.setFont(QFont("Times", 12))
 
     def update_volume(self, volume):
         self.volume = volume
-        self.setText(str(volume) + " onces de " + self.liquid.string_name)
+        self.setText(str(volume) + " onces de " + str.lower(self.liquid.string_name))
 
 
 class WindowManager:
@@ -462,23 +505,27 @@ class WindowManager:
         window_index = self.stack.count() - 1
         self.windows.update({self.stack.widget(window_index).name: window_index})
 
-    def switch_window(self, window_name, drink=None, instructions=None, checkpoints=None):
+    def get_window(self, window_name):
+        return self.stack.widget(self.windows.get(window_name))
+
+    def switch_window(self, window_name, drink=None, instructions=None, checkpoints=None, in_motion=False):
         """
         Switch the window to the given window_name
         :param window_name: Name of the window to switch
         :param drink: Drink object if needed
         :param instructions: Instruction list if needed
         :param checkpoints: Checkpoints of instruction list if needed
+        :param in_motion: Indicate if the machine is in motion
         :return:
         """
         if window_name == "DrinkOptionMenu":
-            self.stack.widget(self.windows.get(window_name)).update_layout(drink)
+            self.get_window(window_name).update_layout(drink)
         elif window_name == "MainMenu":
-            self.stack.widget(self.windows.get(window_name)).update_layout()
+            self.get_window(window_name).update_layout(in_motion)
         elif window_name == "BottleMenu":
-            self.stack.widget(self.windows.get(window_name)).update_layout()
+            self.get_window(window_name).update_layout()
         elif window_name == "MixingMenu":
-            self.stack.widget(self.windows.get(window_name)).update_layout(instructions, checkpoints, drink)
+            self.get_window(window_name).update_layout(instructions, checkpoints, drink)
         self.stack.setCurrentIndex(self.windows.get(window_name))
 
 
@@ -504,17 +551,24 @@ def init_app_ui(app):
 
     stack.resize(ui_manager.res.width(), ui_manager.res.height())
 
+    init_hardware(window_manager.get_window("MainMenu"))
+    window_manager.switch_window("MainMenu", in_motion=True)
+
     stack.show()  # FullScreen()
 
 
-def init_hardware():
+def init_hardware(first_menu):
     serial_synchroniser = SerialSynchroniser()
     if serial_synchroniser.can_start_communication():
-        serial_synchroniser.begin_communication(GCodeGenerator.home())
+        initial_machine_homing(first_menu)
     else:
-        Popup.serial_port_error(lambda:
-                                connect_and_retry(lambda:
-                                                  serial_synchroniser.begin_communication(GCodeGenerator.home())))
+        Popup.serial_port_error(lambda: connect_and_retry(lambda: initial_machine_homing(first_menu)))
+
+
+def initial_machine_homing(first_menu):
+    serial_synchroniser = SerialSynchroniser()
+    serial_synchroniser.begin_communication(GCodeGenerator.home())
+    serial_synchroniser.track_progress(first_menu)
 
 
 def connect_and_retry(runnable):
@@ -529,5 +583,4 @@ def connect_and_retry(runnable):
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     init_app_ui(app)
-    init_hardware()
     sys.exit(app.exec_())

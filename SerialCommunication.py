@@ -94,22 +94,9 @@ class SerialSynchroniser(QObject):
         if checkpoints is not None and max_value is not None:
             self.checkpoints = checkpoints
             self.max_value = max_value
-            self.disconnect_signals()
             self.progress_notifier.connect(self.on_progress)
         else:
-            self.disconnect_signals()
             self.__serial_communication_thread.finished.connect(self.on_end_of_communication)
-
-    def disconnect_signals(self):
-        try:
-            self.progress_notifier.disconnect()
-        except Exception: pass
-        try:
-            self.parent.instruction_completed.disconnect()
-        except Exception: pass
-        try:
-            self.__serial_communication_thread.finished.disconnect()
-        except Exception: pass
 
     @pyqtSlot(int)
     def on_progress(self, value):
@@ -118,7 +105,6 @@ class SerialSynchroniser(QObject):
             self.parent.checkpoint_reached.emit(self.checkpoints.get(value))
         if value is self.max_value:
             self.parent.drink_completed.emit()
-            self.progress_notifier.disconnect()
 
     @pyqtSlot()
     def on_end_of_communication(self):
@@ -131,7 +117,6 @@ class SerialSynchroniser(QObject):
     def abort_communication(self):
         if self.__serial_communication_thread is not None:
             self.communicate.set(False)
-            self.disconnect_signals()
             self.__serial_communication_thread.wait()
 
     def can_start_communication(self):

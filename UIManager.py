@@ -81,7 +81,7 @@ class UIManager:
                           int(self.res.width() * 0.9), int(self.res.height() / 6))
         label.setFont(QFont("Times", 15, QFont.Bold))
 
-    def comboBox_axis_setup(self, comboBox):
+    def combobox_axis_setup(self, comboBox):
         """
         Sets the comboBox for the maintenanceMenu
         :param comboBox:
@@ -103,19 +103,27 @@ class UIManager:
             lambda: button.setStyleSheet(Style.button_color.value))
         button.setFont(QFont("Times", 15, QFont.Bold))
 
-    def group_box_setup(self, groupbox, layout, pos):
+    def group_box_setup(self, groupbox, layout, pos, is_large=False):
         """
         Sets the groupBox for the DrinkOptionMenu and MixingMenu given the wanted position
         :param groupbox: QGroupBox of the menu
         :param layout: QLayout to put inside the groupBox
         :param pos: Index of the groupBox
+        :param is_large: Indicate if the groupBox should be larger
         :return:
         """
-        groupbox.setGeometry(int(self.res.width() * (1 / 15 + 1 / 4 * (pos - 1))),
-                             int(self.res.height() * (1 / 2 - 1 / 4)),
-                             int(self.res.width() / 5),
-                             int(self.res.height() / 2))
+        if is_large:
+            groupbox.setGeometry(int(self.res.width() * (1 / 15 + 1 / 4 * (pos - 1))),
+                                 int(self.res.height() * (1 / 2 - 1 / 4)),
+                                 int(self.res.width() / 3),
+                                 int(self.res.height() / 2))
+        else:
+            groupbox.setGeometry(int(self.res.width() * (1 / 15 + 1 / 4 * (pos - 1))),
+                                 int(self.res.height() * (1 / 2 - 1 / 4)),
+                                 int(self.res.width() / 5),
+                                 int(self.res.height() / 2))
         groupbox.setLayout(layout)
+
 
     def progress_bar_setup(self, progressbar):
         """
@@ -159,7 +167,7 @@ class UIManager:
         self.bottom_right_button_setup(maintenance_menu.pushButton_send)
         self.axis_label_setup(maintenance_menu.label_axis)
         self.slider_setup(maintenance_menu.slider)
-        self.comboBox_axis_setup(maintenance_menu.comboBox_axis)
+        self.combobox_axis_setup(maintenance_menu.comboBox_axis)
         maintenance_menu.pushButton_home.setGeometry(int(self.res.width() / 20), int(self.res.height() / 5),
                                                      int(self.res.width() / 4), int(self.res.height() / 6))
         self.push_button_setup(maintenance_menu.pushButton_home)
@@ -180,8 +188,14 @@ class UIManager:
         self.bottom_background_setup(drink_option_menu.label_bottom_screen)
         self.bottom_left_button_setup(drink_option_menu.pushButton_return)
         self.bottom_right_button_setup(drink_option_menu.pushButton_confirm)
-        self.group_box_setup(drink_option_menu.groupBox_options, drink_option_menu.verticalLayout_options, 1)
-        self.group_box_setup(drink_option_menu.groupBox_ingredients, drink_option_menu.verticalLayout_ingredients, 2)
+
+        self.group_box_setup(drink_option_menu.groupBox_options,
+                             drink_option_menu.verticalLayout_options,
+                             1)
+        self.group_box_setup(drink_option_menu.groupBox_ingredients,
+                             drink_option_menu.verticalLayout_ingredients,
+                             2,
+                             True)
 
     def mixing_menu_setup(self, mixing_menu):
         """
