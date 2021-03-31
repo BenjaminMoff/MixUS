@@ -34,19 +34,23 @@ class ListUSB:
         ports = self.get_usb_devices()
         string = "M118 marlin_detected\n"
         for port in ports:
-            ser = serial.Serial(port, 250000, 8, 'N', 1, timeout=1)
+            ser = serial.Serial(port, 250000, 8, 'N', 1, timeout=1, write_timeout=1)
             time.sleep(1)
             ser.flushInput()
-            ser.write(str.encode(string, 'utf-8'))
+            try:
+                ser.write(str.encode(string, 'utf-8'))
 
-            elapsed_time = 0
-            start_time = time.time()
+                elapsed_time = 0
+                start_time = time.time()
 
-            while elapsed_time < 500:
-                message = ser.readline().decode(errors='replace')
-                if message == "marlin_detected\r\n":
-                    return port
-                elapsed_time = time.time() - start_time
+                while elapsed_time < 0.5:
+                    message = ser.readline().decode(errors='replace')
+                    if message == "marlin_detected\r\n":
+                        return port
+                    elapsed_time = time.time() - start_time
+            except Exception:
+                pass
+
         return None
 
 
@@ -90,9 +94,22 @@ class SerialSynchroniser(QObject):
         if checkpoints is not None and max_value is not None:
             self.checkpoints = checkpoints
             self.max_value = max_value
+            self.disconnect_signals()
             self.progress_notifier.connect(self.on_progress)
         else:
+            self.disconnect_signals()
             self.__serial_communication_thread.finished.connect(self.on_end_of_communication)
+
+    def disconnect_signals(self):
+        try:
+            self.progress_notifier.disconnect()
+        except Exception: pass
+        try:
+            self.parent.instruction_completed.disconnect()
+        except Exception: pass
+        try:
+            self.__serial_communication_thread.finished.disconnect()
+        except Exception: pass
 
     @pyqtSlot(int)
     def on_progress(self, value):
@@ -114,6 +131,7 @@ class SerialSynchroniser(QObject):
     def abort_communication(self):
         if self.__serial_communication_thread is not None:
             self.communicate.set(False)
+            self.disconnect_signals()
             self.__serial_communication_thread.wait()
 
     def can_start_communication(self):

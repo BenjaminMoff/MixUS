@@ -18,7 +18,7 @@ class LimitSwitch:
         try:
             import RPi.GPIO as GPIO
             GPIO.setup(self.switch_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        except ValueError:
+        except ModuleNotFoundError:
             print("Librairie RPi.GPIO indisponible")
 
     def __activate(self):
@@ -28,12 +28,17 @@ class LimitSwitch:
         self.activated = False
 
     def __loop_until(self, runnable, activated):
-        while GPIO.input(self.switch_pin) is not activated and self.canceled is not True:
-            sleep(0.1)
-        if not self.canceled:
+        try:
+            import RPi.GPIO as GPIO
+            while GPIO.input(self.switch_pin) is not activated and self.canceled is not True:
+                sleep(0.1)
+            if not self.canceled:
+                runnable()
+            else:
+                self.canceled = False
+        except ModuleNotFoundError:
+            print("Librairie RPi.GPIO indisponible")
             runnable()
-        else:
-            self.canceled = False
 
     def execute_when_activated(self, runnable):
         Thread(self.__loop_until(runnable, True), daemon=True).start()
@@ -45,4 +50,9 @@ class LimitSwitch:
         self.canceled = True
 
     def is_activated(self):
-        return GPIO.input(self.switch_pin)
+        try:
+            import RPi.GPIO as GPIO
+            return GPIO.input(self.switch_pin)
+        except ModuleNotFoundError:
+            print("Librairie RPi.GPIO indisponible")
+            return True
