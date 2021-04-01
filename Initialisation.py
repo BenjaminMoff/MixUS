@@ -125,6 +125,7 @@ class CmdUI:
             }
         ])["output"]
         print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n')
+        self.image_path = "resources/" + self.image_path
         return self.image_path
 
     def confirm_choice(self):

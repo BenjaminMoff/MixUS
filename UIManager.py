@@ -1,6 +1,6 @@
 from PyQt5.QtGui import QFont, QPixmap
 from PyQt5.QtCore import Qt, QRect
-from PyQt5.QtWidgets import QLabel, QVBoxLayout, QComboBox
+from PyQt5.QtWidgets import QLabel, QVBoxLayout, QComboBox, QScrollArea
 from Enums import *
 
 
@@ -57,9 +57,12 @@ class UIManager:
         :param path: Path to the image from the main directory (images/image.png)
         :return:
         """
-        label.setGeometry(int(self.res.width() * 2 / 3),
-                          int(self.res.height() / 2) - Style.drink_button_size.value.height() / 2,
-                          Style.drink_button_size.value.width(), Style.drink_button_size.value.height())
+        height = Style.drink_button_image_size.value.height()
+        width = Style.drink_button_image_size.value.width()
+        label.setGeometry(int(self.res.width() * 0.72),
+                          int((self.res.height() - height) / 2),
+                          width,
+                          height)
         label.setPixmap(QPixmap(path))
 
     def slider_setup(self, slider):
@@ -124,7 +127,6 @@ class UIManager:
                                  int(self.res.height() / 2))
         groupbox.setLayout(layout)
 
-
     def progress_bar_setup(self, progressbar):
         """
         Sets the position of the progressbar in the bottom right corner of the screen
@@ -137,7 +139,7 @@ class UIManager:
                                 int(self.res.height() * 0.05))
 
     def main_layout_setup(self, layout):
-        layout.setGeometry(0, int(self.res.height() * 0.15), self.res.width(), int(self.res.height() * 0.7))
+        layout.setGeometry(0, int(self.res.height() * 0.13), self.res.width(), int(self.res.height() * 0.72))
 
     def main_menu_setup(self, main_menu):
         """
@@ -154,6 +156,7 @@ class UIManager:
         main_menu.scrollArea_drinklist.setWidgetResizable(True)
         main_menu.scroll_layout.setSpacing(10)
         main_menu.scroll_layout.setContentsMargins(5, 5, 5, 5)
+        main_menu.scrollArea_drinklist.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
     def maintenance_menu_setup(self, maintenance_menu):
         """

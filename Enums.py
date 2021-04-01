@@ -26,16 +26,22 @@ class Liquid(Enum):
     VODKA = "Vodka", True, False
     TEQUILA = "Tequila", True, False
     GIN = "Gin", True, False
+    WHISKEY = "Whiskey", True, False
 
     # Mixers
     TRIPLE_SEC = "Triple sec", True, False
     LIMONCELLO = "Limoncello", True, False
+    BLUE_CURACAO = "Curacao bleu", True, False
 
     # Alcohol-free
     ORANGE_JUICE = "Jus d'orange", False, True
     CRANBERRY_JUICE = "Jus de canneberge", False, True
     COKE = "Coke", False, True
     SPRITE = "Sprite", False, True
+    LEMONADE = "Limonade", False, True
+    TONIC = "Tonique", False, True
+    GINGER_ALE = "Ginger ale", False, True
+    ICED_TEA = "Thé glacé", False, True
 
     @staticmethod
     def list():
@@ -109,7 +115,8 @@ class Style(Enum):
     layout_background_color = "background-color: rgb(255, 255, 255);"
 
     combo_box_size = QSize(400, 59)
-    drink_button_size = QSize(225, 370)
+    drink_button_image_size = QSize(225, 370)
+    drink_button_size = QSize(225, 415)
     menu_button_size = QSize(150, 75)
 
 

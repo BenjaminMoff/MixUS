@@ -459,7 +459,7 @@ class DrinkButton(QWidget):
         self.label = QLabel(drink.name.replace("_", " "))
 
         self.button.setStyleSheet("QPushButton{ background-image: url(" + self.drink.image_path + "); }")
-        self.button.setFixedSize(Style.drink_button_size.value)
+        self.button.setFixedSize(Style.drink_button_image_size.value)
 
         self.label.setAlignment(Qt.AlignCenter)
         self.label.setFont(QFont("Times", 9, QFont.Bold))
