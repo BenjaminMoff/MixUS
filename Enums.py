@@ -121,4 +121,4 @@ class Style(Enum):
 
 
 class HardwareConfig(Enum):
-    limit_switch_pin = 5
+    limit_switch_pin = 11

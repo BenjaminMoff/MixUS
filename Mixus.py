@@ -320,7 +320,7 @@ class DrinkOptionMenu(QDialog):
                                               instructions=instructions,
                                               checkpoints=liquid_checkpoints)
         else:
-            Popup.no_cup_error(self.load_mixing_menu())
+            Popup.no_cup_error(self.load_mixing_menu)
 
     def load_main_menu(self):
         self.serial_synchroniser.track_progress(self.window_manager.get_window("MainMenu"))
