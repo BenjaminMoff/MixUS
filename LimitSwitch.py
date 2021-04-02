@@ -2,6 +2,13 @@ from Enums import HardwareConfig
 from threading import Thread
 from time import sleep
 
+try:
+    import RPi.GPIO as GPIO
+    library_available = True
+except ModuleNotFoundError:
+    library_available = False
+    print("Librairie RPi.GPIO indisponible")
+
 
 class LimitSwitch:
     switch_pin = None
@@ -15,29 +22,20 @@ class LimitSwitch:
 
     def __init__(self):
         self.switch_pin = HardwareConfig.limit_switch_pin.value
-        try:
-            import RPi.GPIO as GPIO
+
+        if library_available:
+            GPIO.setmode(GPIO.BOARD)
             GPIO.setup(self.switch_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-        except ModuleNotFoundError:
-            print("Librairie RPi.GPIO indisponible")
-
-    def __activate(self):
-        self.activated = True
-
-    def __deactivate(self):
-        self.activated = False
 
     def __loop_until(self, runnable, activated):
-        try:
-            import RPi.GPIO as GPIO
-            while GPIO.input(self.switch_pin) is not activated and self.canceled is not True:
+        if library_available:
+            while not GPIO.input(self.switch_pin) is not activated and self.canceled is not True:
                 sleep(0.1)
             if not self.canceled:
                 runnable()
             else:
                 self.canceled = False
-        except ModuleNotFoundError:
-            print("Librairie RPi.GPIO indisponible")
+        else:
             runnable()
 
     def execute_when_activated(self, runnable):
@@ -50,9 +48,7 @@ class LimitSwitch:
         self.canceled = True
 
     def is_activated(self):
-        try:
-            import RPi.GPIO as GPIO
-            return GPIO.input(self.switch_pin)
-        except ModuleNotFoundError:
-            print("Librairie RPi.GPIO indisponible")
+        if library_available:
+            return not GPIO.input(self.switch_pin)
+        else:
             return True

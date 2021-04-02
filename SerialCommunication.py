@@ -168,11 +168,17 @@ class GCodeGenerator:
     """
     Class responsible to generate g-code instructions to execute when making a drink
     """
-    max_x = 700
-    max_y = 120
-    max_z = 30
+    max_x = 785
+    max_y = 150
+    max_z = 20
 
-    # TODO : method for homing at application startup
+    position_dict = {
+        1: 7,
+        2: 155,
+        3: 303,
+        4: 485,
+        5: 636,
+        6: 785}
 
     @staticmethod
     def move_to_slot(index):
@@ -180,10 +186,9 @@ class GCodeGenerator:
         :param index: (int) slot under which the cup should move to
         :return: List of instructions to move the cup under the specified slot
         """
-        # TODO define actual positions of slots
-        position = index * 100
+        position = GCodeGenerator.position_dict.get(index)
         if index != 0:
-            return [["G1 X%d\n" % position, "M400\n", "M118 Instruction completed\n"]]
+            return [["G1 X%d\n" %position, "M400\n", "M118 Instruction completed\n"]]
         return [["G28 X\n", "M400\n", "M118 Instruction completed\n"]]
 
     @staticmethod
@@ -205,8 +210,6 @@ class GCodeGenerator:
             # Retract z axis to allow dispenser to recharge
             instructions.append(["G28 Z\n", "M400\n", "M118 Instruction completed\n"])
 
-            # TODO determine if their should be a waiting time to allow dispenser to recharge
-
         return instructions
 
     @staticmethod
@@ -222,7 +225,6 @@ class GCodeGenerator:
         """
         :return: List of instructions to get the cup out of the machine
         """
-        # TODO define actual maximum y_position of y axis
         instructions = []
         instructions.extend(GCodeGenerator.move_to_slot(0))
         instructions.append(["G1 Y%d\n" % GCodeGenerator.max_y, "M400\n", "M118 Instruction completed\n"])

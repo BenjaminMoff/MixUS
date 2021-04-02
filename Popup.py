@@ -22,7 +22,9 @@ class Popup:
     @staticmethod
     def drink_completed(cup_removed_action):
         msg = Popup.__default_popup()
+        msg.setIcon(QMessageBox.Information)
         msg.setText("Bonne swince!")
+        msg.setInformativeText("Veuillez retirer le verre")
         msg.exec_()
         LimitSwitch().execute_when_deactivated(lambda: Popup.__execute_action_and_close(msg, cup_removed_action))
 
@@ -40,9 +42,8 @@ class Popup:
         msg = Popup.__default_popup()
         msg.setText("Veuillez insérer un verre")
         msg.setIcon(QMessageBox.Information)
-        msg.setStandardButtons(QMessageBox.Cancel)
-        msg.buttonClicked.connect(LimitSwitch().cancel)
-        LimitSwitch().execute_when_activated(cup_detected_action)
+        msg.setStandardButtons(QMessageBox.Retry)
+        msg.buttonClicked.connect(cup_detected_action)
         msg.exec_()
 
     @staticmethod

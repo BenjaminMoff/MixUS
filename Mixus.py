@@ -131,6 +131,7 @@ class MixingMenu(QDialog):
         self.ui_manager.mixing_menu_setup(self)
         self.serial_synchroniser = SerialSynchroniser()
         self.drink = None
+        self.cup_switch = LimitSwitch()
 
     def update_layout(self, instructions, checkpoints, drink):
         """
@@ -190,7 +191,13 @@ class MixingMenu(QDialog):
         self.bottle_manager.pour(liquid_name, self.drink.ingredients.get(liquid_name))
 
     def done_mixing(self):
-        Popup.drink_completed(lambda: self.window_manager.switch_window("MainMenu"))
+        Popup.drink_completed(self.load_main_menu)
+
+    def load_main_menu(self):
+        if not self.cup_switch.is_activated():
+            self.window_manager.switch_window("MainMenu")
+        else:
+            Popup.drink_completed(self.load_main_menu)
 
 
 class DrinkOptionMenu(QDialog):
@@ -302,21 +309,18 @@ class DrinkOptionMenu(QDialog):
     def is_virgin_available(self):
         return self.drink_manager.is_virgin_available(self.drink)
 
-    def confirm_button_action(self):
-        if self.cup_switch.is_activated():
-            self.load_mixing_menu()
-        else:
-            Popup.no_cup_error(self.load_mixing_menu)
-
     def load_mixing_menu(self):
-        instructions, liquid_checkpoints = self.drink_manager.get_instructions(self.drink,
-                                                                               self.radioButton_double.isChecked(),
-                                                                               self.radioButton_virgin.isChecked())
+        if self.cup_switch.is_activated():
+            instructions, liquid_checkpoints = self.drink_manager.get_instructions(self.drink,
+                                                                                   self.radioButton_double.isChecked(),
+                                                                                   self.radioButton_virgin.isChecked())
 
-        self.window_manager.switch_window("MixingMenu",
-                                          drink=self.drink,
-                                          instructions=instructions,
-                                          checkpoints=liquid_checkpoints)
+            self.window_manager.switch_window("MixingMenu",
+                                              drink=self.drink,
+                                              instructions=instructions,
+                                              checkpoints=liquid_checkpoints)
+        else:
+            Popup.no_cup_error(self.load_mixing_menu())
 
     def load_main_menu(self):
         self.serial_synchroniser.track_progress(self.window_manager.get_window("MainMenu"))
