@@ -80,7 +80,7 @@ class Drink:
         """
         Method that determines if their is enough liquid in the bottle list provided to make the drink
         :param bottles:
-        :return:
+        :return: bottles in the slot
         """
         available_liquid = []
         required_liquids = list(self.ingredients.keys())
@@ -104,8 +104,8 @@ class Drink:
         """
         Method that determines if their is enough liquid in the bottle list provided to make a double of this drink
         (double the alcohol)
-        :param bottles:
-        :return:
+        :param bottles: bottles in the slots
+        :return: bool
         """
         counter = 0
         alcoholized_liquids = self.__find_alcoholized()
@@ -125,8 +125,8 @@ class Drink:
         """
         Method that determines if their is enough liquid in the bottle list provided to make a virgin of this drink
         (all the alcohol is replaced by filler)
-        :param bottles:
-        :return:
+        :param bottles: bottles in the slots
+        :return: bool
         """
         # Find the total volume of alcohol in the drink
         added_volume = self.alcohol_volume()
@@ -145,7 +145,7 @@ class Drink:
     def __find_alcoholized(self):
         """
         Method that finds the alcoholized liquids in the drink
-        :return:
+        :return: list of alcoholized liquids
         """
         alcoholized_list = []
         # If the ingredient in the drink is alcoholized, it is added to the list
@@ -157,7 +157,7 @@ class Drink:
     def alcohol_volume(self):
         """
         Method that calculates the volume of alcohol (whatever the type) in the drink
-        :return:
+        :return: Volume of alcohol in the drink in ounces
         """
         alcohol_volume = 0
         alcoholized_list = self.__find_alcoholized()

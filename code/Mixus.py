@@ -124,14 +124,17 @@ class MixingMenu(QDialog):
         self.ui_manager = ui_manager
         self.window_manager = window_manager
         self.bottle_manager = bottle_manager
-        self.pushButton_return.released.connect(self.return_button_action)
-        self.progress.connect(self.update_progress_bar)
-        self.checkpoint_reached.connect(self.update_ingredients)
-        self.drink_completed.connect(self.done_mixing)
+        self.connect_buttons()
         self.ui_manager.mixing_menu_setup(self)
         self.serial_synchroniser = SerialSynchroniser()
         self.drink = None
         self.cup_switch = LimitSwitch()
+
+    def connect_buttons(self):
+        self.pushButton_return.released.connect(self.return_button_action)
+        self.progress.connect(self.update_progress_bar)
+        self.checkpoint_reached.connect(self.update_ingredients)
+        self.drink_completed.connect(self.done_mixing)
 
     def update_layout(self, instructions, checkpoints, drink):
         """

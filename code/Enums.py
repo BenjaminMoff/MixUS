@@ -32,6 +32,7 @@ class Liquid(Enum):
     TRIPLE_SEC = "Triple sec", True, False
     LIMONCELLO = "Limoncello", True, False
     BLUE_CURACAO = "Curacao bleu", True, False
+    TONIC = "Tonique", False, False
 
     # Alcohol-free
     ORANGE_JUICE = "Jus d'orange", False, True
@@ -39,7 +40,6 @@ class Liquid(Enum):
     COKE = "Coke", False, True
     SPRITE = "Sprite", False, True
     LEMONADE = "Limonade", False, True
-    TONIC = "Tonique", False, True
     GINGER_ALE = "Ginger ale", False, True
     ICED_TEA = "Thé glacé", False, True
 

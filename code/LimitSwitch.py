@@ -11,6 +11,10 @@ except ModuleNotFoundError:
 
 
 class LimitSwitch:
+    """
+    A class that represents the limitSwitch that detects if the Glass is present
+    The limitSwitch is normally closed
+    """
     switch_pin = None
     singleton = None
     canceled = False
@@ -48,6 +52,11 @@ class LimitSwitch:
         self.canceled = True
 
     def is_activated(self, expected=True):
+        """
+        Returns true if the limit switch is not activated, false if it is (Normally closed limitSwitch)
+        :param expected: If the library is not available, expected is given to have the wanted answer.
+        :return: bool
+        """
         if library_available:
             return not GPIO.input(self.switch_pin)
         return expected

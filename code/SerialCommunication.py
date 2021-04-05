@@ -20,6 +20,10 @@ class Flag:
 class ListUSB:
 
     def get_usb_devices(self):
+        """
+        Method that gets all the usb devices connected to the computer
+        :return: A list of ports
+        """
         ports = []
         for p in list(serial.tools.list_ports.comports()):
             ports.append(list(p))
@@ -31,6 +35,10 @@ class ListUSB:
         return com_port
 
     def find_usb_device(self):
+        """
+        Method that gets the port name that has a marlin firmware connected to it
+        :return: USB port name
+        """
         ports = self.get_usb_devices()
         string = "M118 marlin_detected\n"
         for port in ports:
@@ -77,6 +85,9 @@ class SerialSynchroniser(QObject):
         self.singleton = self
 
     def set_serial_port(self):
+        """
+        Set the serial port of the SerialSynchroniser
+        """
         if self.serial_port is not None:
             self.serial_port.close()
         list_usb = ListUSB()
@@ -84,12 +95,21 @@ class SerialSynchroniser(QObject):
         self.serial_port = Serial(port_string, baudrate=250000, timeout=0.1)
 
     def begin_communication(self, instructions):
+        """
+        Begin communication with Marlin
+        """
         self.communicate = Flag(True)
         self.__serial_communication_thread.update(self.serial_port, instructions, self.communicate)
         self.__serial_communication_thread.start()
         self.__serial_communication_thread.wait(1)
 
     def track_progress(self, parent, checkpoints=None, max_value=None):
+        """
+        Track the progress of the current operation with checkpoints
+        :param parent:
+        :param checkpoints:
+        :param max_value:
+        """
         self.parent = parent
         if checkpoints is not None and max_value is not None:
             self.checkpoints = checkpoints
@@ -188,7 +208,7 @@ class GCodeGenerator:
         """
         position = GCodeGenerator.position_dict.get(index)
         if index != 0:
-            return [["G1 X%d\n" %position, "M400\n", "M118 Instruction completed\n"]]
+            return [["G1 X%d\n" % position, "M400\n", "M118 Instruction completed\n"]]
         return [["G28 X\n", "M400\n", "M118 Instruction completed\n"]]
 
     @staticmethod
@@ -250,11 +270,13 @@ class GCodeGenerator:
     @staticmethod
     def move_axis(pos, axis):
         """
-        :param pos:
-        :param axis:
-        :return:
+        :param pos: (int) Position to move the axis to
+        :param axis: (str) Axis X, Y or Z to be moved
+        :return: (list of list) set of instructions to send to Marlin
         """
-        if (axis == "X" and pos and GCodeGenerator.max_x) or (axis == "Y" and pos > GCodeGenerator.max_y) or (axis == "Z" and pos > GCodeGenerator.max_z):
-            raise ValueError("position given for the current axis is greater than the max distance on the physical axis")
+        if (axis == "X" and pos > GCodeGenerator.max_x) or (axis == "Y" and pos > GCodeGenerator.max_y) or (
+                axis == "Z" and pos > GCodeGenerator.max_z):
+            raise ValueError(
+                "position given for the current axis is greater than the max distance on the physical axis")
         instructions = [["G1 " + str(axis) + "%d" % pos + "\n", "M400\n", "M118 Instruction completed\n"]]
         return instructions
