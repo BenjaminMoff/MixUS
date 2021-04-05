@@ -188,7 +188,7 @@ class GCodeGenerator:
     """
     Class responsible to generate g-code instructions to execute when making a drink
     """
-    max_x = 785
+    max_x = 790
     max_y = 150
     max_z = 20
 
@@ -196,9 +196,9 @@ class GCodeGenerator:
         1: 7,
         2: 155,
         3: 303,
-        4: 485,
-        5: 636,
-        6: 785}
+        4: 490,
+        5: 638,
+        6: 790}
 
     @staticmethod
     def move_to_slot(index):

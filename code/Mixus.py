@@ -198,7 +198,12 @@ class MixingMenu(QDialog):
 
     def load_main_menu(self):
         if not self.cup_switch.is_activated(expected=False):
-            self.window_manager.switch_window("MainMenu")
+            if self.serial_synchroniser.can_start_communication():
+                self.serial_synchroniser.track_progress(self.window_manager.get_window("MainMenu"))
+                self.serial_synchroniser.begin_communication(GCodeGenerator.insert_cup())
+                self.window_manager.switch_window("MainMenu", in_motion=True)
+            else:
+                connect_and_retry(self.done_mixing())
         else:
             Popup.drink_completed(self.load_main_menu)
 
