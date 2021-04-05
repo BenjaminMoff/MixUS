@@ -381,7 +381,7 @@ class MaintenanceMenu(QDialog):
 
     def send_button_action(self):
         self.is_home = False
-        instructions = GCodeGenerator.move_axis(int(self.label_axis.text()), self.comboBox_axis.currentText)
+        instructions = GCodeGenerator.move_axis(int(self.label_axis.text()), self.comboBox_axis.currentText())
         if self.serial_synchroniser.can_start_communication():
             self.__send_command(instructions)
         else:
