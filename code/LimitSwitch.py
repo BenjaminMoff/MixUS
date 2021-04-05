@@ -47,8 +47,7 @@ class LimitSwitch:
     def cancel(self):
         self.canceled = True
 
-    def is_activated(self):
+    def is_activated(self, expected=True):
         if library_available:
             return not GPIO.input(self.switch_pin)
-        else:
-            return True
+        return expected
