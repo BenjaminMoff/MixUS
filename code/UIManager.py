@@ -72,7 +72,21 @@ class UIManager:
         :return:
         """
         slider.setGeometry(int(self.res.width() / 20), int(self.res.height() / 2),
-                           int(self.res.width() * 0.9), int(self.res.height() / 6))
+                           int(self.res.width() * 0.9), int(self.res.height() / 4))
+        slider.setStyleSheet("""
+        QSlider::groove:horizontal {
+            border: 1px solid;
+            height: 10px;
+            margin: 0px;
+        }
+        QSlider::handle:horizontal {
+            background-color: green;
+            border: 1px solid;
+            height: 80px;
+            width: 40px;
+            margin: -15px 0px;
+        }
+        """)
 
     def axis_label_setup(self, label):
         """
