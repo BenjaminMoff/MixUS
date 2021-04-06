@@ -11,7 +11,7 @@ from JsonHandler import JsonHandler
 from PyInquirer import style_from_dict, Token, prompt
 from pprint import pprint
 
-max_volume = 12  # Max volume (in ounces) in a drink
+max_volume = 10  # Max volume (in ounces) in a drink
 
 
 class CmdUI:
