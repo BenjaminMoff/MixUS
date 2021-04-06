@@ -83,8 +83,8 @@ class UIManager:
             background-color: green;
             border: 1px solid;
             height: 80px;
-            width: 40px;
-            margin: -15px 0px;
+            width: 50px;
+            margin: -50px 0px;
         }
         """)
 
