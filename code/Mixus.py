@@ -342,6 +342,9 @@ class MaintenanceMenu(QDialog):
     checkpoint_reached = pyqtSignal(str)
     instruction_completed = pyqtSignal()
     is_home = True
+    x_value = 0
+    y_value = 0
+    z_value = 0
 
     def __init__(self, window_manager, ui_manager):
         super(MaintenanceMenu, self).__init__()
@@ -367,17 +370,34 @@ class MaintenanceMenu(QDialog):
 
     def slider_update(self, axis):
         if axis == 'X':
+            temp_val = self.x_value
             self.slider.setMaximum(GCodeGenerator.max_x)
+            self.x_value = temp_val
+            self.slider.setValue(self.x_value)
+            self.label_axis.setText(str(self.slider.value()))
         elif axis == 'Y':
+            temp_val = self.y_value
             self.slider.setMaximum(GCodeGenerator.max_y)
+            self.y_value = temp_val
+            self.slider.setValue(self.y_value)
+            self.label_axis.setText(str(self.slider.value()))
         elif axis == 'Z':
+            temp_val = self.z_value
             self.slider.setMaximum(GCodeGenerator.max_z)
+            self.z_value = temp_val
+            self.slider.setValue(self.z_value)
+            self.label_axis.setText(str(self.slider.value()))
         else:
             raise ValueError("Axis given was not X, Y or Z")
-        self.slider.setValue(0)
 
     def label_axis_update(self):
         self.label_axis.setText(str(self.slider.value()))
+        if self.comboBox_axis.currentText() == 'X':
+            self.x_value = self.slider.value()
+        elif self.comboBox_axis.currentText() == 'Y':
+            self.y_value = self.slider.value()
+        elif self.comboBox_axis.currentText() == 'Z':
+            self.z_value = self.slider.value()
 
     def send_button_action(self):
         self.is_home = False
@@ -400,6 +420,10 @@ class MaintenanceMenu(QDialog):
             self.__send_command(instructions)
         else:
             connect_and_retry(lambda: self.__send_command(instructions))
+        self.x_value = 0
+        self.y_value = 0
+        self.z_value = 0
+        self.slider_update(self.comboBox_axis.currentText())
 
     def change_window(self, window_name):
         if not self.is_home:
