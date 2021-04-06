@@ -75,12 +75,13 @@ class UIManager:
                            int(self.res.width() * 0.9), int(self.res.height() / 4))
         slider.setStyleSheet("""
         QSlider::groove:horizontal {
+            background-color: grey;
             border: 1px solid;
-            height: 10px;
+            height: 5px;
             margin: 0px;
         }
         QSlider::handle:horizontal {
-            background-color: green;
+            background-color: rgb(0, 167, 89);
             border: 1px solid;
             height: 80px;
             width: 50px;
