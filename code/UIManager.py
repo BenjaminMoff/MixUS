@@ -95,8 +95,9 @@ class UIManager:
         :param label:
         :return:
         """
-        label.setGeometry(int(self.res.width() * 0.48), int(self.res.height() * 0.35),
-                          int(self.res.width() * 0.9), int(self.res.height() / 6))
+        label.setGeometry(int(self.res.width() * 0.40), int(self.res.height() * 0.35),
+                          int(self.res.width() * 0.2), int(self.res.height() / 6))
+        label.setAlignment(Qt.AlignCenter)
         label.setFont(QFont("Times", 15, QFont.Bold))
 
     def combobox_axis_setup(self, comboBox):
@@ -105,7 +106,7 @@ class UIManager:
         :param comboBox:
         :return:
         """
-        comboBox.setGeometry(int(self.res.width() * (1/2 - 1/8)), int(self.res.height() * (5.18/6)),
+        comboBox.setGeometry(int(self.res.width() * (1 / 2 - 1 / 8)), int(self.res.height() * (5.18 / 6)),
                              int(self.res.width() / 4), int(self.res.height() / 8))
         comboBox.setStyleSheet(Style.combo_box.value)
 
@@ -189,6 +190,12 @@ class UIManager:
         maintenance_menu.pushButton_home.setGeometry(int(self.res.width() / 20), int(self.res.height() / 5),
                                                      int(self.res.width() / 4), int(self.res.height() / 6))
         self.push_button_setup(maintenance_menu.pushButton_home)
+
+        maintenance_menu.pushButton_disable.setGeometry(int(self.res.width() * (1 - 1 / 2 - 1 / 8)),
+                                                        int(self.res.height() / 5),
+                                                        int(self.res.width() / 4),
+                                                        int(self.res.height() / 6))
+        self.push_button_setup(maintenance_menu.pushButton_disable)
 
         maintenance_menu.pushButton_bottle.setGeometry(int(self.res.width() * (1 - 1 / 20 - 1 / 4)),
                                                        int(self.res.height() / 5),

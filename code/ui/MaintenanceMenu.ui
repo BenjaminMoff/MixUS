@@ -74,6 +74,19 @@
     <string>Home</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="pushButton_disable">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>120</y>
+     <width>281</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Désactiver</string>
+   </property>
+  </widget>
   <widget class="QPushButton" name="pushButton_bottle">
    <property name="geometry">
     <rect>

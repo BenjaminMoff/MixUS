@@ -355,6 +355,7 @@ class MaintenanceMenu(QDialog):
         self.pushButton_bottle.clicked.connect(lambda: self.change_window("BottleMenu"))
         self.pushButton_send.clicked.connect(self.send_button_action)
         self.pushButton_home.clicked.connect(self.home_button_action)
+        self.pushButton_home.clicked.connect(self.disable_button_action)
         self.slider.valueChanged.connect(self.label_axis_update)
         self.comboBox_axis.currentIndexChanged.connect(lambda: self.slider_update(self.comboBox_axis.currentText()))
         self.combobox_axis_setup()
@@ -411,6 +412,7 @@ class MaintenanceMenu(QDialog):
         self.pushButton_home.setEnabled(True)
         self.pushButton_return.setEnabled(True)
         self.pushButton_bottle.setEnabled(True)
+        self.pushButton_disable.setEnabled(True)
 
     def home_button_action(self):
         self.is_home = True
@@ -424,6 +426,13 @@ class MaintenanceMenu(QDialog):
         self.z_value = 0
         self.slider_update(self.comboBox_axis.currentText())
 
+    def disable_button_action(self):
+        instructions = GCodeGenerator.disable_steppers()
+        if self.serial_synchroniser.can_start_communication():
+            self.__send_command(instructions)
+        else:
+            connect_and_retry(lambda: self.__send_command(instructions))
+
     def change_window(self, window_name):
         if not self.is_home:
             Popup.home_before_leaving(self.home_button_action)
@@ -435,6 +444,7 @@ class MaintenanceMenu(QDialog):
         self.pushButton_home.setEnabled(False)
         self.pushButton_return.setEnabled(False)
         self.pushButton_bottle.setEnabled(False)
+        self.pushButton_disable.setEnabled(False)
         self.serial_synchroniser.track_progress(self)
         self.serial_synchroniser.begin_communication(instructions)
 

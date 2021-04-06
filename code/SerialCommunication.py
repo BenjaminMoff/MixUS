@@ -280,3 +280,10 @@ class GCodeGenerator:
                 "position given for the current axis is greater than the max distance on the physical axis")
         instructions = [["G1 " + str(axis) + "%d" % pos + "\n", "M400\n", "M118 Instruction completed\n"]]
         return instructions
+
+    @staticmethod
+    def disable_steppers():
+        """
+        :return: (list of list) set of instructions to deactivate steppers
+        """
+        return [["M18\n", "M400\n", "M118 Instruction completed\n"]]
