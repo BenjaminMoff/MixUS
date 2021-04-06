@@ -134,7 +134,7 @@ class MixingMenu(QDialog):
         self.pushButton_return.released.connect(self.return_button_action)
         self.progress.connect(self.update_progress_bar)
         self.checkpoint_reached.connect(self.update_ingredients)
-        self.drink_completed.connect(self.done_mixing)
+        self.drink_completed.connect(self.popup)
 
     def update_layout(self, instructions, checkpoints, drink):
         """
@@ -174,15 +174,14 @@ class MixingMenu(QDialog):
 
     def return_button_action(self):
         self.serial_synchroniser.abort_communication()
-
         if self.serial_synchroniser.can_start_communication():
-            self.end_mixing()
+            self.end_mixing(drink_canceled=True)
         else:
-            connect_and_retry(self.end_mixing)
+            connect_and_retry(lambda: self.end_mixing(drink_canceled=True))
 
-    def end_mixing(self):
+    def end_mixing(self, drink_canceled=False):
         self.serial_synchroniser.begin_communication(GCodeGenerator.serve_cup())
-        self.done_mixing()
+        self.popup(drink_canceled)
 
     def update_progress_bar(self, value):
         self.progressBar.setValue(value)
@@ -193,8 +192,8 @@ class MixingMenu(QDialog):
         self.verticalLayout_done.addWidget(label)
         self.bottle_manager.pour(liquid_name, self.drink.ingredients.get(liquid_name))
 
-    def done_mixing(self):
-        Popup.drink_completed(self.load_main_menu)
+    def popup(self, drink_canceled=False):
+        Popup.drink_completed(self.load_main_menu, drink_canceled=drink_canceled)
 
     def load_main_menu(self):
         if not self.cup_switch.is_activated(expected=False):
@@ -203,7 +202,7 @@ class MixingMenu(QDialog):
                 self.serial_synchroniser.begin_communication(GCodeGenerator.insert_cup())
                 self.window_manager.switch_window("MainMenu", in_motion=True)
             else:
-                connect_and_retry(self.done_mixing())
+                connect_and_retry(self.popup())
         else:
             Popup.drink_completed(self.load_main_menu)
 
