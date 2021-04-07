@@ -1,0 +1,404 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DataModel &#8212; MixUS 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for DataModel</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">Enums</span> <span class="kn">import</span> <span class="n">Liquid</span><span class="p">,</span> <span class="n">BottleSize</span>
+<span class="kn">from</span> <span class="nn">SerialCommunication</span> <span class="kn">import</span> <span class="n">GCodeGenerator</span>
+
+
+<div class="viewcode-block" id="Bottle"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.Bottle">[docs]</a><span class="k">class</span> <span class="nc">Bottle</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class that stores current volume and liquid type of bottles on the machine</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot_number</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">liquid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">volume_left_ml</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__slot_number</span> <span class="o">=</span> <span class="n">slot_number</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__liquid</span> <span class="o">=</span> <span class="n">liquid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__volume_left_ml</span> <span class="o">=</span> <span class="n">volume_left_ml</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__slot_number</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">get_slot_number</span><span class="p">()</span> <span class="ow">and</span> \
+               <span class="bp">self</span><span class="o">.</span><span class="n">__liquid</span><span class="o">.</span><span class="n">string_name</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">get_liquid_name</span><span class="p">()</span> <span class="ow">and</span> \
+               <span class="bp">self</span><span class="o">.</span><span class="n">__volume_left_ml</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">get_volume_left</span><span class="p">()</span>
+
+    <span class="c1"># Method that keeps tracks of the remaining liquid in the bottle when poured</span>
+<div class="viewcode-block" id="Bottle.pour"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.Bottle.pour">[docs]</a>    <span class="k">def</span> <span class="nf">pour</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ounces</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__volume_left_ml</span> <span class="o">-</span> <span class="n">BottleSize</span><span class="o">.</span><span class="n">ounces_to_ml</span><span class="p">(</span><span class="n">ounces</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__volume_left_ml</span> <span class="o">-=</span> <span class="n">BottleSize</span><span class="o">.</span><span class="n">ounces_to_ml</span><span class="p">(</span><span class="n">ounces</span><span class="p">)</span></div>
+
+    <span class="c1"># Bunch of methods that sets and gets the attributes of Bottle</span>
+<div class="viewcode-block" id="Bottle.set_liquid"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.Bottle.set_liquid">[docs]</a>    <span class="k">def</span> <span class="nf">set_liquid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">liquid</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__liquid</span> <span class="o">=</span> <span class="n">liquid</span></div>
+
+<div class="viewcode-block" id="Bottle.get_liquid"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.Bottle.get_liquid">[docs]</a>    <span class="k">def</span> <span class="nf">get_liquid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid</span></div>
+
+<div class="viewcode-block" id="Bottle.get_liquid_name"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.Bottle.get_liquid_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_liquid_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid</span><span class="o">.</span><span class="n">string_name</span></div>
+
+<div class="viewcode-block" id="Bottle.set_volume_left"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.Bottle.set_volume_left">[docs]</a>    <span class="k">def</span> <span class="nf">set_volume_left</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vol_left</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__volume_left_ml</span> <span class="o">=</span> <span class="n">vol_left</span></div>
+
+<div class="viewcode-block" id="Bottle.get_volume_left"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.Bottle.get_volume_left">[docs]</a>    <span class="k">def</span> <span class="nf">get_volume_left</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__volume_left_ml</span></div>
+
+<div class="viewcode-block" id="Bottle.set_slot_number"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.Bottle.set_slot_number">[docs]</a>    <span class="k">def</span> <span class="nf">set_slot_number</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot_number</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__slot_number</span> <span class="o">=</span> <span class="n">slot_number</span></div>
+
+<div class="viewcode-block" id="Bottle.get_slot_number"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.Bottle.get_slot_number">[docs]</a>    <span class="k">def</span> <span class="nf">get_slot_number</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__slot_number</span></div>
+
+<div class="viewcode-block" id="Bottle.is_alcoholized"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.Bottle.is_alcoholized">[docs]</a>    <span class="k">def</span> <span class="nf">is_alcoholized</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid</span><span class="o">.</span><span class="n">is_alcoholized</span></div>
+
+<div class="viewcode-block" id="Bottle.is_filler"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.Bottle.is_filler">[docs]</a>    <span class="k">def</span> <span class="nf">is_filler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid</span><span class="o">.</span><span class="n">is_filler</span></div>
+
+<div class="viewcode-block" id="Bottle.copy"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.Bottle.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Bottle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__slot_number</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__volume_left_ml</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Drink"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.Drink">[docs]</a><span class="k">class</span> <span class="nc">Drink</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class that stores ingredients for a specific drink and image path for display</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ingredients_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">image_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ingredients</span> <span class="o">=</span> <span class="n">ingredients_dict</span>  <span class="c1"># self.ingredients is a dictionary of Liquid.string_name:Volume</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_path</span> <span class="o">=</span> <span class="n">image_path</span>  <span class="c1"># Path to the image for display use</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">liquids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ingredients</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ingredient</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ingredients</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">liquids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Liquid</span><span class="o">.</span><span class="n">get_liquid_from_string_name</span><span class="p">(</span><span class="n">ingredient</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span> <span class="ow">and</span> \
+               <span class="bp">self</span><span class="o">.</span><span class="n">ingredients</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">ingredients</span> <span class="ow">and</span> \
+               <span class="bp">self</span><span class="o">.</span><span class="n">image_path</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">image_path</span> <span class="ow">and</span> \
+               <span class="bp">self</span><span class="o">.</span><span class="n">liquids</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">liquids</span>
+
+<div class="viewcode-block" id="Drink.is_available"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.Drink.is_available">[docs]</a>    <span class="k">def</span> <span class="nf">is_available</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bottles</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method that determines if their is enough liquid in the bottle list provided to make the drink</span>
+<span class="sd">        :param bottles:</span>
+<span class="sd">        :return: bottles in the slot</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">available_liquid</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">required_liquids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ingredients</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="k">for</span> <span class="n">liquid</span> <span class="ow">in</span> <span class="n">required_liquids</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">bottle</span> <span class="ow">in</span> <span class="n">bottles</span><span class="p">:</span>
+                <span class="c1"># If the remaining volume in the bottle is enough to make the drink, then the counter increases</span>
+                <span class="k">if</span> <span class="n">bottle</span><span class="o">.</span><span class="n">get_liquid_name</span><span class="p">()</span> <span class="o">==</span> <span class="n">liquid</span> \
+                        <span class="ow">and</span> <span class="n">bottle</span><span class="o">.</span><span class="n">get_volume_left</span><span class="p">()</span> <span class="o">&gt;=</span> \
+                        <span class="n">BottleSize</span><span class="o">.</span><span class="n">ounces_to_ml</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ingredients</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">liquid</span><span class="p">)):</span>
+                    <span class="n">available_liquid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bottle</span><span class="o">.</span><span class="n">get_liquid_name</span><span class="p">())</span>
+        <span class="c1"># If the counter is equal to the number of ingredients, then the drink is available for the user</span>
+        <span class="n">required_liquids</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="n">available_liquid</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">available_liquid</span> <span class="o">==</span> <span class="n">required_liquids</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Drink.enough_for_double"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.Drink.enough_for_double">[docs]</a>    <span class="k">def</span> <span class="nf">enough_for_double</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bottles</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method that determines if their is enough liquid in the bottle list provided to make a double of this drink</span>
+<span class="sd">        (double the alcohol)</span>
+<span class="sd">        :param bottles: bottles in the slots</span>
+<span class="sd">        :return: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">alcoholized_liquids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__find_alcoholized</span><span class="p">()</span>
+        <span class="c1"># Check for each alcoholized liquid if the volume left in the bottle_manager is enough to make a double</span>
+        <span class="k">for</span> <span class="n">alcoholized_liquid</span> <span class="ow">in</span> <span class="n">alcoholized_liquids</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">bottle</span> <span class="ow">in</span> <span class="n">bottles</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">bottle</span><span class="o">.</span><span class="n">get_liquid_name</span><span class="p">()</span> <span class="o">==</span> <span class="n">alcoholized_liquid</span><span class="o">.</span><span class="n">string_name</span> <span class="ow">and</span> <span class="n">bottle</span><span class="o">.</span><span class="n">get_volume_left</span><span class="p">()</span> <span class="o">&gt;=</span> \
+                        <span class="bp">self</span><span class="o">.</span><span class="n">ingredients</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">alcoholized_liquid</span><span class="o">.</span><span class="n">string_name</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c1"># If the counter is equal to the number of alcoholized liquids, then the doubled drink is available for the user</span>
+        <span class="k">if</span> <span class="n">counter</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">alcoholized_liquids</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Drink.enough_for_virgin"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.Drink.enough_for_virgin">[docs]</a>    <span class="k">def</span> <span class="nf">enough_for_virgin</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bottles</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method that determines if their is enough liquid in the bottle list provided to make a virgin of this drink</span>
+<span class="sd">        (all the alcohol is replaced by filler)</span>
+<span class="sd">        :param bottles: bottles in the slots</span>
+<span class="sd">        :return: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Find the total volume of alcohol in the drink</span>
+        <span class="n">added_volume</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alcohol_volume</span><span class="p">()</span>
+        <span class="n">total_volume</span> <span class="o">=</span> <span class="n">added_volume</span>
+        <span class="c1"># Find the default volume of filler and add it to added_volume</span>
+        <span class="k">for</span> <span class="n">liquid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">liquids</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">bottle</span> <span class="ow">in</span> <span class="n">bottles</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">bottle</span><span class="o">.</span><span class="n">get_liquid_name</span><span class="p">()</span> <span class="o">==</span> <span class="n">liquid</span><span class="o">.</span><span class="n">string_name</span> <span class="ow">and</span> <span class="n">liquid</span><span class="o">.</span><span class="n">is_filler</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">total_volume</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ingredients</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">liquid</span><span class="o">.</span><span class="n">string_name</span><span class="p">)</span>
+                <span class="c1"># Check if the total volume is higher than the remaining volume in the bottle</span>
+                <span class="k">if</span> <span class="n">bottle</span><span class="o">.</span><span class="n">get_volume_left</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">total_volume</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">False</span></div>
+
+    <span class="k">def</span> <span class="nf">__find_alcoholized</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method that finds the alcoholized liquids in the drink</span>
+<span class="sd">        :return: list of alcoholized liquids</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">alcoholized_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># If the ingredient in the drink is alcoholized, it is added to the list</span>
+        <span class="k">for</span> <span class="n">liquid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">liquids</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">liquid</span><span class="o">.</span><span class="n">is_alcoholized</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">alcoholized_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">liquid</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">alcoholized_list</span>
+
+<div class="viewcode-block" id="Drink.alcohol_volume"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.Drink.alcohol_volume">[docs]</a>    <span class="k">def</span> <span class="nf">alcohol_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method that calculates the volume of alcohol (whatever the type) in the drink</span>
+<span class="sd">        :return: Volume of alcohol in the drink in ounces</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">alcohol_volume</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">alcoholized_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__find_alcoholized</span><span class="p">()</span>
+        <span class="c1"># Sum of the volumes of all the alcoholized ingredients in the drink</span>
+        <span class="k">for</span> <span class="n">liquid</span> <span class="ow">in</span> <span class="n">alcoholized_list</span><span class="p">:</span>
+            <span class="n">alcohol_volume</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ingredients</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">liquid</span><span class="o">.</span><span class="n">string_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">alcohol_volume</span></div></div>
+
+
+<div class="viewcode-block" id="BottleManager"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.BottleManager">[docs]</a><span class="k">class</span> <span class="nc">BottleManager</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class to manage bottles on the machine</span>
+<span class="sd">    Load data from persistence file at instantiation and saves data when bottle list is modified</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_handler</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">json_handler</span> <span class="o">=</span> <span class="n">json_handler</span>
+        <span class="n">bottles</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_handler</span><span class="o">.</span><span class="n">load_bottles</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_bottles</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bottles</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottles_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">bottles</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BottleManager.update"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.BottleManager.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bottles</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bottles</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_bottles</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Too many bottle_manager for the number of slots&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">bottle</span> <span class="ow">in</span> <span class="n">bottles</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bottles_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">bottle</span><span class="o">.</span><span class="n">get_slot_number</span><span class="p">():</span> <span class="n">bottle</span><span class="p">})</span>
+
+        <span class="c1"># Updates persistence file every time a modification is made</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_data</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BottleManager.pour"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.BottleManager.pour">[docs]</a>    <span class="k">def</span> <span class="nf">pour</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">liquid_name</span><span class="p">,</span> <span class="n">ounces</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">bottle</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bottles_dict</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">bottle</span><span class="o">.</span><span class="n">get_liquid_name</span><span class="p">()</span> <span class="o">==</span> <span class="n">liquid_name</span><span class="p">:</span>
+                <span class="n">bottle</span><span class="o">.</span><span class="n">pour</span><span class="p">(</span><span class="n">ounces</span><span class="p">)</span>
+                <span class="k">break</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_data</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BottleManager.get_bottles"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.BottleManager.get_bottles">[docs]</a>    <span class="k">def</span> <span class="nf">get_bottles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bottles_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="BottleManager.remove_bottle"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.BottleManager.remove_bottle">[docs]</a>    <span class="k">def</span> <span class="nf">remove_bottle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottles_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">slot</span><span class="p">:</span> <span class="kc">None</span><span class="p">})</span></div>
+
+<div class="viewcode-block" id="BottleManager.save_data"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.BottleManager.save_data">[docs]</a>    <span class="k">def</span> <span class="nf">save_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">json_handler</span><span class="o">.</span><span class="n">save_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_bottles</span><span class="p">())</span></div></div>
+
+
+<div class="viewcode-block" id="DrinkManager"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.DrinkManager">[docs]</a><span class="k">class</span> <span class="nc">DrinkManager</span><span class="p">:</span>
+    <span class="n">drinks</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">json_handler</span><span class="p">,</span> <span class="n">bottle_manager</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">json_handler</span> <span class="o">=</span> <span class="n">json_handler</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drinks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">json_handler</span><span class="o">.</span><span class="n">load_drinks</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottle_manager</span> <span class="o">=</span> <span class="n">bottle_manager</span>
+
+    <span class="c1"># Method that returns a list of the available drinks depending on the bottles</span>
+<div class="viewcode-block" id="DrinkManager.get_available_drinks"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.DrinkManager.get_available_drinks">[docs]</a>    <span class="k">def</span> <span class="nf">get_available_drinks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method that returns a list of drink that can be made with the content of the bottles stored in bottle_manager</span>
+<span class="sd">        :return: list of available drinks</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">available_drinks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">drink</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">drinks</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">drink</span><span class="o">.</span><span class="n">is_available</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bottle_manager</span><span class="o">.</span><span class="n">bottles_dict</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">available_drinks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">drink</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">available_drinks</span></div>
+
+<div class="viewcode-block" id="DrinkManager.get_drink_from_name"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.DrinkManager.get_drink_from_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_drink_from_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">drink</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">drinks</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">drink</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">drink</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="DrinkManager.add_new_drink"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.DrinkManager.add_new_drink">[docs]</a>    <span class="k">def</span> <span class="nf">add_new_drink</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drink</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drinks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">drink</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DrinkManager.remove_drink"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.DrinkManager.remove_drink">[docs]</a>    <span class="k">def</span> <span class="nf">remove_drink</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drink</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drinks</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">drink</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DrinkManager.save_data"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.DrinkManager.save_data">[docs]</a>    <span class="k">def</span> <span class="nf">save_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">json_handler</span><span class="o">.</span><span class="n">save_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">drinks</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DrinkManager.is_double_available"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.DrinkManager.is_double_available">[docs]</a>    <span class="k">def</span> <span class="nf">is_double_available</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drink</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">drink</span><span class="o">.</span><span class="n">enough_for_double</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bottle_manager</span><span class="o">.</span><span class="n">get_bottles</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="DrinkManager.is_virgin_available"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.DrinkManager.is_virgin_available">[docs]</a>    <span class="k">def</span> <span class="nf">is_virgin_available</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drink</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">drink</span><span class="o">.</span><span class="n">enough_for_virgin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bottle_manager</span><span class="o">.</span><span class="n">get_bottles</span><span class="p">())</span></div>
+
+    <span class="c1"># Returns list of g-code instructions for a specific drink</span>
+<div class="viewcode-block" id="DrinkManager.get_instructions"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.DrinkManager.get_instructions">[docs]</a>    <span class="k">def</span> <span class="nf">get_instructions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drink</span><span class="p">,</span> <span class="n">is_double</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_virgin</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param drink: specified drink to make</span>
+<span class="sd">        :param is_double: specify if the alcohol content should be doubled</span>
+<span class="sd">        :param is_virgin: specify if the alcohol content should be removed</span>
+<span class="sd">        :return: list of list of g-code strings to make the drink and</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">instructions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">poured_liquids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">liquid_checkpoints</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Move the cup in the machine</span>
+        <span class="n">instructions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">GCodeGenerator</span><span class="o">.</span><span class="n">insert_cup</span><span class="p">())</span>
+
+        <span class="c1"># TODO handle multiple fillers</span>
+        <span class="c1"># Find bottles that match the drink ingredients in their order of apparition in the slots</span>
+        <span class="k">for</span> <span class="n">bottle</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bottle_manager</span><span class="o">.</span><span class="n">get_bottles</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">liquid</span> <span class="ow">in</span> <span class="n">drink</span><span class="o">.</span><span class="n">liquids</span><span class="p">:</span>
+
+                <span class="c1"># Check for match in bottle liquid and drink ingredients + check if not already poured</span>
+                <span class="k">if</span> <span class="n">bottle</span><span class="o">.</span><span class="n">get_liquid_name</span><span class="p">()</span> <span class="o">==</span> <span class="n">liquid</span><span class="o">.</span><span class="n">string_name</span> <span class="ow">and</span> <span class="n">liquid</span><span class="o">.</span><span class="n">string_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">poured_liquids</span><span class="p">:</span>
+                    <span class="n">poured_liquids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">liquid</span><span class="o">.</span><span class="n">string_name</span><span class="p">)</span>
+
+                    <span class="c1"># Move to the slot if their is liquid to pour</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">liquid</span><span class="o">.</span><span class="n">is_alcoholized</span> <span class="ow">and</span> <span class="n">is_virgin</span><span class="p">):</span>
+                        <span class="c1"># Move to the slot</span>
+                        <span class="n">instructions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">GCodeGenerator</span><span class="o">.</span><span class="n">move_to_slot</span><span class="p">(</span><span class="n">bottle</span><span class="o">.</span><span class="n">get_slot_number</span><span class="p">()))</span>
+
+                        <span class="c1"># Pour necessary amount of liquid</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__compute_ounces_to_pour</span><span class="p">(</span><span class="n">instructions</span><span class="p">,</span> <span class="n">drink</span><span class="p">,</span> <span class="n">liquid</span><span class="p">,</span> <span class="n">is_double</span><span class="p">,</span> <span class="n">is_virgin</span><span class="p">)</span>
+                        <span class="n">liquid_checkpoints</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="nb">len</span><span class="p">(</span><span class="n">instructions</span><span class="p">):</span> <span class="n">liquid</span><span class="o">.</span><span class="n">string_name</span><span class="p">})</span>
+
+        <span class="c1"># Move to slot 0 and get the cup out of the machine</span>
+        <span class="n">instructions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">GCodeGenerator</span><span class="o">.</span><span class="n">serve_cup</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">instructions</span><span class="p">,</span> <span class="n">liquid_checkpoints</span></div>
+
+    <span class="k">def</span> <span class="nf">__compute_ounces_to_pour</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instructions</span><span class="p">,</span> <span class="n">drink</span><span class="p">,</span> <span class="n">liquid</span><span class="p">,</span> <span class="n">is_double</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">is_virgin</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="c1"># If the drink is double, the alcohol content is doubled and the filler is reduced accordingly</span>
+        <span class="k">if</span> <span class="n">is_double</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">liquid</span><span class="o">.</span><span class="n">is_alcoholized</span><span class="p">:</span>
+                <span class="n">instructions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">GCodeGenerator</span><span class="o">.</span><span class="n">pour</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">drink</span><span class="o">.</span><span class="n">ingredients</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">liquid</span><span class="o">.</span><span class="n">string_name</span><span class="p">)))</span>
+            <span class="k">elif</span> <span class="n">liquid</span><span class="o">.</span><span class="n">is_filler</span><span class="p">:</span>
+                <span class="n">volume_to_remove</span> <span class="o">=</span> <span class="n">drink</span><span class="o">.</span><span class="n">alcohol_volume</span><span class="p">()</span>
+                <span class="n">instructions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">GCodeGenerator</span><span class="o">.</span><span class="n">pour</span><span class="p">(</span><span class="n">drink</span><span class="o">.</span><span class="n">ingredients</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">liquid</span><span class="o">.</span><span class="n">string_name</span><span class="p">)</span> <span class="o">-</span> <span class="n">volume_to_remove</span><span class="p">))</span>
+
+        <span class="c1"># If the drink is virgin, the alcohol content is removed and the filler is increased accordingly</span>
+        <span class="k">elif</span> <span class="n">is_virgin</span> <span class="ow">and</span> <span class="n">liquid</span><span class="o">.</span><span class="n">is_filler</span><span class="p">:</span>
+            <span class="n">volume_to_add</span> <span class="o">=</span> <span class="n">drink</span><span class="o">.</span><span class="n">alcohol_volume</span><span class="p">()</span>
+            <span class="n">instructions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">GCodeGenerator</span><span class="o">.</span><span class="n">pour</span><span class="p">(</span><span class="n">drink</span><span class="o">.</span><span class="n">ingredients</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">liquid</span><span class="o">.</span><span class="n">string_name</span><span class="p">)</span> <span class="o">+</span> <span class="n">volume_to_add</span><span class="p">))</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">instructions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">GCodeGenerator</span><span class="o">.</span><span class="n">pour</span><span class="p">(</span><span class="n">drink</span><span class="o">.</span><span class="n">ingredients</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">liquid</span><span class="o">.</span><span class="n">string_name</span><span class="p">)))</span>
+
+    <span class="c1"># Returns the order in which the ingredients should be added to minimize distance</span>
+<div class="viewcode-block" id="DrinkManager.sort_ingredients_by_slot_numbers"><a class="viewcode-back" href="../Documentation/DataModel.html#DataModel.DrinkManager.sort_ingredients_by_slot_numbers">[docs]</a>    <span class="k">def</span> <span class="nf">sort_ingredients_by_slot_numbers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drink</span><span class="p">):</span>
+        <span class="k">pass</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">MixUS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Yohan Bélanger, Félix Richard, Benjamin Moffett, Laurent Tétreault, Raphaël Cloutier.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

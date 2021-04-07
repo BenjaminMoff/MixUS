@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LimitSwitch &#8212; MixUS 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for LimitSwitch</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">Enums</span> <span class="kn">import</span> <span class="n">HardwareConfig</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">RPi.GPIO</span> <span class="k">as</span> <span class="nn">GPIO</span>
+    <span class="n">library_available</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
+    <span class="n">library_available</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Librairie RPi.GPIO indisponible&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="LimitSwitch"><a class="viewcode-back" href="../Documentation/LimitSwitch.html#LimitSwitch.LimitSwitch">[docs]</a><span class="k">class</span> <span class="nc">LimitSwitch</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class that represents the limitSwitch that detects if the Glass is present</span>
+<span class="sd">    The limitSwitch is normally closed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">switch_pin</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">singleton</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">canceled</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">singleton</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">singleton</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">singleton</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">switch_pin</span> <span class="o">=</span> <span class="n">HardwareConfig</span><span class="o">.</span><span class="n">limit_switch_pin</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="k">if</span> <span class="n">library_available</span><span class="p">:</span>
+            <span class="n">GPIO</span><span class="o">.</span><span class="n">setmode</span><span class="p">(</span><span class="n">GPIO</span><span class="o">.</span><span class="n">BOARD</span><span class="p">)</span>
+            <span class="n">GPIO</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">switch_pin</span><span class="p">,</span> <span class="n">GPIO</span><span class="o">.</span><span class="n">IN</span><span class="p">,</span> <span class="n">pull_up_down</span><span class="o">=</span><span class="n">GPIO</span><span class="o">.</span><span class="n">PUD_DOWN</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__loop_until</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runnable</span><span class="p">,</span> <span class="n">activated</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Runs the passed function when the state specified by the parameter activated is obtained</span>
+<span class="sd">        :param runnable: (runnable) function to run</span>
+<span class="sd">        :param activated: (bool) state of the switch at which the function must run</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">library_available</span><span class="p">:</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">GPIO</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">switch_pin</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">activated</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">canceled</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">canceled</span><span class="p">:</span>
+                <span class="n">runnable</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">canceled</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">runnable</span><span class="p">()</span>
+
+<div class="viewcode-block" id="LimitSwitch.execute_when_deactivated"><a class="viewcode-back" href="../Documentation/LimitSwitch.html#LimitSwitch.LimitSwitch.execute_when_deactivated">[docs]</a>    <span class="k">def</span> <span class="nf">execute_when_deactivated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runnable</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param runnable: (runnable) function to run when the switch is deactivated</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Thread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__loop_until</span><span class="p">(</span><span class="n">runnable</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="LimitSwitch.is_activated"><a class="viewcode-back" href="../Documentation/LimitSwitch.html#LimitSwitch.LimitSwitch.is_activated">[docs]</a>    <span class="k">def</span> <span class="nf">is_activated</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expected</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns true if the limit switch is not activated, false if it is (Normally closed limitSwitch)</span>
+<span class="sd">        :param expected: If the library is not available, expected is given to have the wanted answer.</span>
+<span class="sd">        :return: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">library_available</span><span class="p">:</span>
+            <span class="k">return</span> <span class="ow">not</span> <span class="n">GPIO</span><span class="o">.</span><span class="n">input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">switch_pin</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">expected</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">MixUS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Yohan Bélanger, Félix Richard, Benjamin Moffett, Laurent Tétreault, Raphaël Cloutier.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

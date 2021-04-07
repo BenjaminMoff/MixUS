@@ -1,0 +1,395 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UIManager &#8212; MixUS 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for UIManager</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt5.QtGui</span> <span class="kn">import</span> <span class="n">QFont</span><span class="p">,</span> <span class="n">QPixmap</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="kn">import</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QRect</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtWidgets</span> <span class="kn">import</span> <span class="n">QLabel</span><span class="p">,</span> <span class="n">QVBoxLayout</span><span class="p">,</span> <span class="n">QComboBox</span><span class="p">,</span> <span class="n">QScrollArea</span>
+<span class="kn">from</span> <span class="nn">Enums</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="UIManager"><a class="viewcode-back" href="../Documentation/UIManager.html#UIManager.UIManager">[docs]</a><span class="k">class</span> <span class="nc">UIManager</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">window_manager</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">window_manager</span> <span class="o">=</span> <span class="n">window_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">res</span> <span class="o">=</span> <span class="n">get_screen_resolution</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+<div class="viewcode-block" id="UIManager.title_setup"><a class="viewcode-back" href="../Documentation/UIManager.html#UIManager.UIManager.title_setup">[docs]</a>    <span class="k">def</span> <span class="nf">title_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the title in the top center and a green background</span>
+<span class="sd">        :param title: QLabel of the menu</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">title</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.15</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
+        <span class="n">title</span><span class="o">.</span><span class="n">setAlignment</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignCenter</span><span class="p">)</span>
+        <span class="n">title</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">label_background_color</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">title</span><span class="o">.</span><span class="n">setFont</span><span class="p">(</span><span class="n">QFont</span><span class="p">(</span><span class="s2">&quot;Times&quot;</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">QFont</span><span class="o">.</span><span class="n">Bold</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="UIManager.bottom_right_button_setup"><a class="viewcode-back" href="../Documentation/UIManager.html#UIManager.UIManager.bottom_right_button_setup">[docs]</a>    <span class="k">def</span> <span class="nf">bottom_right_button_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">button</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the given pushButton in the bottom right corner of the screen</span>
+<span class="sd">        :param button: QPushButton of the menu</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">button</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">30</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">5</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">*</span> <span class="mf">5.18</span> <span class="o">/</span> <span class="mi">6</span><span class="p">),</span>
+                           <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">5</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">8</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">push_button_setup</span><span class="p">(</span><span class="n">button</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UIManager.bottom_left_button_setup"><a class="viewcode-back" href="../Documentation/UIManager.html#UIManager.UIManager.bottom_left_button_setup">[docs]</a>    <span class="k">def</span> <span class="nf">bottom_left_button_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">button</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the given pushButton in the bottom left corner of the screen</span>
+<span class="sd">        :param button: QPushButton of the menu</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">button</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">30</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">*</span> <span class="mf">5.18</span> <span class="o">/</span> <span class="mi">6</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">5</span><span class="p">),</span>
+                           <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">8</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">push_button_setup</span><span class="p">(</span><span class="n">button</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UIManager.bottom_background_setup"><a class="viewcode-back" href="../Documentation/UIManager.html#UIManager.UIManager.bottom_background_setup">[docs]</a>    <span class="k">def</span> <span class="nf">bottom_background_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the background of the bottom of the screen to green</span>
+<span class="sd">        :param label: QLabel of the menu</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">label</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.85</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.15</span><span class="p">))</span>
+
+        <span class="n">label</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">label_background_color</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UIManager.image_setup"><a class="viewcode-back" href="../Documentation/UIManager.html#UIManager.UIManager.image_setup">[docs]</a>    <span class="k">def</span> <span class="nf">image_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the label in the center right of the screen and puts an image in it</span>
+<span class="sd">        :param label: QLabel of the menu</span>
+<span class="sd">        :param path: Path to the image from the main directory (images/image.png)</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">height</span> <span class="o">=</span> <span class="n">Style</span><span class="o">.</span><span class="n">drink_button_image_size</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">height</span><span class="p">()</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="n">Style</span><span class="o">.</span><span class="n">drink_button_image_size</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">width</span><span class="p">()</span>
+        <span class="n">label</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.72</span><span class="p">),</span>
+                          <span class="nb">int</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">-</span> <span class="n">height</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
+                          <span class="n">width</span><span class="p">,</span>
+                          <span class="n">height</span><span class="p">)</span>
+        <span class="n">label</span><span class="o">.</span><span class="n">setPixmap</span><span class="p">(</span><span class="n">QPixmap</span><span class="p">(</span><span class="n">path</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="UIManager.slider_setup"><a class="viewcode-back" href="../Documentation/UIManager.html#UIManager.UIManager.slider_setup">[docs]</a>    <span class="k">def</span> <span class="nf">slider_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slider</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the slider for the maintenanceMenu</span>
+<span class="sd">        :param slider: QSlider of the menu</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">slider</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">20</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
+                           <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">4</span><span class="p">))</span>
+        <span class="n">slider</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        QSlider::groove:horizontal {</span>
+<span class="s2">            background-color: grey;</span>
+<span class="s2">            border: 1px solid;</span>
+<span class="s2">            height: 5px;</span>
+<span class="s2">            margin: 0px;</span>
+<span class="s2">        }</span>
+<span class="s2">        QSlider::handle:horizontal {</span>
+<span class="s2">            background-color: rgb(0, 167, 89);</span>
+<span class="s2">            border: 1px solid;</span>
+<span class="s2">            height: 80px;</span>
+<span class="s2">            width: 50px;</span>
+<span class="s2">            margin: -50px 0px;</span>
+<span class="s2">        }</span>
+<span class="s2">        &quot;&quot;&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UIManager.axis_label_setup"><a class="viewcode-back" href="../Documentation/UIManager.html#UIManager.UIManager.axis_label_setup">[docs]</a>    <span class="k">def</span> <span class="nf">axis_label_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the label for the axis slider</span>
+<span class="sd">        :param label:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">label</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.40</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.35</span><span class="p">),</span>
+                          <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.2</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">6</span><span class="p">))</span>
+        <span class="n">label</span><span class="o">.</span><span class="n">setAlignment</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignCenter</span><span class="p">)</span>
+        <span class="n">label</span><span class="o">.</span><span class="n">setFont</span><span class="p">(</span><span class="n">QFont</span><span class="p">(</span><span class="s2">&quot;Times&quot;</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="n">QFont</span><span class="o">.</span><span class="n">Bold</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="UIManager.combobox_axis_setup"><a class="viewcode-back" href="../Documentation/UIManager.html#UIManager.UIManager.combobox_axis_setup">[docs]</a>    <span class="k">def</span> <span class="nf">combobox_axis_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">comboBox</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the comboBox for the maintenanceMenu</span>
+<span class="sd">        :param comboBox:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">comboBox</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">8</span><span class="p">)),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="mf">5.18</span> <span class="o">/</span> <span class="mi">6</span><span class="p">)),</span>
+                             <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">4</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">8</span><span class="p">))</span>
+        <span class="n">comboBox</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">combo_box</span><span class="o">.</span><span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UIManager.push_button_setup"><a class="viewcode-back" href="../Documentation/UIManager.html#UIManager.UIManager.push_button_setup">[docs]</a>    <span class="k">def</span> <span class="nf">push_button_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">button</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the appearance of the given button.</span>
+<span class="sd">        :param button: QPushButton of the menu</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">button</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">button_color</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">button</span><span class="o">.</span><span class="n">pressed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">button</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">button_color_pressed</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+        <span class="n">button</span><span class="o">.</span><span class="n">released</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="n">button</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">button_color</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+        <span class="n">button</span><span class="o">.</span><span class="n">setFont</span><span class="p">(</span><span class="n">QFont</span><span class="p">(</span><span class="s2">&quot;Times&quot;</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="n">QFont</span><span class="o">.</span><span class="n">Bold</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="UIManager.group_box_setup"><a class="viewcode-back" href="../Documentation/UIManager.html#UIManager.UIManager.group_box_setup">[docs]</a>    <span class="k">def</span> <span class="nf">group_box_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupbox</span><span class="p">,</span> <span class="n">layout</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">is_large</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the groupBox for the DrinkOptionMenu and MixingMenu given the wanted position</span>
+<span class="sd">        :param groupbox: QGroupBox of the menu</span>
+<span class="sd">        :param layout: QLayout to put inside the groupBox</span>
+<span class="sd">        :param pos: Index of the groupBox</span>
+<span class="sd">        :param is_large: Indicate if the groupBox should be larger</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">is_large</span><span class="p">:</span>
+            <span class="n">groupbox</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">15</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">*</span> <span class="p">(</span><span class="n">pos</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))),</span>
+                                 <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)),</span>
+                                 <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">3</span><span class="p">),</span>
+                                 <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">groupbox</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">15</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">*</span> <span class="p">(</span><span class="n">pos</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))),</span>
+                                 <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)),</span>
+                                 <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">5</span><span class="p">),</span>
+                                 <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">groupbox</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="n">layout</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UIManager.progress_bar_setup"><a class="viewcode-back" href="../Documentation/UIManager.html#UIManager.UIManager.progress_bar_setup">[docs]</a>    <span class="k">def</span> <span class="nf">progress_bar_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">progressbar</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the position of the progressbar in the bottom right corner of the screen</span>
+<span class="sd">        :param progressbar: QProgressBar of the menu</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">progressbar</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.3</span><span class="p">),</span>
+                                <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">),</span>
+                                <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.65</span><span class="p">),</span>
+                                <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.05</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="UIManager.main_layout_setup"><a class="viewcode-back" href="../Documentation/UIManager.html#UIManager.UIManager.main_layout_setup">[docs]</a>    <span class="k">def</span> <span class="nf">main_layout_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layout</span><span class="p">):</span>
+        <span class="n">layout</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.13</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">*</span> <span class="mf">0.72</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="UIManager.main_menu_setup"><a class="viewcode-back" href="../Documentation/UIManager.html#UIManager.UIManager.main_menu_setup">[docs]</a>    <span class="k">def</span> <span class="nf">main_menu_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">main_menu</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets up the MainMenu</span>
+<span class="sd">        :param main_menu: MainMenu object</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title_setup</span><span class="p">(</span><span class="n">main_menu</span><span class="o">.</span><span class="n">label_Title</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_background_setup</span><span class="p">(</span><span class="n">main_menu</span><span class="o">.</span><span class="n">label_bottom_screen</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_left_button_setup</span><span class="p">(</span><span class="n">main_menu</span><span class="o">.</span><span class="n">pushButton_maintenance</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_right_button_setup</span><span class="p">(</span><span class="n">main_menu</span><span class="o">.</span><span class="n">pushButton_exit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_layout_setup</span><span class="p">(</span><span class="n">main_menu</span><span class="o">.</span><span class="n">scrollArea_drinklist</span><span class="p">)</span>
+
+        <span class="n">main_menu</span><span class="o">.</span><span class="n">scrollArea_drinklist</span><span class="o">.</span><span class="n">setWidgetResizable</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">main_menu</span><span class="o">.</span><span class="n">scroll_layout</span><span class="o">.</span><span class="n">setSpacing</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">main_menu</span><span class="o">.</span><span class="n">scroll_layout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="n">main_menu</span><span class="o">.</span><span class="n">scrollArea_drinklist</span><span class="o">.</span><span class="n">setVerticalScrollBarPolicy</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">ScrollBarAlwaysOff</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UIManager.maintenance_menu_setup"><a class="viewcode-back" href="../Documentation/UIManager.html#UIManager.UIManager.maintenance_menu_setup">[docs]</a>    <span class="k">def</span> <span class="nf">maintenance_menu_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">maintenance_menu</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets up the MaintenanceMenu</span>
+<span class="sd">        :param maintenance_menu: MaintenanceMenu object</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title_setup</span><span class="p">(</span><span class="n">maintenance_menu</span><span class="o">.</span><span class="n">label_Title</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_background_setup</span><span class="p">(</span><span class="n">maintenance_menu</span><span class="o">.</span><span class="n">label_bottom_screen</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_left_button_setup</span><span class="p">(</span><span class="n">maintenance_menu</span><span class="o">.</span><span class="n">pushButton_return</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_right_button_setup</span><span class="p">(</span><span class="n">maintenance_menu</span><span class="o">.</span><span class="n">pushButton_send</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis_label_setup</span><span class="p">(</span><span class="n">maintenance_menu</span><span class="o">.</span><span class="n">label_axis</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slider_setup</span><span class="p">(</span><span class="n">maintenance_menu</span><span class="o">.</span><span class="n">slider</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">combobox_axis_setup</span><span class="p">(</span><span class="n">maintenance_menu</span><span class="o">.</span><span class="n">comboBox_axis</span><span class="p">)</span>
+        <span class="n">maintenance_menu</span><span class="o">.</span><span class="n">pushButton_home</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">20</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">5</span><span class="p">),</span>
+                                                     <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">4</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">6</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">push_button_setup</span><span class="p">(</span><span class="n">maintenance_menu</span><span class="o">.</span><span class="n">pushButton_home</span><span class="p">)</span>
+
+        <span class="n">maintenance_menu</span><span class="o">.</span><span class="n">pushButton_disable</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">8</span><span class="p">)),</span>
+                                                        <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">5</span><span class="p">),</span>
+                                                        <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">4</span><span class="p">),</span>
+                                                        <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">6</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">push_button_setup</span><span class="p">(</span><span class="n">maintenance_menu</span><span class="o">.</span><span class="n">pushButton_disable</span><span class="p">)</span>
+
+        <span class="n">maintenance_menu</span><span class="o">.</span><span class="n">pushButton_bottle</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">20</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)),</span>
+                                                       <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">5</span><span class="p">),</span>
+                                                       <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">width</span><span class="p">()</span> <span class="o">/</span> <span class="mi">4</span><span class="p">),</span>
+                                                       <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">res</span><span class="o">.</span><span class="n">height</span><span class="p">()</span> <span class="o">/</span> <span class="mi">6</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">push_button_setup</span><span class="p">(</span><span class="n">maintenance_menu</span><span class="o">.</span><span class="n">pushButton_bottle</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UIManager.drink_option_menu_setup"><a class="viewcode-back" href="../Documentation/UIManager.html#UIManager.UIManager.drink_option_menu_setup">[docs]</a>    <span class="k">def</span> <span class="nf">drink_option_menu_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drink_option_menu</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets up the DrinkOptionMenu</span>
+<span class="sd">        :param drink_option_menu: DrinkOptionMenu object</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title_setup</span><span class="p">(</span><span class="n">drink_option_menu</span><span class="o">.</span><span class="n">label_Title</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_background_setup</span><span class="p">(</span><span class="n">drink_option_menu</span><span class="o">.</span><span class="n">label_bottom_screen</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_left_button_setup</span><span class="p">(</span><span class="n">drink_option_menu</span><span class="o">.</span><span class="n">pushButton_return</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_right_button_setup</span><span class="p">(</span><span class="n">drink_option_menu</span><span class="o">.</span><span class="n">pushButton_confirm</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">group_box_setup</span><span class="p">(</span><span class="n">drink_option_menu</span><span class="o">.</span><span class="n">groupBox_options</span><span class="p">,</span>
+                             <span class="n">drink_option_menu</span><span class="o">.</span><span class="n">verticalLayout_options</span><span class="p">,</span>
+                             <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group_box_setup</span><span class="p">(</span><span class="n">drink_option_menu</span><span class="o">.</span><span class="n">groupBox_ingredients</span><span class="p">,</span>
+                             <span class="n">drink_option_menu</span><span class="o">.</span><span class="n">verticalLayout_ingredients</span><span class="p">,</span>
+                             <span class="mi">2</span><span class="p">,</span>
+                             <span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UIManager.mixing_menu_setup"><a class="viewcode-back" href="../Documentation/UIManager.html#UIManager.UIManager.mixing_menu_setup">[docs]</a>    <span class="k">def</span> <span class="nf">mixing_menu_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mixing_menu</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets up the MixingMenu</span>
+<span class="sd">        :param mixing_menu: MixingMenu object</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title_setup</span><span class="p">(</span><span class="n">mixing_menu</span><span class="o">.</span><span class="n">label_Title</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_background_setup</span><span class="p">(</span><span class="n">mixing_menu</span><span class="o">.</span><span class="n">label_bottom_screen</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_left_button_setup</span><span class="p">(</span><span class="n">mixing_menu</span><span class="o">.</span><span class="n">pushButton_return</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group_box_setup</span><span class="p">(</span><span class="n">mixing_menu</span><span class="o">.</span><span class="n">groupBox_wating</span><span class="p">,</span> <span class="n">mixing_menu</span><span class="o">.</span><span class="n">verticalLayout_waiting</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group_box_setup</span><span class="p">(</span><span class="n">mixing_menu</span><span class="o">.</span><span class="n">groupBox_done</span><span class="p">,</span> <span class="n">mixing_menu</span><span class="o">.</span><span class="n">verticalLayout_done</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar_setup</span><span class="p">(</span><span class="n">mixing_menu</span><span class="o">.</span><span class="n">progressBar</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="UIManager.bottle_menu_setup"><a class="viewcode-back" href="../Documentation/UIManager.html#UIManager.UIManager.bottle_menu_setup">[docs]</a>    <span class="k">def</span> <span class="nf">bottle_menu_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bottle_menu</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets up the BottleMenu</span>
+<span class="sd">        :param bottle_menu: BottleMenu object</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title_setup</span><span class="p">(</span><span class="n">bottle_menu</span><span class="o">.</span><span class="n">label_Title</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_background_setup</span><span class="p">(</span><span class="n">bottle_menu</span><span class="o">.</span><span class="n">label_bottom_screen</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_left_button_setup</span><span class="p">(</span><span class="n">bottle_menu</span><span class="o">.</span><span class="n">pushButton_return</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bottom_right_button_setup</span><span class="p">(</span><span class="n">bottle_menu</span><span class="o">.</span><span class="n">pushButton_confirm</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_layout_setup</span><span class="p">(</span><span class="n">bottle_menu</span><span class="o">.</span><span class="n">scrollArea_bottles</span><span class="p">)</span>
+        <span class="n">bottle_menu</span><span class="o">.</span><span class="n">scroll_layout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">(</span><span class="n">bottle_menu</span><span class="o">.</span><span class="n">scrollAreaWidgetContents</span><span class="p">)</span>
+        <span class="n">bottle_menu</span><span class="o">.</span><span class="n">scroll_layout</span><span class="o">.</span><span class="n">setSpacing</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">bottle_menu</span><span class="o">.</span><span class="n">scroll_layout</span><span class="o">.</span><span class="n">setObjectName</span><span class="p">(</span><span class="s2">&quot;scroll_layout&quot;</span><span class="p">)</span>
+        <span class="n">bottle_menu</span><span class="o">.</span><span class="n">scroll_layout</span><span class="o">.</span><span class="n">setContentsMargins</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="n">bottle_menu</span><span class="o">.</span><span class="n">scroll_layout</span><span class="o">.</span><span class="n">setAlignment</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">AlignCenter</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__init_slot_number</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bottle_layout</span><span class="p">):</span>
+        <span class="n">bottle_layout</span><span class="o">.</span><span class="n">slot_number</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">()</span>
+        <span class="n">bottle_layout</span><span class="o">.</span><span class="n">slot_number</span><span class="o">.</span><span class="n">setFont</span><span class="p">(</span><span class="n">QFont</span><span class="p">(</span><span class="s2">&quot;Times&quot;</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="n">QFont</span><span class="o">.</span><span class="n">Bold</span><span class="p">))</span>
+        <span class="c1"># bottle_layout.slot_number.setAlignment(Qt.AlignLeft)</span>
+        <span class="n">bottle_layout</span><span class="o">.</span><span class="n">slot_number</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">bottle_layout</span><span class="o">.</span><span class="n">bottle</span><span class="o">.</span><span class="n">get_slot_number</span><span class="p">()))</span>
+        <span class="n">bottle_layout</span><span class="o">.</span><span class="n">add_widget_to_superclass</span><span class="p">(</span><span class="n">bottle_layout</span><span class="o">.</span><span class="n">slot_number</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init_liquid_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bottle_layout</span><span class="p">):</span>
+        <span class="n">bottle_layout</span><span class="o">.</span><span class="n">liquid_type_combo_box</span> <span class="o">=</span> <span class="n">QComboBox</span><span class="p">()</span>
+        <span class="n">bottle_layout</span><span class="o">.</span><span class="n">liquid_type_combo_box</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">combo_box</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">bottle_layout</span><span class="o">.</span><span class="n">liquid_type_combo_box</span><span class="o">.</span><span class="n">setFixedSize</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">combo_box_size</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">bottle_layout</span><span class="o">.</span><span class="n">liquid_type_combo_box</span><span class="o">.</span><span class="n">setFont</span><span class="p">(</span><span class="n">QFont</span><span class="p">(</span><span class="s2">&quot;Times&quot;</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="n">QFont</span><span class="o">.</span><span class="n">Bold</span><span class="p">))</span>
+        <span class="n">bottle_layout</span><span class="o">.</span><span class="n">liquid_type_combo_box</span><span class="o">.</span><span class="n">view</span><span class="p">()</span><span class="o">.</span><span class="n">setVerticalScrollBarPolicy</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">ScrollBarAsNeeded</span><span class="p">)</span>
+        <span class="n">bottle_layout</span><span class="o">.</span><span class="n">init_combo_box</span><span class="p">(</span><span class="n">bottle_layout</span><span class="o">.</span><span class="n">liquid_type_combo_box</span><span class="p">,</span> <span class="n">bottle_layout</span><span class="o">.</span><span class="n">bottle</span><span class="o">.</span><span class="n">get_liquid_name</span><span class="p">(),</span>
+                                     <span class="n">Liquid</span><span class="o">.</span><span class="n">list</span><span class="p">())</span>
+        <span class="n">bottle_layout</span><span class="o">.</span><span class="n">liquid_type_combo_box</span><span class="o">.</span><span class="n">activated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">bottle_layout</span><span class="o">.</span><span class="n">new_liquid_type_selected</span><span class="p">)</span>
+        <span class="n">bottle_layout</span><span class="o">.</span><span class="n">add_widget_to_superclass</span><span class="p">(</span><span class="n">bottle_layout</span><span class="o">.</span><span class="n">liquid_type_combo_box</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__init_volume_left</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bottle_layout</span><span class="p">):</span>
+        <span class="n">bottle_layout</span><span class="o">.</span><span class="n">volume_left_combo_box</span> <span class="o">=</span> <span class="n">QComboBox</span><span class="p">()</span>
+        <span class="n">bottle_layout</span><span class="o">.</span><span class="n">volume_left_combo_box</span><span class="o">.</span><span class="n">setStyleSheet</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">combo_box</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">bottle_layout</span><span class="o">.</span><span class="n">volume_left_combo_box</span><span class="o">.</span><span class="n">setFixedSize</span><span class="p">(</span><span class="n">Style</span><span class="o">.</span><span class="n">combo_box_size</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">bottle_layout</span><span class="o">.</span><span class="n">volume_left_combo_box</span><span class="o">.</span><span class="n">setFont</span><span class="p">(</span><span class="n">QFont</span><span class="p">(</span><span class="s2">&quot;Times&quot;</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="n">QFont</span><span class="o">.</span><span class="n">Bold</span><span class="p">))</span>
+        <span class="n">bottle_layout</span><span class="o">.</span><span class="n">volume_left_combo_box</span><span class="o">.</span><span class="n">view</span><span class="p">()</span><span class="o">.</span><span class="n">setVerticalScrollBarPolicy</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">ScrollBarAsNeeded</span><span class="p">)</span>
+        <span class="n">bottle_layout</span><span class="o">.</span><span class="n">init_combo_box</span><span class="p">(</span><span class="n">bottle_layout</span><span class="o">.</span><span class="n">volume_left_combo_box</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">bottle_layout</span><span class="o">.</span><span class="n">bottle</span><span class="o">.</span><span class="n">get_volume_left</span><span class="p">()),</span>
+                                     <span class="n">BottleSize</span><span class="o">.</span><span class="n">list</span><span class="p">())</span>
+        <span class="n">bottle_layout</span><span class="o">.</span><span class="n">volume_left_combo_box</span><span class="o">.</span><span class="n">activated</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">bottle_layout</span><span class="o">.</span><span class="n">new_volume_selected</span><span class="p">)</span>
+        <span class="n">bottle_layout</span><span class="o">.</span><span class="n">add_widget_to_superclass</span><span class="p">(</span><span class="n">bottle_layout</span><span class="o">.</span><span class="n">volume_left_combo_box</span><span class="p">)</span>
+
+<div class="viewcode-block" id="UIManager.bottle_layout_setup"><a class="viewcode-back" href="../Documentation/UIManager.html#UIManager.UIManager.bottle_layout_setup">[docs]</a>    <span class="k">def</span> <span class="nf">bottle_layout_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bottle_layout</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__init_slot_number</span><span class="p">(</span><span class="n">bottle_layout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__init_liquid_type</span><span class="p">(</span><span class="n">bottle_layout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__init_volume_left</span><span class="p">(</span><span class="n">bottle_layout</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="get_screen_resolution"><a class="viewcode-back" href="../Documentation/UIManager.html#UIManager.get_screen_resolution">[docs]</a><span class="k">def</span> <span class="nf">get_screen_resolution</span><span class="p">(</span><span class="n">app</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to get the current screen resolution</span>
+<span class="sd">    :param app: current app</span>
+<span class="sd">    :return: QRect(0, 0, sc_res.width(), sc_res.height())</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sc_res</span> <span class="o">=</span> <span class="n">app</span><span class="o">.</span><span class="n">desktop</span><span class="p">()</span><span class="o">.</span><span class="n">screenGeometry</span><span class="p">()</span>
+    <span class="n">sc_res</span> <span class="o">=</span> <span class="n">QRect</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1024</span><span class="p">,</span> <span class="mi">600</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sc_res</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">MixUS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Yohan Bélanger, Félix Richard, Benjamin Moffett, Laurent Tétreault, Raphaël Cloutier.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -9,11 +9,11 @@ cd Python-3.7.0
 sudo ./configure
 sudo make -j 4
 sudo make altinstall
+sudo apt-get install python3-pip
 
 # Libraries
-apt-get install
-pip3 install PyQt5
-pip3 install pyserial
-pip3 install gpiozero
-pip3 install inquirer
-pip3 install RPi.GPIO
+pip install PyQt5
+pip install pyserial
+pip install gpiozero
+pip install inquirer
+pip install RPi.GPIO

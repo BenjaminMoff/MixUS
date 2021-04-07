@@ -1,0 +1,415 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SerialCommunication &#8212; MixUS 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for SerialCommunication</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">serial</span>
+<span class="kn">import</span> <span class="nn">serial.tools.list_ports</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">serial</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="kn">import</span> <span class="n">pyqtSignal</span><span class="p">,</span> <span class="n">pyqtSlot</span><span class="p">,</span> <span class="n">QThread</span><span class="p">,</span> <span class="n">Qt</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="kn">import</span> <span class="n">QObject</span>
+
+
+<div class="viewcode-block" id="Flag"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.Flag">[docs]</a><span class="k">class</span> <span class="nc">Flag</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span>
+
+<div class="viewcode-block" id="Flag.set"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.Flag.set">[docs]</a>    <span class="k">def</span> <span class="nf">set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="Flag.get"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.Flag.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span></div></div>
+
+
+<div class="viewcode-block" id="ListUSB"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.ListUSB">[docs]</a><span class="k">class</span> <span class="nc">ListUSB</span><span class="p">:</span>
+
+<div class="viewcode-block" id="ListUSB.get_usb_devices"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.ListUSB.get_usb_devices">[docs]</a>    <span class="k">def</span> <span class="nf">get_usb_devices</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method that gets all the usb devices connected to the computer</span>
+<span class="sd">        :return: A list of ports</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ports</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">serial</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">list_ports</span><span class="o">.</span><span class="n">comports</span><span class="p">()):</span>
+            <span class="n">ports</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+
+        <span class="n">com_port</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">ports</span><span class="p">:</span>
+            <span class="n">com_port</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">port</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">com_port</span></div>
+
+<div class="viewcode-block" id="ListUSB.find_usb_device"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.ListUSB.find_usb_device">[docs]</a>    <span class="k">def</span> <span class="nf">find_usb_device</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method that gets the port name that has a marlin firmware connected to it</span>
+<span class="sd">        :return: USB port name</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ports</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_usb_devices</span><span class="p">()</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="s2">&quot;M118 marlin_detected</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">ports</span><span class="p">:</span>
+            <span class="n">ser</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="mi">250000</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">write_timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">ser</span><span class="o">.</span><span class="n">flushInput</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ser</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+
+                <span class="n">elapsed_time</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+                <span class="k">while</span> <span class="n">elapsed_time</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
+                    <span class="n">message</span> <span class="o">=</span> <span class="n">ser</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">errors</span><span class="o">=</span><span class="s1">&#39;replace&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">message</span> <span class="o">==</span> <span class="s2">&quot;marlin_detected</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">port</span>
+                    <span class="n">elapsed_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div></div>
+
+
+<div class="viewcode-block" id="SerialSynchroniser"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.SerialSynchroniser">[docs]</a><span class="k">class</span> <span class="nc">SerialSynchroniser</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class responsible to communicate with the motor controller board by serial port</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">serial_port</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">progress_notifier</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">parent</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">checkpoints</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">__serial_communication_thread</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">singleton</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">singleton</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">singleton</span> <span class="o">=</span> <span class="n">QObject</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">singleton</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_serial_port</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__serial_communication_thread</span> <span class="o">=</span> <span class="n">SerialCommunicator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">singleton</span> <span class="o">=</span> <span class="bp">self</span>
+
+<div class="viewcode-block" id="SerialSynchroniser.set_serial_port"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.SerialSynchroniser.set_serial_port">[docs]</a>    <span class="k">def</span> <span class="nf">set_serial_port</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the serial port of the SerialSynchroniser</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">list_usb</span> <span class="o">=</span> <span class="n">ListUSB</span><span class="p">()</span>
+        <span class="n">port_string</span> <span class="o">=</span> <span class="n">list_usb</span><span class="o">.</span><span class="n">find_usb_device</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span> <span class="o">=</span> <span class="n">Serial</span><span class="p">(</span><span class="n">port_string</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="mi">250000</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SerialSynchroniser.begin_communication"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.SerialSynchroniser.begin_communication">[docs]</a>    <span class="k">def</span> <span class="nf">begin_communication</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instructions</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Begin communication with Marlin</span>
+<span class="sd">        :param instructions: () parent with slots linked to emited signals</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">communicate</span> <span class="o">=</span> <span class="n">Flag</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__serial_communication_thread</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span><span class="p">,</span> <span class="n">instructions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">communicate</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__serial_communication_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__serial_communication_thread</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SerialSynchroniser.track_progress"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.SerialSynchroniser.track_progress">[docs]</a>    <span class="k">def</span> <span class="nf">track_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">checkpoints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Track the progress of the current operation with checkpoints</span>
+<span class="sd">        :param parent: parent with slots linked to emited signals</span>
+<span class="sd">        :param checkpoints: (dict{int: string}) checkpoints at which a signal is emited</span>
+<span class="sd">        :param max_value: (int) maximum value of the progress</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="k">if</span> <span class="n">checkpoints</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">max_value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">checkpoints</span> <span class="o">=</span> <span class="n">checkpoints</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span> <span class="o">=</span> <span class="n">max_value</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progress_notifier</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_progress</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__serial_communication_thread</span><span class="o">.</span><span class="n">finished</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_end_of_communication</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SerialSynchroniser.on_progress"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.SerialSynchroniser.on_progress">[docs]</a>    <span class="nd">@pyqtSlot</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">on_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Receives signal when progress detected and notify parent</span>
+<span class="sd">        :param value: (int) value emited by the signal</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">progress</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">value</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span> <span class="o">*</span> <span class="mi">100</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">checkpoints</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">checkpoint_reached</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">checkpoints</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_value</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">drink_completed</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SerialSynchroniser.on_end_of_communication"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.SerialSynchroniser.on_end_of_communication">[docs]</a>    <span class="nd">@pyqtSlot</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">on_end_of_communication</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Receives signal at end of communication and notify parent</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">instruction_completed</span><span class="o">.</span><span class="n">emit</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SerialSynchroniser.wait_end_of_communication"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.SerialSynchroniser.wait_end_of_communication">[docs]</a>    <span class="k">def</span> <span class="nf">wait_end_of_communication</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Wait for the communication thread to end</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__serial_communication_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__serial_communication_thread</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SerialSynchroniser.abort_communication"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.SerialSynchroniser.abort_communication">[docs]</a>    <span class="k">def</span> <span class="nf">abort_communication</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stop sending instructions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__serial_communication_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">communicate</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__serial_communication_thread</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SerialSynchroniser.can_start_communication"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.SerialSynchroniser.can_start_communication">[docs]</a>    <span class="k">def</span> <span class="nf">can_start_communication</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verifies if the serial port is still available</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">ports</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">serial</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">list_ports</span><span class="o">.</span><span class="n">comports</span><span class="p">()):</span>
+            <span class="n">ports</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span><span class="o">.</span><span class="n">portstr</span> <span class="ow">in</span> <span class="n">ports</span></div></div>
+
+
+<div class="viewcode-block" id="SerialCommunicator"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.SerialCommunicator">[docs]</a><span class="k">class</span> <span class="nc">SerialCommunicator</span><span class="p">(</span><span class="n">QThread</span><span class="p">):</span>
+    <span class="n">progress_notifier</span> <span class="o">=</span> <span class="n">pyqtSignal</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SerialCommunicator</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+
+<div class="viewcode-block" id="SerialCommunicator.update"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.SerialCommunicator.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">serial_port</span><span class="p">,</span> <span class="n">instructions</span><span class="p">,</span> <span class="n">communicate</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Updates the thread&#39;s parameters before running</span>
+<span class="sd">        :param serial_port: (Serial) serial port that host communication</span>
+<span class="sd">        :param instructions: (list of list of string) instructions to send</span>
+<span class="sd">        :param communicate: (Flag) flag that indicates if the communication should continue</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instructions</span> <span class="o">=</span> <span class="n">instructions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span> <span class="o">=</span> <span class="n">serial_port</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">communicate</span> <span class="o">=</span> <span class="n">communicate</span></div>
+
+<div class="viewcode-block" id="SerialCommunicator.run"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.SerialCommunicator.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes communication protocol</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">instruction</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instructions</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">communicate</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__send_instruction</span><span class="p">(</span><span class="n">instruction</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__read_from_serial</span><span class="p">(</span><span class="s2">&quot;Instruction completed</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progress_notifier</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">progress_notifier</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="nf">__send_instruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">instruction</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sends an instruction trough serial port</span>
+<span class="sd">        :param instruction: (list of string) instruction to be sent</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">string</span> <span class="ow">in</span> <span class="n">instruction</span><span class="p">:</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__read_from_serial</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trigger_msg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads the serial port&#39;s buffer until trigger message is read</span>
+<span class="sd">        :param trigger_msg: (string) string to look for in the serial port&#39;s buffer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__instruction_done</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__instruction_done</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">communicate</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial_port</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">message</span> <span class="o">==</span> <span class="n">trigger_msg</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__instruction_done</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="GCodeGenerator"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.GCodeGenerator">[docs]</a><span class="k">class</span> <span class="nc">GCodeGenerator</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class responsible to generate g-code instructions to execute when making a drink</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">max_x</span> <span class="o">=</span> <span class="mi">790</span>
+    <span class="n">max_y</span> <span class="o">=</span> <span class="mi">150</span>
+    <span class="n">max_z</span> <span class="o">=</span> <span class="mi">20</span>
+
+    <span class="n">position_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">1</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+        <span class="mi">2</span><span class="p">:</span> <span class="mi">155</span><span class="p">,</span>
+        <span class="mi">3</span><span class="p">:</span> <span class="mi">303</span><span class="p">,</span>
+        <span class="mi">4</span><span class="p">:</span> <span class="mi">490</span><span class="p">,</span>
+        <span class="mi">5</span><span class="p">:</span> <span class="mi">638</span><span class="p">,</span>
+        <span class="mi">6</span><span class="p">:</span> <span class="mi">790</span><span class="p">}</span>
+
+<div class="viewcode-block" id="GCodeGenerator.move_to_slot"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.GCodeGenerator.move_to_slot">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">move_to_slot</span><span class="p">(</span><span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param index: (int) slot under which the cup should move to</span>
+<span class="sd">        :return: List of instructions to move the cup under the specified slot</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">GCodeGenerator</span><span class="o">.</span><span class="n">position_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[[</span><span class="s2">&quot;G1 X</span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">position</span><span class="p">,</span> <span class="s2">&quot;M400</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M118 Instruction completed</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="p">[[</span><span class="s2">&quot;G28 X</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M400</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M118 Instruction completed</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">]]</span></div>
+
+<div class="viewcode-block" id="GCodeGenerator.pour"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.GCodeGenerator.pour">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">pour</span><span class="p">(</span><span class="n">ounces</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param ounces: (int) Number of ounces to pour in the cup</span>
+<span class="sd">        :return: List of instructions to pour the specified amount of ounces in the cup</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">instructions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ounces</span><span class="p">):</span>
+            <span class="c1"># Raise z axis to activate dispenser</span>
+            <span class="n">instructions</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="s2">&quot;G1 Z</span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">GCodeGenerator</span><span class="o">.</span><span class="n">max_z</span><span class="p">,</span> <span class="s2">&quot;M400</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M118 Instruction completed</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">])</span>
+
+            <span class="c1"># Wait 3 seconds to allow the liquid to escape dispenser</span>
+            <span class="n">instructions</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="s2">&quot;G4 S3</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M400</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M118 Instruction completed</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">])</span>
+
+            <span class="c1"># Retract z axis to allow dispenser to recharge</span>
+            <span class="n">instructions</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="s2">&quot;G28 Z</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M400</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M118 Instruction completed</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">instructions</span></div>
+
+<div class="viewcode-block" id="GCodeGenerator.insert_cup"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.GCodeGenerator.insert_cup">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">insert_cup</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: List of instructions to retract the cup in the machine</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">instructions</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot;G28 Y</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M400</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M118 Instruction completed</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="n">instructions</span></div>
+
+<div class="viewcode-block" id="GCodeGenerator.serve_cup"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.GCodeGenerator.serve_cup">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">serve_cup</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: List of instructions to get the cup out of the machine</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">instructions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">instructions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">GCodeGenerator</span><span class="o">.</span><span class="n">move_to_slot</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="n">instructions</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="s2">&quot;G1 Y</span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">GCodeGenerator</span><span class="o">.</span><span class="n">max_y</span><span class="p">,</span> <span class="s2">&quot;M400</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M118 Instruction completed</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">instructions</span></div>
+
+<div class="viewcode-block" id="GCodeGenerator.wait_for_cup"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.GCodeGenerator.wait_for_cup">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">wait_for_cup</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: List of instructions to deploy y axis in order to get the cup from the user</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[[</span><span class="s2">&quot;G1 Y</span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">GCodeGenerator</span><span class="o">.</span><span class="n">max_y</span><span class="p">,</span> <span class="s2">&quot;M400</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M118 Instruction completed</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">]]</span></div>
+
+<div class="viewcode-block" id="GCodeGenerator.home"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.GCodeGenerator.home">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">home</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: List of instructions to home each axis</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">instructions</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot;G28 Z</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M400</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M118 Instruction completed</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">],</span>
+                        <span class="p">[</span><span class="s2">&quot;G28 Y</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M400</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M118 Instruction completed</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">],</span>
+                        <span class="p">[</span><span class="s2">&quot;G28 X</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M400</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M118 Instruction completed</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="n">instructions</span></div>
+
+<div class="viewcode-block" id="GCodeGenerator.move_axis"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.GCodeGenerator.move_axis">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">move_axis</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">axis</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param pos: (int) Position to move the axis to</span>
+<span class="sd">        :param axis: (str) Axis X, Y or Z to be moved</span>
+<span class="sd">        :return: (list of list) set of instructions to send to Marlin</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">axis</span> <span class="o">==</span> <span class="s2">&quot;X&quot;</span> <span class="ow">and</span> <span class="n">pos</span> <span class="o">&gt;</span> <span class="n">GCodeGenerator</span><span class="o">.</span><span class="n">max_x</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">axis</span> <span class="o">==</span> <span class="s2">&quot;Y&quot;</span> <span class="ow">and</span> <span class="n">pos</span> <span class="o">&gt;</span> <span class="n">GCodeGenerator</span><span class="o">.</span><span class="n">max_y</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+                <span class="n">axis</span> <span class="o">==</span> <span class="s2">&quot;Z&quot;</span> <span class="ow">and</span> <span class="n">pos</span> <span class="o">&gt;</span> <span class="n">GCodeGenerator</span><span class="o">.</span><span class="n">max_z</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;position given for the current axis is greater than the max distance on the physical axis&quot;</span><span class="p">)</span>
+        <span class="n">instructions</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot;G1 &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">axis</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">pos</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M400</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M118 Instruction completed</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="n">instructions</span></div>
+
+<div class="viewcode-block" id="GCodeGenerator.disable_steppers"><a class="viewcode-back" href="../Documentation/SerialCommunication.html#SerialCommunication.GCodeGenerator.disable_steppers">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">disable_steppers</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: (list of list) set of instructions to deactivate steppers</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[[</span><span class="s2">&quot;M18</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M400</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;M118 Instruction completed</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">]]</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">MixUS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Yohan Bélanger, Félix Richard, Benjamin Moffett, Laurent Tétreault, Raphaël Cloutier.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,579 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+    <title>Mixus module &#8212; MixUS 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-Mixus">
+<span id="mixus-module"></span><h1>Mixus module<a class="headerlink" href="#module-Mixus" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="Mixus.BottleLayout">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">Mixus.</span></code><code class="sig-name descname"><span class="pre">BottleLayout</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">temp_bottle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ui_manager</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#BottleLayout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.BottleLayout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QHBoxLayout</span></code></p>
+<p>Layout to allow modification of liquid type and volume of bottles on the machine
+ComboBoxes are used to get user input</p>
+<dl class="py method">
+<dt id="Mixus.BottleLayout.add_widget_to_superclass">
+<code class="sig-name descname"><span class="pre">add_widget_to_superclass</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">widget</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#BottleLayout.add_widget_to_superclass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.BottleLayout.add_widget_to_superclass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.BottleLayout.init_combo_box">
+<code class="sig-name descname"><span class="pre">init_combo_box</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">combo_box</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">selected_item</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">items</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#BottleLayout.init_combo_box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.BottleLayout.init_combo_box" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.BottleLayout.liquid_type_combo_box">
+<code class="sig-name descname"><span class="pre">liquid_type_combo_box</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#Mixus.BottleLayout.liquid_type_combo_box" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.BottleLayout.new_liquid_type_selected">
+<code class="sig-name descname"><span class="pre">new_liquid_type_selected</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#BottleLayout.new_liquid_type_selected"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.BottleLayout.new_liquid_type_selected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.BottleLayout.new_volume_selected">
+<code class="sig-name descname"><span class="pre">new_volume_selected</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#BottleLayout.new_volume_selected"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.BottleLayout.new_volume_selected" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.BottleLayout.slot_number">
+<code class="sig-name descname"><span class="pre">slot_number</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#Mixus.BottleLayout.slot_number" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.BottleLayout.update_layout">
+<code class="sig-name descname"><span class="pre">update_layout</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_bottle</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#BottleLayout.update_layout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.BottleLayout.update_layout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the layout to display status of new_bottle
+:param new_bottle: bottle used to update combo boxes
+:return:</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.BottleLayout.volume_left_combo_box">
+<code class="sig-name descname"><span class="pre">volume_left_combo_box</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#Mixus.BottleLayout.volume_left_combo_box" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="Mixus.BottleMenu">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">Mixus.</span></code><code class="sig-name descname"><span class="pre">BottleMenu</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_manager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ui_manager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bottle_manager</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#BottleMenu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.BottleMenu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QDialog</span></code></p>
+<p>Menu to update the software when bottles are changed on the machine</p>
+<dl class="py attribute">
+<dt id="Mixus.BottleMenu.bottle_layouts">
+<code class="sig-name descname"><span class="pre">bottle_layouts</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{}</span></em><a class="headerlink" href="#Mixus.BottleMenu.bottle_layouts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.BottleMenu.bottle_manager">
+<code class="sig-name descname"><span class="pre">bottle_manager</span></code><em class="property"> <span class="pre">=</span> <span class="pre">[]</span></em><a class="headerlink" href="#Mixus.BottleMenu.bottle_manager" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.BottleMenu.bottles_setup">
+<code class="sig-name descname"><span class="pre">bottles_setup</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#BottleMenu.bottles_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.BottleMenu.bottles_setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.BottleMenu.confirm_button_released">
+<code class="sig-name descname"><span class="pre">confirm_button_released</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#BottleMenu.confirm_button_released"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.BottleMenu.confirm_button_released" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.BottleMenu.connect_buttons">
+<code class="sig-name descname"><span class="pre">connect_buttons</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#BottleMenu.connect_buttons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.BottleMenu.connect_buttons" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.BottleMenu.name">
+<code class="sig-name descname"><span class="pre">name</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'BottleMenu'</span></em><a class="headerlink" href="#Mixus.BottleMenu.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.BottleMenu.temp_bottles">
+<code class="sig-name descname"><span class="pre">temp_bottles</span></code><em class="property"> <span class="pre">=</span> <span class="pre">[]</span></em><a class="headerlink" href="#Mixus.BottleMenu.temp_bottles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.BottleMenu.update_layout">
+<code class="sig-name descname"><span class="pre">update_layout</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#BottleMenu.update_layout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.BottleMenu.update_layout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method called when the bottle menu is loaded
+Updates each bottle layout with the current content of bottle manager
+:return:</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.BottleMenu.window_manager">
+<code class="sig-name descname"><span class="pre">window_manager</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#Mixus.BottleMenu.window_manager" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="Mixus.DrinkButton">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">Mixus.</span></code><code class="sig-name descname"><span class="pre">DrinkButton</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scroll_area_widget_contents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drink</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#DrinkButton"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.DrinkButton" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QWidget</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="Mixus.DrinkOptionMenu">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">Mixus.</span></code><code class="sig-name descname"><span class="pre">DrinkOptionMenu</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_manager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ui_manager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drink_manager</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#DrinkOptionMenu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.DrinkOptionMenu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QDialog</span></code></p>
+<dl class="py attribute">
+<dt id="Mixus.DrinkOptionMenu.checkpoint_reached">
+<code class="sig-name descname"><span class="pre">checkpoint_reached</span></code><a class="headerlink" href="#Mixus.DrinkOptionMenu.checkpoint_reached" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.DrinkOptionMenu.drink">
+<code class="sig-name descname"><span class="pre">drink</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#Mixus.DrinkOptionMenu.drink" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.DrinkOptionMenu.in_motion">
+<code class="sig-name descname"><span class="pre">in_motion</span></code><em class="property"> <span class="pre">=</span> <span class="pre">False</span></em><a class="headerlink" href="#Mixus.DrinkOptionMenu.in_motion" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.DrinkOptionMenu.instruction_completed">
+<code class="sig-name descname"><span class="pre">instruction_completed</span></code><a class="headerlink" href="#Mixus.DrinkOptionMenu.instruction_completed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.DrinkOptionMenu.is_current_setting_valid">
+<code class="sig-name descname"><span class="pre">is_current_setting_valid</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#DrinkOptionMenu.is_current_setting_valid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.DrinkOptionMenu.is_current_setting_valid" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.DrinkOptionMenu.is_double_available">
+<code class="sig-name descname"><span class="pre">is_double_available</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#DrinkOptionMenu.is_double_available"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.DrinkOptionMenu.is_double_available" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.DrinkOptionMenu.is_virgin_available">
+<code class="sig-name descname"><span class="pre">is_virgin_available</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#DrinkOptionMenu.is_virgin_available"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.DrinkOptionMenu.is_virgin_available" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.DrinkOptionMenu.load_main_menu">
+<code class="sig-name descname"><span class="pre">load_main_menu</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#DrinkOptionMenu.load_main_menu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.DrinkOptionMenu.load_main_menu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.DrinkOptionMenu.load_mixing_menu">
+<code class="sig-name descname"><span class="pre">load_mixing_menu</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#DrinkOptionMenu.load_mixing_menu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.DrinkOptionMenu.load_mixing_menu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.DrinkOptionMenu.name">
+<code class="sig-name descname"><span class="pre">name</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'DrinkOptionMenu'</span></em><a class="headerlink" href="#Mixus.DrinkOptionMenu.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.DrinkOptionMenu.progress">
+<code class="sig-name descname"><span class="pre">progress</span></code><a class="headerlink" href="#Mixus.DrinkOptionMenu.progress" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.DrinkOptionMenu.request_cup">
+<code class="sig-name descname"><span class="pre">request_cup</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#DrinkOptionMenu.request_cup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.DrinkOptionMenu.request_cup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.DrinkOptionMenu.return_button_action">
+<code class="sig-name descname"><span class="pre">return_button_action</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#DrinkOptionMenu.return_button_action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.DrinkOptionMenu.return_button_action" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.DrinkOptionMenu.update_ingredients">
+<code class="sig-name descname"><span class="pre">update_ingredients</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#DrinkOptionMenu.update_ingredients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.DrinkOptionMenu.update_ingredients" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.DrinkOptionMenu.update_layout">
+<code class="sig-name descname"><span class="pre">update_layout</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drink</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#DrinkOptionMenu.update_layout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.DrinkOptionMenu.update_layout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="Mixus.LiquidLabel">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">Mixus.</span></code><code class="sig-name descname"><span class="pre">LiquidLabel</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">liquid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">volume</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#LiquidLabel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.LiquidLabel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QLabel</span></code></p>
+<dl class="py method">
+<dt id="Mixus.LiquidLabel.update_volume">
+<code class="sig-name descname"><span class="pre">update_volume</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">volume</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#LiquidLabel.update_volume"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.LiquidLabel.update_volume" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="Mixus.MainMenu">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">Mixus.</span></code><code class="sig-name descname"><span class="pre">MainMenu</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_manager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ui_manager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drink_manager</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MainMenu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MainMenu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QMainWindow</span></code></p>
+<dl class="py attribute">
+<dt id="Mixus.MainMenu.checkpoint_reached">
+<code class="sig-name descname"><span class="pre">checkpoint_reached</span></code><a class="headerlink" href="#Mixus.MainMenu.checkpoint_reached" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.MainMenu.connect_buttons">
+<code class="sig-name descname"><span class="pre">connect_buttons</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MainMenu.connect_buttons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MainMenu.connect_buttons" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.MainMenu.enable_buttons">
+<code class="sig-name descname"><span class="pre">enable_buttons</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MainMenu.enable_buttons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MainMenu.enable_buttons" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.MainMenu.instruction_completed">
+<code class="sig-name descname"><span class="pre">instruction_completed</span></code><a class="headerlink" href="#Mixus.MainMenu.instruction_completed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.MainMenu.name">
+<code class="sig-name descname"><span class="pre">name</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'MainMenu'</span></em><a class="headerlink" href="#Mixus.MainMenu.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.MainMenu.progress">
+<code class="sig-name descname"><span class="pre">progress</span></code><a class="headerlink" href="#Mixus.MainMenu.progress" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.MainMenu.update_layout">
+<code class="sig-name descname"><span class="pre">update_layout</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_motion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MainMenu.update_layout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MainMenu.update_layout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="Mixus.MaintenanceMenu">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">Mixus.</span></code><code class="sig-name descname"><span class="pre">MaintenanceMenu</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_manager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ui_manager</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MaintenanceMenu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MaintenanceMenu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QDialog</span></code></p>
+<dl class="py method">
+<dt id="Mixus.MaintenanceMenu.change_window">
+<code class="sig-name descname"><span class="pre">change_window</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MaintenanceMenu.change_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MaintenanceMenu.change_window" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.MaintenanceMenu.checkpoint_reached">
+<code class="sig-name descname"><span class="pre">checkpoint_reached</span></code><a class="headerlink" href="#Mixus.MaintenanceMenu.checkpoint_reached" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.MaintenanceMenu.combobox_axis_setup">
+<code class="sig-name descname"><span class="pre">combobox_axis_setup</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MaintenanceMenu.combobox_axis_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MaintenanceMenu.combobox_axis_setup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.MaintenanceMenu.disable_button_action">
+<code class="sig-name descname"><span class="pre">disable_button_action</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MaintenanceMenu.disable_button_action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MaintenanceMenu.disable_button_action" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.MaintenanceMenu.home_button_action">
+<code class="sig-name descname"><span class="pre">home_button_action</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MaintenanceMenu.home_button_action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MaintenanceMenu.home_button_action" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.MaintenanceMenu.instruction_completed">
+<code class="sig-name descname"><span class="pre">instruction_completed</span></code><a class="headerlink" href="#Mixus.MaintenanceMenu.instruction_completed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.MaintenanceMenu.is_home">
+<code class="sig-name descname"><span class="pre">is_home</span></code><em class="property"> <span class="pre">=</span> <span class="pre">True</span></em><a class="headerlink" href="#Mixus.MaintenanceMenu.is_home" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.MaintenanceMenu.label_axis_update">
+<code class="sig-name descname"><span class="pre">label_axis_update</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MaintenanceMenu.label_axis_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MaintenanceMenu.label_axis_update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.MaintenanceMenu.name">
+<code class="sig-name descname"><span class="pre">name</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'MaintenanceMenu'</span></em><a class="headerlink" href="#Mixus.MaintenanceMenu.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.MaintenanceMenu.on_instruction_completed">
+<code class="sig-name descname"><span class="pre">on_instruction_completed</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MaintenanceMenu.on_instruction_completed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MaintenanceMenu.on_instruction_completed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.MaintenanceMenu.progress">
+<code class="sig-name descname"><span class="pre">progress</span></code><a class="headerlink" href="#Mixus.MaintenanceMenu.progress" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.MaintenanceMenu.send_button_action">
+<code class="sig-name descname"><span class="pre">send_button_action</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MaintenanceMenu.send_button_action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MaintenanceMenu.send_button_action" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.MaintenanceMenu.slider_update">
+<code class="sig-name descname"><span class="pre">slider_update</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MaintenanceMenu.slider_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MaintenanceMenu.slider_update" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.MaintenanceMenu.x_value">
+<code class="sig-name descname"><span class="pre">x_value</span></code><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#Mixus.MaintenanceMenu.x_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.MaintenanceMenu.y_value">
+<code class="sig-name descname"><span class="pre">y_value</span></code><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#Mixus.MaintenanceMenu.y_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.MaintenanceMenu.z_value">
+<code class="sig-name descname"><span class="pre">z_value</span></code><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#Mixus.MaintenanceMenu.z_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="Mixus.MixingMenu">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">Mixus.</span></code><code class="sig-name descname"><span class="pre">MixingMenu</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_manager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ui_manager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bottle_manager</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MixingMenu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MixingMenu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtWidgets.QDialog</span></code></p>
+<dl class="py attribute">
+<dt id="Mixus.MixingMenu.checkpoint_reached">
+<code class="sig-name descname"><span class="pre">checkpoint_reached</span></code><a class="headerlink" href="#Mixus.MixingMenu.checkpoint_reached" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.MixingMenu.connect_buttons">
+<code class="sig-name descname"><span class="pre">connect_buttons</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MixingMenu.connect_buttons"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MixingMenu.connect_buttons" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.MixingMenu.drink_completed">
+<code class="sig-name descname"><span class="pre">drink_completed</span></code><a class="headerlink" href="#Mixus.MixingMenu.drink_completed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.MixingMenu.end_mixing">
+<code class="sig-name descname"><span class="pre">end_mixing</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drink_canceled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MixingMenu.end_mixing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MixingMenu.end_mixing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.MixingMenu.instruction_completed">
+<code class="sig-name descname"><span class="pre">instruction_completed</span></code><a class="headerlink" href="#Mixus.MixingMenu.instruction_completed" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.MixingMenu.load_main_menu">
+<code class="sig-name descname"><span class="pre">load_main_menu</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MixingMenu.load_main_menu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MixingMenu.load_main_menu" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.MixingMenu.name">
+<code class="sig-name descname"><span class="pre">name</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'MixingMenu'</span></em><a class="headerlink" href="#Mixus.MixingMenu.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.MixingMenu.popup">
+<code class="sig-name descname"><span class="pre">popup</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">drink_canceled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MixingMenu.popup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MixingMenu.popup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.MixingMenu.progress">
+<code class="sig-name descname"><span class="pre">progress</span></code><a class="headerlink" href="#Mixus.MixingMenu.progress" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.MixingMenu.return_button_action">
+<code class="sig-name descname"><span class="pre">return_button_action</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MixingMenu.return_button_action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MixingMenu.return_button_action" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.MixingMenu.start_mixing">
+<code class="sig-name descname"><span class="pre">start_mixing</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instructions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoints</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MixingMenu.start_mixing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MixingMenu.start_mixing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.MixingMenu.update_ingredients">
+<code class="sig-name descname"><span class="pre">update_ingredients</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">liquid_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MixingMenu.update_ingredients"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MixingMenu.update_ingredients" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.MixingMenu.update_layout">
+<code class="sig-name descname"><span class="pre">update_layout</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instructions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoints</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drink</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MixingMenu.update_layout"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MixingMenu.update_layout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method called when the MixingMenu is loaded
+Updates the ingredients and the progressBar for the current drink
+:param instructions: List of instructions to pass to the serial port
+:param checkpoints: Checkpoints of the instruction list to update ingredients
+:param drink: Drink that is going to be made
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.MixingMenu.update_progress_bar">
+<code class="sig-name descname"><span class="pre">update_progress_bar</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#MixingMenu.update_progress_bar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.MixingMenu.update_progress_bar" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="Mixus.WindowManager">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">Mixus.</span></code><code class="sig-name descname"><span class="pre">WindowManager</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stack</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#WindowManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.WindowManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class responsible to switch between menus and update layouts</p>
+<dl class="py method">
+<dt id="Mixus.WindowManager.append_window">
+<code class="sig-name descname"><span class="pre">append_window</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#WindowManager.append_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.WindowManager.append_window" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the window to the stack
+:param window:
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.WindowManager.get_window">
+<code class="sig-name descname"><span class="pre">get_window</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#WindowManager.get_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.WindowManager.get_window" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.WindowManager.stack">
+<code class="sig-name descname"><span class="pre">stack</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#Mixus.WindowManager.stack" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="Mixus.WindowManager.switch_window">
+<code class="sig-name descname"><span class="pre">switch_window</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">window_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instructions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_motion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#WindowManager.switch_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.WindowManager.switch_window" title="Permalink to this definition">¶</a></dt>
+<dd><p>Switch the window to the given window_name
+:param window_name: Name of the window to switch
+:param drink: Drink object if needed
+:param instructions: Instruction list if needed
+:param checkpoints: Checkpoints of instruction list if needed
+:param in_motion: Indicate if the machine is in motion
+:return:</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="Mixus.WindowManager.windows">
+<code class="sig-name descname"><span class="pre">windows</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{}</span></em><a class="headerlink" href="#Mixus.WindowManager.windows" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="Mixus.connect_and_retry">
+<code class="sig-prename descclassname"><span class="pre">Mixus.</span></code><code class="sig-name descname"><span class="pre">connect_and_retry</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runnable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#connect_and_retry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.connect_and_retry" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="Mixus.init_app_ui">
+<code class="sig-prename descclassname"><span class="pre">Mixus.</span></code><code class="sig-name descname"><span class="pre">init_app_ui</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#init_app_ui"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.init_app_ui" title="Permalink to this definition">¶</a></dt>
+<dd><p>Functions that initiates the app
+:param app: current app
+:return:</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="Mixus.init_hardware">
+<code class="sig-prename descclassname"><span class="pre">Mixus.</span></code><code class="sig-name descname"><span class="pre">init_hardware</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first_menu</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#init_hardware"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.init_hardware" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="Mixus.initial_machine_homing">
+<code class="sig-prename descclassname"><span class="pre">Mixus.</span></code><code class="sig-name descname"><span class="pre">initial_machine_homing</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">first_menu</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Mixus.html#initial_machine_homing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Mixus.initial_machine_homing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">MixUS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Yohan Bélanger, Félix Richard, Benjamin Moffett, Laurent Tétreault, Raphaël Cloutier.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/Documentation/Mixus.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

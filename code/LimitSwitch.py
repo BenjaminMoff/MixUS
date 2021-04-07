@@ -32,6 +32,11 @@ class LimitSwitch:
             GPIO.setup(self.switch_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
     def __loop_until(self, runnable, activated):
+        """
+        Runs the passed function when the state specified by the parameter activated is obtained
+        :param runnable: (runnable) function to run
+        :param activated: (bool) state of the switch at which the function must run
+        """
         if library_available:
             while not GPIO.input(self.switch_pin) is not activated and self.canceled is not True:
                 sleep(0.1)
@@ -42,14 +47,11 @@ class LimitSwitch:
         else:
             runnable()
 
-    def execute_when_activated(self, runnable):
-        Thread(self.__loop_until(runnable, True), daemon=True).start()
-
     def execute_when_deactivated(self, runnable):
+        """
+        :param runnable: (runnable) function to run when the switch is deactivated
+        """
         Thread(self.__loop_until(runnable, False), daemon=True).start()
-
-    def cancel(self):
-        self.canceled = True
 
     def is_activated(self, expected=True):
         """

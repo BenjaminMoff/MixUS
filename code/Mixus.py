@@ -355,7 +355,7 @@ class MaintenanceMenu(QDialog):
         self.pushButton_bottle.clicked.connect(lambda: self.change_window("BottleMenu"))
         self.pushButton_send.clicked.connect(self.send_button_action)
         self.pushButton_home.clicked.connect(self.home_button_action)
-        self.pushButton_home.clicked.connect(self.disable_button_action)
+        self.pushButton_disable.clicked.connect(self.disable_button_action)
         self.slider.valueChanged.connect(self.label_axis_update)
         self.comboBox_axis.currentIndexChanged.connect(lambda: self.slider_update(self.comboBox_axis.currentText()))
         self.combobox_axis_setup()

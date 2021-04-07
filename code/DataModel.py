@@ -253,7 +253,7 @@ class DrinkManager:
         :param drink: specified drink to make
         :param is_double: specify if the alcohol content should be doubled
         :param is_virgin: specify if the alcohol content should be removed
-        :return: list of list of g-code strings to make the drink
+        :return: list of list of g-code strings to make the drink and
         """
         instructions = []
         poured_liquids = []

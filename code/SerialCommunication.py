@@ -97,6 +97,7 @@ class SerialSynchroniser(QObject):
     def begin_communication(self, instructions):
         """
         Begin communication with Marlin
+        :param instructions: () parent with slots linked to emited signals
         """
         self.communicate = Flag(True)
         self.__serial_communication_thread.update(self.serial_port, instructions, self.communicate)
@@ -106,9 +107,9 @@ class SerialSynchroniser(QObject):
     def track_progress(self, parent, checkpoints=None, max_value=None):
         """
         Track the progress of the current operation with checkpoints
-        :param parent:
-        :param checkpoints:
-        :param max_value:
+        :param parent: parent with slots linked to emited signals
+        :param checkpoints: (dict{int: string}) checkpoints at which a signal is emited
+        :param max_value: (int) maximum value of the progress
         """
         self.parent = parent
         if checkpoints is not None and max_value is not None:
@@ -120,6 +121,10 @@ class SerialSynchroniser(QObject):
 
     @pyqtSlot(int)
     def on_progress(self, value):
+        """
+        Receives signal when progress detected and notify parent
+        :param value: (int) value emited by the signal
+        """
         self.parent.progress.emit(int(value / self.max_value * 100))
         if value in list(self.checkpoints.keys()):
             self.parent.checkpoint_reached.emit(self.checkpoints.get(value))
@@ -128,18 +133,30 @@ class SerialSynchroniser(QObject):
 
     @pyqtSlot()
     def on_end_of_communication(self):
+        """
+        Receives signal at end of communication and notify parent
+        """
         self.parent.instruction_completed.emit()
 
     def wait_end_of_communication(self):
+        """
+        Wait for the communication thread to end
+        """
         if self.__serial_communication_thread is not None:
             self.__serial_communication_thread.wait()
 
     def abort_communication(self):
+        """
+        Stop sending instructions
+        """
         if self.__serial_communication_thread is not None:
             self.communicate.set(False)
             self.__serial_communication_thread.wait()
 
     def can_start_communication(self):
+        """
+        Verifies if the serial port is still available
+        """
         if self.serial_port is None:
             return False
         ports = []
@@ -156,14 +173,20 @@ class SerialCommunicator(QThread):
         self.parent = parent
 
     def update(self, serial_port, instructions, communicate):
+        """
+        Updates the thread's parameters before running
+        :param serial_port: (Serial) serial port that host communication
+        :param instructions: (list of list of string) instructions to send
+        :param communicate: (Flag) flag that indicates if the communication should continue
+        """
         self.instructions = instructions
         self.serial_port = serial_port
         self.communicate = communicate
 
     def run(self):
-        self.__send_instructions()
-
-    def __send_instructions(self):
+        """
+        Executes communication protocol
+        """
         for index, instruction in enumerate(self.instructions):
             if not self.communicate.get():
                 return
@@ -172,11 +195,19 @@ class SerialCommunicator(QThread):
             self.progress_notifier.emit(self.parent.progress_notifier.emit(index + 1))
 
     def __send_instruction(self, instruction):
+        """
+        Sends an instruction trough serial port
+        :param instruction: (list of string) instruction to be sent
+        """
         for string in instruction:
             time.sleep(1)
             self.serial_port.write(str.encode(string, "utf-8"))
 
     def __read_from_serial(self, trigger_msg):
+        """
+        Reads the serial port's buffer until trigger message is read
+        :param trigger_msg: (string) string to look for in the serial port's buffer
+        """
         self.__instruction_done = False
         while not self.__instruction_done and self.communicate.get():
             message = self.serial_port.readline().decode("utf-8")
@@ -217,8 +248,6 @@ class GCodeGenerator:
         :param ounces: (int) Number of ounces to pour in the cup
         :return: List of instructions to pour the specified amount of ounces in the cup
         """
-        # TODO define actual z movement to pour
-
         instructions = []
         for i in range(ounces):
             # Raise z axis to activate dispenser

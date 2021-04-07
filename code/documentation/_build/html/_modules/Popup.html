@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Popup &#8212; MixUS 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for Popup</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">PyQt5.QtWidgets</span> <span class="kn">import</span> <span class="n">QMessageBox</span><span class="p">,</span> <span class="n">QPushButton</span>
+<span class="kn">from</span> <span class="nn">LimitSwitch</span> <span class="kn">import</span> <span class="n">LimitSwitch</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtGui</span> <span class="kn">import</span> <span class="n">QFont</span>
+
+
+<div class="viewcode-block" id="Popup"><a class="viewcode-back" href="../Documentation/Popup.html#Popup.Popup">[docs]</a><span class="k">class</span> <span class="nc">Popup</span><span class="p">:</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__default_popup</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: QMessageBox with default popup aesthetics</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">QMessageBox</span><span class="p">()</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">setWindowTitle</span><span class="p">(</span><span class="s2">&quot;Mixus&quot;</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">setModal</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">setFont</span><span class="p">(</span><span class="n">QFont</span><span class="p">(</span><span class="s2">&quot;Times&quot;</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="n">QFont</span><span class="o">.</span><span class="n">Bold</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">msg</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__execute_action_and_close</span><span class="p">(</span><span class="n">popup</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param popup: (QMessageBox) popup to be closed</span>
+<span class="sd">        :param action: (runnable) function to run before closing popup</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">popup</span><span class="o">.</span><span class="n">done</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">action</span><span class="p">()</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="Popup.drink_completed"><a class="viewcode-back" href="../Documentation/Popup.html#Popup.Popup.drink_completed">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">drink_completed</span><span class="p">(</span><span class="n">cup_removed_action</span><span class="p">,</span> <span class="n">drink_canceled</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param home_action: (runnable) function to run when home button clicked</span>
+<span class="sd">        :param drink_canceled: (runnable) function to run when home button clicked</span>
+<span class="sd">        :return: dsiplay a popup window asking user to home the machine</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">Popup</span><span class="o">.</span><span class="n">__default_popup</span><span class="p">()</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">setIcon</span><span class="p">(</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Information</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">drink_canceled</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Annulation de la commande&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Bonne swince!&quot;</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">setInformativeText</span><span class="p">(</span><span class="s2">&quot;Veuillez récupérer votre verre&quot;</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span>
+        <span class="n">LimitSwitch</span><span class="p">()</span><span class="o">.</span><span class="n">execute_when_deactivated</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">Popup</span><span class="o">.</span><span class="n">__execute_action_and_close</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">cup_removed_action</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Popup.serial_port_error"><a class="viewcode-back" href="../Documentation/Popup.html#Popup.Popup.serial_port_error">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">serial_port_error</span><span class="p">(</span><span class="n">retry_action</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param retry_action: (runnable) function to run when retry button is clicked</span>
+<span class="sd">        :return: dsiplay a popup window indicating that the serial communication is not available</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">Popup</span><span class="o">.</span><span class="n">__default_popup</span><span class="p">()</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Connection avec le barman perdue&quot;</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">setIcon</span><span class="p">(</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Critical</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">setStandardButtons</span><span class="p">(</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Retry</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">buttonClicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">Popup</span><span class="o">.</span><span class="n">__execute_action_and_close</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">retry_action</span><span class="p">))</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">exec</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Popup.no_cup_error"><a class="viewcode-back" href="../Documentation/Popup.html#Popup.Popup.no_cup_error">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">no_cup_error</span><span class="p">(</span><span class="n">retry_action</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param retry_action: (runnable) function to run when retry button is clicked</span>
+<span class="sd">        :return: dsiplay a popup window asking user to insert a cup in the machine</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">Popup</span><span class="o">.</span><span class="n">__default_popup</span><span class="p">()</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Veuillez insérer votre verre&quot;</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">setIcon</span><span class="p">(</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Information</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">setStandardButtons</span><span class="p">(</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Retry</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">buttonClicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">retry_action</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Popup.home_before_leaving"><a class="viewcode-back" href="../Documentation/Popup.html#Popup.Popup.home_before_leaving">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">home_before_leaving</span><span class="p">(</span><span class="n">home_action</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param home_action: (runnable) function to run when home button is clicked</span>
+<span class="sd">        :return: dsiplay a popup window asking user to home the machine</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">Popup</span><span class="o">.</span><span class="n">__default_popup</span><span class="p">()</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Veuillez home avant de quitter ce menu&quot;</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">setIcon</span><span class="p">(</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Warning</span><span class="p">)</span>
+        <span class="n">home_button</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s1">&#39;Home&#39;</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">addButton</span><span class="p">(</span><span class="n">home_button</span><span class="p">,</span> <span class="n">QMessageBox</span><span class="o">.</span><span class="n">YesRole</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">setStandardButtons</span><span class="p">(</span><span class="n">QMessageBox</span><span class="o">.</span><span class="n">Cancel</span><span class="p">)</span>
+        <span class="n">home_button</span><span class="o">.</span><span class="n">clicked</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">home_action</span><span class="p">)</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">exec_</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">MixUS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Yohan Bélanger, Félix Richard, Benjamin Moffett, Laurent Tétreault, Raphaël Cloutier.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

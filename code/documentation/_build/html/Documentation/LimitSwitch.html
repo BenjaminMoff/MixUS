@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+    <title>LimitSwitch module &#8212; MixUS 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-LimitSwitch">
+<span id="limitswitch-module"></span><h1>LimitSwitch module<a class="headerlink" href="#module-LimitSwitch" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="LimitSwitch.LimitSwitch">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">LimitSwitch.</span></code><code class="sig-name descname"><span class="pre">LimitSwitch</span></code><a class="reference internal" href="../_modules/LimitSwitch.html#LimitSwitch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LimitSwitch.LimitSwitch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class that represents the limitSwitch that detects if the Glass is present
+The limitSwitch is normally closed</p>
+<dl class="py attribute">
+<dt id="LimitSwitch.LimitSwitch.canceled">
+<code class="sig-name descname"><span class="pre">canceled</span></code><em class="property"> <span class="pre">=</span> <span class="pre">False</span></em><a class="headerlink" href="#LimitSwitch.LimitSwitch.canceled" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="LimitSwitch.LimitSwitch.execute_when_deactivated">
+<code class="sig-name descname"><span class="pre">execute_when_deactivated</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runnable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LimitSwitch.html#LimitSwitch.execute_when_deactivated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LimitSwitch.LimitSwitch.execute_when_deactivated" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>runnable</strong> – (runnable) function to run when the switch is deactivated</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="LimitSwitch.LimitSwitch.is_activated">
+<code class="sig-name descname"><span class="pre">is_activated</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/LimitSwitch.html#LimitSwitch.is_activated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#LimitSwitch.LimitSwitch.is_activated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns true if the limit switch is not activated, false if it is (Normally closed limitSwitch)
+:param expected: If the library is not available, expected is given to have the wanted answer.
+:return: bool</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="LimitSwitch.LimitSwitch.singleton">
+<code class="sig-name descname"><span class="pre">singleton</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#LimitSwitch.LimitSwitch.singleton" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="LimitSwitch.LimitSwitch.switch_pin">
+<code class="sig-name descname"><span class="pre">switch_pin</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#LimitSwitch.LimitSwitch.switch_pin" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">MixUS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Yohan Bélanger, Félix Richard, Benjamin Moffett, Laurent Tétreault, Raphaël Cloutier.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/Documentation/LimitSwitch.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

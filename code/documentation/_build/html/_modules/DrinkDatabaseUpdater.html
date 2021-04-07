@@ -1,0 +1,353 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DrinkDatabaseUpdater &#8212; MixUS 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for DrinkDatabaseUpdater</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">inquirer</span> <span class="k">as</span> <span class="nn">inquirer</span>
+
+<span class="kn">from</span> <span class="nn">DataModel</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Enums</span> <span class="kn">import</span> <span class="n">Paths</span><span class="p">,</span> <span class="n">Liquid</span>
+<span class="kn">from</span> <span class="nn">JsonHandler</span> <span class="kn">import</span> <span class="n">JsonHandler</span>
+
+<span class="kn">from</span> <span class="nn">PyInquirer</span> <span class="kn">import</span> <span class="n">style_from_dict</span><span class="p">,</span> <span class="n">Token</span><span class="p">,</span> <span class="n">prompt</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pprint</span>
+
+<span class="n">max_volume</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># Max volume (in ounces) in a drink</span>
+
+
+<div class="viewcode-block" id="CmdUI"><a class="viewcode-back" href="../Documentation/DrinkDatabaseUpdater.html#DrinkDatabaseUpdater.CmdUI">[docs]</a><span class="k">class</span> <span class="nc">CmdUI</span><span class="p">:</span>
+    <span class="n">drink_name</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">drink_liquids</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ingredient_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">image_path</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">drink_manager</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">liquids</span> <span class="o">=</span> <span class="n">Liquid</span><span class="o">.</span><span class="n">list</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drink_manager</span> <span class="o">=</span> <span class="n">drink_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__style</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__style</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="n">style_from_dict</span><span class="p">({</span>
+            <span class="n">Token</span><span class="o">.</span><span class="n">Separator</span><span class="p">:</span> <span class="s1">&#39;#cc5454&#39;</span><span class="p">,</span>
+            <span class="n">Token</span><span class="o">.</span><span class="n">QuestionMark</span><span class="p">:</span> <span class="s1">&#39;#673ab7 bold&#39;</span><span class="p">,</span>
+            <span class="n">Token</span><span class="o">.</span><span class="n">Selected</span><span class="p">:</span> <span class="s1">&#39;#cc5454&#39;</span><span class="p">,</span>  <span class="c1"># default</span>
+            <span class="n">Token</span><span class="o">.</span><span class="n">Pointer</span><span class="p">:</span> <span class="s1">&#39;#673ab7 bold&#39;</span><span class="p">,</span>
+            <span class="n">Token</span><span class="o">.</span><span class="n">Instruction</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>  <span class="c1"># default</span>
+            <span class="n">Token</span><span class="o">.</span><span class="n">Answer</span><span class="p">:</span> <span class="s1">&#39;#f44336 bold&#39;</span><span class="p">,</span>
+            <span class="n">Token</span><span class="o">.</span><span class="n">Question</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+        <span class="p">})</span>
+
+<div class="viewcode-block" id="CmdUI.action_inquirer"><a class="viewcode-back" href="../Documentation/DrinkDatabaseUpdater.html#DrinkDatabaseUpdater.CmdUI.action_inquirer">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">action_inquirer</span><span class="p">():</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="n">prompt</span><span class="p">([</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;Sélectionner votre choix&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;output&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;choices&#39;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s1">&#39;Ajouter une nouvelle boisson à la base de données&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;Retirer une boisson de la base de données&#39;</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="p">}</span>
+        <span class="p">])[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Ajouter&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CmdUI.drink_name_inquirer"><a class="viewcode-back" href="../Documentation/DrinkDatabaseUpdater.html#DrinkDatabaseUpdater.CmdUI.drink_name_inquirer">[docs]</a>    <span class="k">def</span> <span class="nf">drink_name_inquirer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drink_name</span> <span class="o">=</span> <span class="n">prompt</span><span class="p">([</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;input&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Nom de la nouvelle Boisson </span><span class="se">\n</span><span class="s1"> (Pour annuler, entrer: exit):&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;output&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;validate&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">answer</span><span class="p">:</span> \
+                    <span class="s1">&#39;Le nom de la boisson doit avoir au moins 4 charactères&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__verify_drink_name</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> \
+                        <span class="k">else</span> <span class="p">(</span>
+                        <span class="s1">&#39;Une boisson portant ce nom existe déjà dans la base de données&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__verify_drink_name</span><span class="p">(</span>
+                            <span class="n">answer</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="kc">True</span><span class="p">),</span>
+
+            <span class="p">}</span>
+        <span class="p">],</span> <span class="n">style</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="p">)[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">drink_name</span> <span class="o">==</span> <span class="s2">&quot;exit&quot;</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;User exited app&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">drink_name</span></div>
+
+<div class="viewcode-block" id="CmdUI.liquids_inquirer"><a class="viewcode-back" href="../Documentation/DrinkDatabaseUpdater.html#DrinkDatabaseUpdater.CmdUI.liquids_inquirer">[docs]</a>    <span class="k">def</span> <span class="nf">liquids_inquirer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">drink_liquids</span> <span class="o">=</span> <span class="n">prompt</span><span class="p">([</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;checkbox&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;Sélectionner les Liquides pour la nouvelle Boisson&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;output&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;choices&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">liquid</span><span class="p">}</span> <span class="k">for</span> <span class="n">liquid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">liquids</span><span class="p">],</span>
+            <span class="p">}</span>
+        <span class="p">],</span> <span class="n">style</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="p">)[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">drink_liquids</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[1m&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[4m&#39;</span> <span class="o">+</span> <span class="s2">&quot;La boisson doit avoir au moins un ingrédient&quot;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[0m&#39;</span><span class="p">)</span>
+            <span class="n">drink_liquids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">liquids_inquirer</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">drink_liquids</span></div>
+
+<div class="viewcode-block" id="CmdUI.quantity_inquirer"><a class="viewcode-back" href="../Documentation/DrinkDatabaseUpdater.html#DrinkDatabaseUpdater.CmdUI.quantity_inquirer">[docs]</a>    <span class="k">def</span> <span class="nf">quantity_inquirer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">liquid</span><span class="p">):</span>
+        <span class="n">volume</span> <span class="o">=</span> <span class="n">prompt</span><span class="p">([</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;input&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Entrer la quantité de &#39;</span> <span class="o">+</span> <span class="n">liquid</span> <span class="o">+</span> <span class="s1">&#39; dans la boisson (en once)&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;output&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;validate&#39;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">answer</span><span class="p">:</span> <span class="s1">&#39;Le volume maximal est de &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                    <span class="n">max_volume</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; onces&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__verify_drink_volume</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">(</span>
+                    <span class="s1">&#39;Le volume entrer doit être un nombre entier (en onces)&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__verify_drink_volume</span><span class="p">(</span>
+                        <span class="n">answer</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="kc">True</span><span class="p">),</span>
+            <span class="p">}</span>
+        <span class="p">])[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ingredient_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">drink_liquids</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ingredient_dict</span><span class="p">)]:</span> <span class="n">volume</span><span class="p">})</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">volume</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CmdUI.image_path_inquirer"><a class="viewcode-back" href="../Documentation/DrinkDatabaseUpdater.html#DrinkDatabaseUpdater.CmdUI.image_path_inquirer">[docs]</a>    <span class="k">def</span> <span class="nf">image_path_inquirer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_path</span> <span class="o">=</span> <span class="n">prompt</span><span class="p">([</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;input&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Tout d</span><span class="se">\&#39;</span><span class="s1">abord, ajouter l</span><span class="se">\&#39;</span><span class="s1">image dans le dossier resources/ du code.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="s1">&#39;L</span><span class="se">\&#39;</span><span class="s1">image doit être de format .png ou .jpg</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="s1">&#39;Ensuite, indiquer le nom du fichier de l</span><span class="se">\&#39;</span><span class="s1">image + l</span><span class="se">\&#39;</span><span class="s1">extension ex:Rhum_and_coke.png&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;output&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;rhum_and_coke.jpg&#39;</span><span class="p">,</span>
+                <span class="c1"># TODO changer le default pour une vrai image par default</span>
+                <span class="s1">&#39;validate&#39;</span><span class="p">:</span> <span class="k">lambda</span>
+                    <span class="n">answer</span><span class="p">:</span> <span class="s1">&#39;Le fichier ne se trouve pas dans le répertoire resources/&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__verify_image_path</span><span class="p">(</span>
+                    <span class="n">answer</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">(</span>
+                    <span class="s1">&#39;Le type de fichier n</span><span class="se">\&#39;</span><span class="s1">est pas supporté par l</span><span class="se">\&#39;</span><span class="s1">application&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__verify_image_path</span><span class="p">(</span>
+                        <span class="n">answer</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="kc">True</span><span class="p">),</span>
+            <span class="p">}</span>
+        <span class="p">])[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_path</span> <span class="o">=</span> <span class="s2">&quot;resources/&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_path</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_path</span></div>
+
+<div class="viewcode-block" id="CmdUI.confirm_choice"><a class="viewcode-back" href="../Documentation/DrinkDatabaseUpdater.html#DrinkDatabaseUpdater.CmdUI.confirm_choice">[docs]</a>    <span class="k">def</span> <span class="nf">confirm_choice</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">display_ingredients</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">ingredient</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ingredient_dict</span><span class="p">):</span>
+            <span class="n">display_ingredients</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ingredient_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ingredient</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39; once(s) de &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ingredient</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">confirm</span> <span class="o">=</span> <span class="n">prompt</span><span class="p">([</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;confirm&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Boisson à ajouter:</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="s1">&#39;nom: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">drink_name</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                           <span class="o">+</span> <span class="n">display_ingredients</span> <span class="o">+</span>
+                           <span class="s1">&#39;fichier de l</span><span class="se">\&#39;</span><span class="s1">image: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image_path</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1"> Confirmer&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;output&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">])[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">confirm</span></div>
+
+<div class="viewcode-block" id="CmdUI.remove_drink"><a class="viewcode-back" href="../Documentation/DrinkDatabaseUpdater.html#DrinkDatabaseUpdater.CmdUI.remove_drink">[docs]</a>    <span class="k">def</span> <span class="nf">remove_drink</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">drink_to_remove</span> <span class="o">=</span> <span class="n">prompt</span><span class="p">([</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;list&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;message&#39;</span><span class="p">:</span> <span class="s1">&#39;Sélectionner la Boisson à retirer de la base de données&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;output&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;choices&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">drink</span><span class="o">.</span><span class="n">name</span><span class="p">}</span> <span class="k">for</span> <span class="n">drink</span> <span class="ow">in</span> <span class="n">drink_manager</span><span class="o">.</span><span class="n">drinks</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="p">])[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">drink_manager</span><span class="o">.</span><span class="n">get_drink_from_name</span><span class="p">(</span><span class="n">drink_to_remove</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__verify_drink_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">answer</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">drink</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">drink_manager</span><span class="o">.</span><span class="n">drinks</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">drink</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">answer</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="mi">2</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__verify_drink_volume</span><span class="p">(</span><span class="n">answer</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">answer</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">answer</span> <span class="o">&gt;</span> <span class="mi">12</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+        <span class="k">return</span> <span class="mi">2</span>
+
+    <span class="k">def</span> <span class="nf">__verify_image_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">answer</span><span class="p">):</span>
+        <span class="n">extension</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">answer</span><span class="p">)[</span><span class="o">-</span><span class="mi">4</span><span class="p">:])</span>
+        <span class="k">if</span> <span class="n">extension</span> <span class="o">!=</span> <span class="s1">&#39;.jpg&#39;</span> <span class="ow">and</span> <span class="n">extension</span> <span class="o">!=</span> <span class="s1">&#39;.png&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;resources/&quot;</span> <span class="o">+</span> <span class="n">answer</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+        <span class="k">return</span> <span class="mi">2</span></div>
+
+
+<div class="viewcode-block" id="NewDrink"><a class="viewcode-back" href="../Documentation/DrinkDatabaseUpdater.html#DrinkDatabaseUpdater.NewDrink">[docs]</a><span class="k">class</span> <span class="nc">NewDrink</span><span class="p">:</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ingredients</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ingredients_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">image_path</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">drink</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd_ui</span><span class="p">,</span> <span class="n">drink_manager</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cmd_ui</span> <span class="o">=</span> <span class="n">cmd_ui</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drink_manager</span> <span class="o">=</span> <span class="n">drink_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">json_handler</span> <span class="o">=</span> <span class="n">json_handler</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_action</span><span class="p">()</span>
+
+<div class="viewcode-block" id="NewDrink.get_action"><a class="viewcode-back" href="../Documentation/DrinkDatabaseUpdater.html#DrinkDatabaseUpdater.NewDrink.get_action">[docs]</a>    <span class="k">def</span> <span class="nf">get_action</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmd_ui</span><span class="o">.</span><span class="n">action_inquirer</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_drink_parameters</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">remove_drink</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="NewDrink.get_drink_parameters"><a class="viewcode-back" href="../Documentation/DrinkDatabaseUpdater.html#DrinkDatabaseUpdater.NewDrink.get_drink_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">get_drink_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmd_ui</span><span class="o">.</span><span class="n">drink_name_inquirer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ingredients</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmd_ui</span><span class="o">.</span><span class="n">liquids_inquirer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_volumes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmd_ui</span><span class="o">.</span><span class="n">image_path_inquirer</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmd_ui</span><span class="o">.</span><span class="n">confirm_choice</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">drink</span> <span class="o">=</span> <span class="n">Drink</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ingredients_dict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">drink_manager</span><span class="o">.</span><span class="n">add_new_drink</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">drink</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">drink_manager</span><span class="o">.</span><span class="n">save_data</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="NewDrink.remove_drink"><a class="viewcode-back" href="../Documentation/DrinkDatabaseUpdater.html#DrinkDatabaseUpdater.NewDrink.remove_drink">[docs]</a>    <span class="k">def</span> <span class="nf">remove_drink</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">drink_to_remove</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmd_ui</span><span class="o">.</span><span class="n">remove_drink</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drink_manager</span><span class="o">.</span><span class="n">remove_drink</span><span class="p">(</span><span class="n">drink_to_remove</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">drink_manager</span><span class="o">.</span><span class="n">save_data</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="NewDrink.get_volumes"><a class="viewcode-back" href="../Documentation/DrinkDatabaseUpdater.html#DrinkDatabaseUpdater.NewDrink.get_volumes">[docs]</a>    <span class="k">def</span> <span class="nf">get_volumes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[1m&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[4m&#39;</span> <span class="o">+</span> <span class="s1">&#39;Le volume de la boisson dépasse la limite de &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+            <span class="n">max_volume</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; onces&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\033</span><span class="s1">[0m&#39;</span><span class="p">)</span>
+        <span class="n">vol_tot</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">ingredient</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ingredients</span><span class="p">:</span>
+            <span class="n">vol</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cmd_ui</span><span class="o">.</span><span class="n">quantity_inquirer</span><span class="p">(</span><span class="n">ingredient</span><span class="p">)</span>
+            <span class="n">vol_tot</span> <span class="o">+=</span> <span class="n">vol</span>
+            <span class="k">if</span> <span class="n">vol_tot</span> <span class="o">&gt;</span> <span class="mi">12</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ingredients_dict</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cmd_ui</span><span class="o">.</span><span class="n">ingredient_dict</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_volumes</span><span class="p">()</span>
+                <span class="k">break</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ingredients_dict</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">ingredient</span><span class="p">:</span> <span class="n">vol</span><span class="p">})</span></div></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">json_handler</span> <span class="o">=</span> <span class="n">JsonHandler</span><span class="p">(</span><span class="n">Paths</span><span class="o">.</span><span class="n">BOTTLES</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">Paths</span><span class="o">.</span><span class="n">DRINKS</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+    <span class="n">bottle_manager</span> <span class="o">=</span> <span class="n">BottleManager</span><span class="p">(</span><span class="n">json_handler</span><span class="p">)</span>
+    <span class="n">drink_manager</span> <span class="o">=</span> <span class="n">DrinkManager</span><span class="p">(</span><span class="n">json_handler</span><span class="p">,</span> <span class="n">bottle_manager</span><span class="p">)</span>
+
+    <span class="n">new_drink</span> <span class="o">=</span> <span class="n">NewDrink</span><span class="p">(</span><span class="n">CmdUI</span><span class="p">(</span><span class="n">drink_manager</span><span class="p">),</span> <span class="n">drink_manager</span><span class="p">)</span>
+
+<span class="c1">#     json_handler = JsonHandler(Paths.BOTTLES.value, Paths.DRINKS.value)</span>
+<span class="c1">#     bottle_list = [Bottle(1, Liquid.RUM, 5), Bottle(2, Liquid.VODKA, 500),</span>
+<span class="c1">#                    Bottle(3, Liquid.TEQUILA, 375), Bottle(4, Liquid.CRANBERRY_JUICE, 1000),</span>
+<span class="c1">#                    Bottle(5, Liquid.TRIPLE_SEC, 750), Bottle(6, Liquid.ORANGE_JUICE, 1000)]</span>
+<span class="c1">#     json_handler.save_data(bottle_list)</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">MixUS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Yohan Bélanger, Félix Richard, Benjamin Moffett, Laurent Tétreault, Raphaël Cloutier.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

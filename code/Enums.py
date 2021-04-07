@@ -5,7 +5,9 @@ import os
 
 
 class Liquid(Enum):
-
+    """
+    Enum of all liquids used in the application's drinks
+    """
     def __new__(cls, *args, **kwds):
         value = len(cls.__members__) + 2
         obj = object.__new__(cls)
@@ -56,6 +58,9 @@ class Liquid(Enum):
 
 
 class BottleSize(Enum):
+    """
+    Enum of accepted bottle sizes
+    """
     ML_500 = 500
     ML_750 = 750
     ML_1000 = 1000
@@ -76,6 +81,9 @@ class BottleSize(Enum):
 
 # Paths to persistence files
 class Paths(Enum):
+    """
+    Enum of relevant paths used in the application
+    """
     BOTTLES = os.path.join(os.path.dirname(__file__),
                            "persistence/bottles.json")
     DRINKS = os.path.join(os.path.dirname(__file__),
@@ -93,6 +101,9 @@ class Paths(Enum):
 
 
 class Style(Enum):
+    """
+    Enum of stylesheets used in the application
+    """
     label_background_color = "border: 1px solid;" \
                              "border-color: rgb(0, 0, 0);" \
                              "background-color: rgb(0, 167, 89);"
@@ -121,4 +132,7 @@ class Style(Enum):
 
 
 class HardwareConfig(Enum):
+    """
+    Specifies the pin used on the Raspberry Pi to connect the cup detection limit switch
+    """
     limit_switch_pin = 11

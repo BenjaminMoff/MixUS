@@ -1,0 +1,235 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Enums &#8212; MixUS 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for Enums</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">PyQt5</span> <span class="kn">import</span> <span class="n">QtCore</span>
+<span class="kn">from</span> <span class="nn">PyQt5.QtCore</span> <span class="kn">import</span> <span class="n">QSize</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+
+<div class="viewcode-block" id="Liquid"><a class="viewcode-back" href="../Documentation/Enums.html#Enums.Liquid">[docs]</a><span class="k">class</span> <span class="nc">Liquid</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enum of all liquids used in the application&#39;s drinks</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">__members__</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">_value_</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string_name</span><span class="p">,</span> <span class="n">is_alcoholized</span><span class="p">,</span> <span class="n">is_filler</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">string_name</span> <span class="o">=</span> <span class="n">string_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_alcoholized</span> <span class="o">=</span> <span class="n">is_alcoholized</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_filler</span> <span class="o">=</span> <span class="n">is_filler</span>
+
+    <span class="c1"># Used to describe an empty slot</span>
+    <span class="n">NONE</span> <span class="o">=</span> <span class="s2">&quot;Aucun&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+
+    <span class="c1"># Liquors</span>
+    <span class="n">RUM</span> <span class="o">=</span> <span class="s2">&quot;Rhum&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span>
+    <span class="n">VODKA</span> <span class="o">=</span> <span class="s2">&quot;Vodka&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span>
+    <span class="n">TEQUILA</span> <span class="o">=</span> <span class="s2">&quot;Tequila&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span>
+    <span class="n">GIN</span> <span class="o">=</span> <span class="s2">&quot;Gin&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span>
+    <span class="n">WHISKEY</span> <span class="o">=</span> <span class="s2">&quot;Whiskey&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span>
+
+    <span class="c1"># Mixers</span>
+    <span class="n">TRIPLE_SEC</span> <span class="o">=</span> <span class="s2">&quot;Triple sec&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span>
+    <span class="n">LIMONCELLO</span> <span class="o">=</span> <span class="s2">&quot;Limoncello&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span>
+    <span class="n">BLUE_CURACAO</span> <span class="o">=</span> <span class="s2">&quot;Curacao bleu&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">False</span>
+    <span class="n">TONIC</span> <span class="o">=</span> <span class="s2">&quot;Tonique&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+
+    <span class="c1"># Alcohol-free</span>
+    <span class="n">ORANGE_JUICE</span> <span class="o">=</span> <span class="s2">&quot;Jus d&#39;orange&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span>
+    <span class="n">CRANBERRY_JUICE</span> <span class="o">=</span> <span class="s2">&quot;Jus de canneberge&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span>
+    <span class="n">COKE</span> <span class="o">=</span> <span class="s2">&quot;Coke&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span>
+    <span class="n">SPRITE</span> <span class="o">=</span> <span class="s2">&quot;Sprite&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span>
+    <span class="n">LEMONADE</span> <span class="o">=</span> <span class="s2">&quot;Limonade&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span>
+    <span class="n">GINGER_ALE</span> <span class="o">=</span> <span class="s2">&quot;Ginger ale&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span>
+    <span class="n">ICED_TEA</span> <span class="o">=</span> <span class="s2">&quot;Thé glacé&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="Liquid.list"><a class="viewcode-back" href="../Documentation/Enums.html#Enums.Liquid.list">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">list</span><span class="p">():</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">string_name</span><span class="p">,</span> <span class="n">Liquid</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Liquid.get_liquid_from_string_name"><a class="viewcode-back" href="../Documentation/Enums.html#Enums.Liquid.get_liquid_from_string_name">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_liquid_from_string_name</span><span class="p">(</span><span class="n">string_name</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">liquid</span> <span class="ow">in</span> <span class="n">Liquid</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">liquid</span><span class="o">.</span><span class="n">string_name</span> <span class="o">==</span> <span class="n">string_name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">Liquid</span><span class="p">[</span><span class="n">liquid</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No Liquid contains this string_name: &quot;</span> <span class="o">+</span> <span class="n">string_name</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="BottleSize"><a class="viewcode-back" href="../Documentation/Enums.html#Enums.BottleSize">[docs]</a><span class="k">class</span> <span class="nc">BottleSize</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enum of accepted bottle sizes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ML_500</span> <span class="o">=</span> <span class="mi">500</span>
+    <span class="n">ML_750</span> <span class="o">=</span> <span class="mi">750</span>
+    <span class="n">ML_1000</span> <span class="o">=</span> <span class="mi">1000</span>
+    <span class="n">ML_1140</span> <span class="o">=</span> <span class="mi">1140</span>
+
+<div class="viewcode-block" id="BottleSize.list"><a class="viewcode-back" href="../Documentation/Enums.html#Enums.BottleSize.list">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">list</span><span class="p">():</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">value</span><span class="p">),</span> <span class="n">BottleSize</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="BottleSize.ounces_to_ml"><a class="viewcode-back" href="../Documentation/Enums.html#Enums.BottleSize.ounces_to_ml">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">ounces_to_ml</span><span class="p">(</span><span class="n">ounces</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">30</span> <span class="o">*</span> <span class="n">ounces</span></div>
+
+<div class="viewcode-block" id="BottleSize.ml_to_ounces"><a class="viewcode-back" href="../Documentation/Enums.html#Enums.BottleSize.ml_to_ounces">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">ml_to_ounces</span><span class="p">(</span><span class="n">ml</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">ml</span> <span class="o">/</span> <span class="mi">30</span><span class="p">)</span></div></div>
+
+
+<span class="c1"># Paths to persistence files</span>
+<div class="viewcode-block" id="Paths"><a class="viewcode-back" href="../Documentation/Enums.html#Enums.Paths">[docs]</a><span class="k">class</span> <span class="nc">Paths</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enum of relevant paths used in the application</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">BOTTLES</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span>
+                           <span class="s2">&quot;persistence/bottles.json&quot;</span><span class="p">)</span>
+    <span class="n">DRINKS</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span>
+                          <span class="s2">&quot;persistence/drinks.json&quot;</span><span class="p">)</span>
+    <span class="n">MAIN_MENU</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span>
+                             <span class="s2">&quot;ui/MainMenu.ui&quot;</span><span class="p">)</span>
+    <span class="n">BOTTLE_MENU</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span>
+                               <span class="s2">&quot;ui/BottleMenu.ui&quot;</span><span class="p">)</span>
+    <span class="n">DRINK_OPTION_MENU</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span>
+                                     <span class="s2">&quot;ui/DrinkOptionMenu.ui&quot;</span><span class="p">)</span>
+    <span class="n">MAINTENANCE_MENU</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span>
+                                    <span class="s2">&quot;ui/MaintenanceMenu.ui&quot;</span><span class="p">)</span>
+    <span class="n">MIXING_MENU</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span>
+                               <span class="s2">&quot;ui/MixingMenu.ui&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Style"><a class="viewcode-back" href="../Documentation/Enums.html#Enums.Style">[docs]</a><span class="k">class</span> <span class="nc">Style</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enum of stylesheets used in the application</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">label_background_color</span> <span class="o">=</span> <span class="s2">&quot;border: 1px solid;&quot;</span> \
+                             <span class="s2">&quot;border-color: rgb(0, 0, 0);&quot;</span> \
+                             <span class="s2">&quot;background-color: rgb(0, 167, 89);&quot;</span>
+    <span class="n">button_color</span> <span class="o">=</span> <span class="s2">&quot;border-radius: 15px;&quot;</span> \
+                   <span class="s2">&quot;background-color: rgb(255, 255, 255);&quot;</span>
+    <span class="n">button_color_pressed</span> <span class="o">=</span> <span class="s2">&quot;border-radius: 15px;&quot;</span> \
+                           <span class="s2">&quot;background-color: rgb(200, 200, 200);&quot;</span>
+
+    <span class="n">layout_contour_color</span> <span class="o">=</span> <span class="s2">&quot;border: 1px solid;&quot;</span> \
+                           <span class="s2">&quot;border-color: rgb(0, 0, 0);&quot;</span>
+
+    <span class="n">drink_button</span> <span class="o">=</span> <span class="s2">&quot;border: 1px solid;&quot;</span> \
+                   <span class="s2">&quot;border-radius: 20px;&quot;</span> \
+                   <span class="s2">&quot;border-color: rgb(0, 0, 0);&quot;</span>
+
+    <span class="n">combo_box</span> <span class="o">=</span> <span class="s2">&quot;border: 1px solid;&quot;</span> \
+                <span class="s2">&quot;border-color: rgb(0, 0, 0);&quot;</span> \
+                <span class="s2">&quot;background-color: rgb(240, 240, 240);&quot;</span>
+
+    <span class="n">layout_background_color</span> <span class="o">=</span> <span class="s2">&quot;background-color: rgb(255, 255, 255);&quot;</span>
+
+    <span class="n">combo_box_size</span> <span class="o">=</span> <span class="n">QSize</span><span class="p">(</span><span class="mi">400</span><span class="p">,</span> <span class="mi">59</span><span class="p">)</span>
+    <span class="n">drink_button_image_size</span> <span class="o">=</span> <span class="n">QSize</span><span class="p">(</span><span class="mi">225</span><span class="p">,</span> <span class="mi">370</span><span class="p">)</span>
+    <span class="n">drink_button_size</span> <span class="o">=</span> <span class="n">QSize</span><span class="p">(</span><span class="mi">225</span><span class="p">,</span> <span class="mi">415</span><span class="p">)</span>
+    <span class="n">menu_button_size</span> <span class="o">=</span> <span class="n">QSize</span><span class="p">(</span><span class="mi">150</span><span class="p">,</span> <span class="mi">75</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="HardwareConfig"><a class="viewcode-back" href="../Documentation/Enums.html#Enums.HardwareConfig">[docs]</a><span class="k">class</span> <span class="nc">HardwareConfig</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Specifies the pin used on the Raspberry Pi to connect the cup detection limit switch</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">limit_switch_pin</span> <span class="o">=</span> <span class="mi">11</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">MixUS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Yohan Bélanger, Félix Richard, Benjamin Moffett, Laurent Tétreault, Raphaël Cloutier.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

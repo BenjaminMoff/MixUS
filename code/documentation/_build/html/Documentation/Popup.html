@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+    <title>Popup module &#8212; MixUS 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-Popup">
+<span id="popup-module"></span><h1>Popup module<a class="headerlink" href="#module-Popup" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="Popup.Popup">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">Popup.</span></code><code class="sig-name descname"><span class="pre">Popup</span></code><a class="reference internal" href="../_modules/Popup.html#Popup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Popup.Popup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="Popup.Popup.drink_completed">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">drink_completed</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cup_removed_action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drink_canceled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Popup.html#Popup.drink_completed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Popup.Popup.drink_completed" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>home_action</strong> – (runnable) function to run when home button clicked</p></li>
+<li><p><strong>drink_canceled</strong> – (runnable) function to run when home button clicked</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dsiplay a popup window asking user to home the machine</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Popup.Popup.home_before_leaving">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">home_before_leaving</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">home_action</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Popup.html#Popup.home_before_leaving"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Popup.Popup.home_before_leaving" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>home_action</strong> – (runnable) function to run when home button is clicked</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dsiplay a popup window asking user to home the machine</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Popup.Popup.no_cup_error">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">no_cup_error</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">retry_action</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Popup.html#Popup.no_cup_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Popup.Popup.no_cup_error" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>retry_action</strong> – (runnable) function to run when retry button is clicked</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dsiplay a popup window asking user to insert a cup in the machine</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="Popup.Popup.serial_port_error">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">serial_port_error</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">retry_action</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/Popup.html#Popup.serial_port_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#Popup.Popup.serial_port_error" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>retry_action</strong> – (runnable) function to run when retry button is clicked</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>dsiplay a popup window indicating that the serial communication is not available</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">MixUS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Yohan Bélanger, Félix Richard, Benjamin Moffett, Laurent Tétreault, Raphaël Cloutier.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/Documentation/Popup.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

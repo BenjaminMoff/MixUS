@@ -1,0 +1,367 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17: http://docutils.sourceforge.net/" />
+
+    <title>SerialCommunication module &#8212; MixUS 1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-SerialCommunication">
+<span id="serialcommunication-module"></span><h1>SerialCommunication module<a class="headerlink" href="#module-SerialCommunication" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="SerialCommunication.Flag">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">SerialCommunication.</span></code><code class="sig-name descname"><span class="pre">Flag</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#Flag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.Flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="SerialCommunication.Flag.get">
+<code class="sig-name descname"><span class="pre">get</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#Flag.get"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.Flag.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="SerialCommunication.Flag.set">
+<code class="sig-name descname"><span class="pre">set</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#Flag.set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.Flag.set" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="SerialCommunication.GCodeGenerator">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">SerialCommunication.</span></code><code class="sig-name descname"><span class="pre">GCodeGenerator</span></code><a class="reference internal" href="../_modules/SerialCommunication.html#GCodeGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.GCodeGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class responsible to generate g-code instructions to execute when making a drink</p>
+<dl class="py method">
+<dt id="SerialCommunication.GCodeGenerator.disable_steppers">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">disable_steppers</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#GCodeGenerator.disable_steppers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.GCodeGenerator.disable_steppers" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>(list of list) set of instructions to deactivate steppers</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="SerialCommunication.GCodeGenerator.home">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">home</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#GCodeGenerator.home"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.GCodeGenerator.home" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of instructions to home each axis</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="SerialCommunication.GCodeGenerator.insert_cup">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">insert_cup</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#GCodeGenerator.insert_cup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.GCodeGenerator.insert_cup" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of instructions to retract the cup in the machine</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="SerialCommunication.GCodeGenerator.max_x">
+<code class="sig-name descname"><span class="pre">max_x</span></code><em class="property"> <span class="pre">=</span> <span class="pre">790</span></em><a class="headerlink" href="#SerialCommunication.GCodeGenerator.max_x" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="SerialCommunication.GCodeGenerator.max_y">
+<code class="sig-name descname"><span class="pre">max_y</span></code><em class="property"> <span class="pre">=</span> <span class="pre">150</span></em><a class="headerlink" href="#SerialCommunication.GCodeGenerator.max_y" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="SerialCommunication.GCodeGenerator.max_z">
+<code class="sig-name descname"><span class="pre">max_z</span></code><em class="property"> <span class="pre">=</span> <span class="pre">20</span></em><a class="headerlink" href="#SerialCommunication.GCodeGenerator.max_z" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="SerialCommunication.GCodeGenerator.move_axis">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">move_axis</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#GCodeGenerator.move_axis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.GCodeGenerator.move_axis" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pos</strong> – (int) Position to move the axis to</p></li>
+<li><p><strong>axis</strong> – (str) Axis X, Y or Z to be moved</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>(list of list) set of instructions to send to Marlin</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="SerialCommunication.GCodeGenerator.move_to_slot">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">move_to_slot</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#GCodeGenerator.move_to_slot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.GCodeGenerator.move_to_slot" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>index</strong> – (int) slot under which the cup should move to</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of instructions to move the cup under the specified slot</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="SerialCommunication.GCodeGenerator.position_dict">
+<code class="sig-name descname"><span class="pre">position_dict</span></code><em class="property"> <span class="pre">=</span> <span class="pre">{1:</span> <span class="pre">7,</span> <span class="pre">2:</span> <span class="pre">155,</span> <span class="pre">3:</span> <span class="pre">303,</span> <span class="pre">4:</span> <span class="pre">490,</span> <span class="pre">5:</span> <span class="pre">638,</span> <span class="pre">6:</span> <span class="pre">790}</span></em><a class="headerlink" href="#SerialCommunication.GCodeGenerator.position_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="SerialCommunication.GCodeGenerator.pour">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">pour</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ounces</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#GCodeGenerator.pour"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.GCodeGenerator.pour" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ounces</strong> – (int) Number of ounces to pour in the cup</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of instructions to pour the specified amount of ounces in the cup</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="SerialCommunication.GCodeGenerator.serve_cup">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">serve_cup</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#GCodeGenerator.serve_cup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.GCodeGenerator.serve_cup" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of instructions to get the cup out of the machine</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="SerialCommunication.GCodeGenerator.wait_for_cup">
+<em class="property"><span class="pre">static</span> </em><code class="sig-name descname"><span class="pre">wait_for_cup</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#GCodeGenerator.wait_for_cup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.GCodeGenerator.wait_for_cup" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of instructions to deploy y axis in order to get the cup from the user</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="SerialCommunication.ListUSB">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">SerialCommunication.</span></code><code class="sig-name descname"><span class="pre">ListUSB</span></code><a class="reference internal" href="../_modules/SerialCommunication.html#ListUSB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.ListUSB" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt id="SerialCommunication.ListUSB.find_usb_device">
+<code class="sig-name descname"><span class="pre">find_usb_device</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#ListUSB.find_usb_device"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.ListUSB.find_usb_device" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method that gets the port name that has a marlin firmware connected to it
+:return: USB port name</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="SerialCommunication.ListUSB.get_usb_devices">
+<code class="sig-name descname"><span class="pre">get_usb_devices</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#ListUSB.get_usb_devices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.ListUSB.get_usb_devices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method that gets all the usb devices connected to the computer
+:return: A list of ports</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="SerialCommunication.SerialCommunicator">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">SerialCommunication.</span></code><code class="sig-name descname"><span class="pre">SerialCommunicator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#SerialCommunicator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.SerialCommunicator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtCore.QThread</span></code></p>
+<dl class="py attribute">
+<dt id="SerialCommunication.SerialCommunicator.progress_notifier">
+<code class="sig-name descname"><span class="pre">progress_notifier</span></code><a class="headerlink" href="#SerialCommunication.SerialCommunicator.progress_notifier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="SerialCommunication.SerialCommunicator.run">
+<code class="sig-name descname"><span class="pre">run</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#SerialCommunicator.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.SerialCommunicator.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes communication protocol</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="SerialCommunication.SerialCommunicator.update">
+<code class="sig-name descname"><span class="pre">update</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">serial_port</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instructions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">communicate</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#SerialCommunicator.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.SerialCommunicator.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the thread’s parameters before running
+:param serial_port: (Serial) serial port that host communication
+:param instructions: (list of list of string) instructions to send
+:param communicate: (Flag) flag that indicates if the communication should continue</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="SerialCommunication.SerialSynchroniser">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">SerialCommunication.</span></code><code class="sig-name descname"><span class="pre">SerialSynchroniser</span></code><a class="reference internal" href="../_modules/SerialCommunication.html#SerialSynchroniser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.SerialSynchroniser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyQt5.QtCore.QObject</span></code></p>
+<p>Class responsible to communicate with the motor controller board by serial port</p>
+<dl class="py method">
+<dt id="SerialCommunication.SerialSynchroniser.abort_communication">
+<code class="sig-name descname"><span class="pre">abort_communication</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#SerialSynchroniser.abort_communication"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.SerialSynchroniser.abort_communication" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stop sending instructions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="SerialCommunication.SerialSynchroniser.begin_communication">
+<code class="sig-name descname"><span class="pre">begin_communication</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instructions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#SerialSynchroniser.begin_communication"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.SerialSynchroniser.begin_communication" title="Permalink to this definition">¶</a></dt>
+<dd><p>Begin communication with Marlin
+:param instructions: () parent with slots linked to emited signals</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="SerialCommunication.SerialSynchroniser.can_start_communication">
+<code class="sig-name descname"><span class="pre">can_start_communication</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#SerialSynchroniser.can_start_communication"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.SerialSynchroniser.can_start_communication" title="Permalink to this definition">¶</a></dt>
+<dd><p>Verifies if the serial port is still available</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="SerialCommunication.SerialSynchroniser.checkpoints">
+<code class="sig-name descname"><span class="pre">checkpoints</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#SerialCommunication.SerialSynchroniser.checkpoints" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="SerialCommunication.SerialSynchroniser.on_end_of_communication">
+<code class="sig-name descname"><span class="pre">on_end_of_communication</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#SerialSynchroniser.on_end_of_communication"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.SerialSynchroniser.on_end_of_communication" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receives signal at end of communication and notify parent</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="SerialCommunication.SerialSynchroniser.on_progress">
+<code class="sig-name descname"><span class="pre">on_progress</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#SerialSynchroniser.on_progress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.SerialSynchroniser.on_progress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receives signal when progress detected and notify parent
+:param value: (int) value emited by the signal</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="SerialCommunication.SerialSynchroniser.parent">
+<code class="sig-name descname"><span class="pre">parent</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#SerialCommunication.SerialSynchroniser.parent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="SerialCommunication.SerialSynchroniser.progress_notifier">
+<code class="sig-name descname"><span class="pre">progress_notifier</span></code><a class="headerlink" href="#SerialCommunication.SerialSynchroniser.progress_notifier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="SerialCommunication.SerialSynchroniser.serial_port">
+<code class="sig-name descname"><span class="pre">serial_port</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#SerialCommunication.SerialSynchroniser.serial_port" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="SerialCommunication.SerialSynchroniser.set_serial_port">
+<code class="sig-name descname"><span class="pre">set_serial_port</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#SerialSynchroniser.set_serial_port"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.SerialSynchroniser.set_serial_port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the serial port of the SerialSynchroniser</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="SerialCommunication.SerialSynchroniser.singleton">
+<code class="sig-name descname"><span class="pre">singleton</span></code><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#SerialCommunication.SerialSynchroniser.singleton" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="SerialCommunication.SerialSynchroniser.track_progress">
+<code class="sig-name descname"><span class="pre">track_progress</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#SerialSynchroniser.track_progress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.SerialSynchroniser.track_progress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Track the progress of the current operation with checkpoints
+:param parent: parent with slots linked to emited signals
+:param checkpoints: (dict{int: string}) checkpoints at which a signal is emited
+:param max_value: (int) maximum value of the progress</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="SerialCommunication.SerialSynchroniser.wait_end_of_communication">
+<code class="sig-name descname"><span class="pre">wait_end_of_communication</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/SerialCommunication.html#SerialSynchroniser.wait_end_of_communication"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#SerialCommunication.SerialSynchroniser.wait_end_of_communication" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wait for the communication thread to end</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">MixUS</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Yohan Bélanger, Félix Richard, Benjamin Moffett, Laurent Tétreault, Raphaël Cloutier.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/Documentation/SerialCommunication.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
