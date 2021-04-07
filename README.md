@@ -23,6 +23,16 @@ All the information for mechanical assembly can be found in [this wiki](https://
 ### Raspberry Pi Setup
 If you chose to use a Raspberry Pi, you can run [this file](https://github.com/BenjaminMoff/MixUS/blob/main/configuration/PiConfig.sh) to automagically download Python, compile it, and get all the required packages.
 
+If you are using the same 7" touch screen that we are (see the bom for the exact screen), you need to change the following in the Raspberry Pi's config.txt file:
+- max_usb_curren=1
+- hdmi_force_hotplug=1
+- config_hdmi_boost=7
+- hdmi_group=2
+- hdmi_mode=87
+- hdmi_drive=1
+- display_rotate=0
+- hdmi_cvt 1024 600 60 6 0 0 0
+
 ### Windows Setup
 If you chose to use a Windows computer, you need to have a version of Python 3 installed. Then, you can run [this file](https://github.com/BenjaminMoff/MixUS/blob/main/configuration/Pythonconfig.bat) to automagically download the required packages.
 
