@@ -1,5 +1,4 @@
 # MixUS
-Nothing here yet...
 
 ## License GNU GPL
 MixUS is an open source project that uses the GNU GPL v3 license. This license is used since PyQt5, the framework that the app is built on, is also GNU GPL v3.
@@ -18,7 +17,7 @@ More information on about the [LICENSE can be found here](https://gist.github.co
 
 
 ## Mechanical Assembly
-
+All the information for mechanical assembly can be found in [this wiki](https://github.com/BenjaminMoff/MixUS/wiki)
 ## Software
 
 ### Raspberry Pi Setup
