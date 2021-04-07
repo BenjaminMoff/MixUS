@@ -60,4 +60,4 @@ To run the application, you need to run the following command in the terminal fr
 - Raspbian: python3 Mixus.py
 
 ### Documentation
-The entire documentation for the code is in the [Mixus Documentation file](https://github.com/BenjaminMoff/MixUS/blob/main/Mixus%20Documentation.lnk).
+The entire documentation for the code can be found [here](https://htmlpreview.github.io/?https://raw.githubusercontent.com/BenjaminMoff/MixUS/main/code/documentation/_build/html/index.html).
