@@ -1,6 +1,6 @@
 # MixUS
 
-## License GNU GPL
+## Software License GNU GPL
 MixUS is an open source project that uses the GNU GPL v3 license. This license is used since PyQt5, the framework that the app is built on, is also GNU GPL v3.
 
 1. Anyone can copy, modify and distribute this software.
@@ -13,8 +13,19 @@ MixUS is an open source project that uses the GNU GPL v3 license. This license i
 8. This software is provided without warranty.
 9. The software author or license can not be held liable for any damages inflicted by the software.
 
-More information on about the [LICENSE can be found here](https://gist.github.com/kn9ts/cbe95340d29fc1aaeaa5dd5c059d2e60)
+More information about this license can be found [here](https://gist.github.com/kn9ts/cbe95340d29fc1aaeaa5dd5c059d2e60)
 
+## Material License CC BY-SA
+MixUS uses cads found in the [Open Build catalog](https://openbuildspartstore.com/). Thus, the material license for this project is the Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA). 
+Under this license, you are free to:
+- Share: copy and redistribute the material in any medium or format
+- Adapt: remix, transform, and build upon the material for any purpose, even commercially.
+
+Under the following terms:
+- Attribution: You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+- ShareAlike: If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
+
+More information about this license can be found [here](https://creativecommons.org/licenses/by-sa/4.0/?fbclid=IwAR1nMqahF2SNDniU5qahvUERI8FzeTw22oniBX6LPSnPQnIk0aLiyP96HRw)
 
 ## Mechanical Assembly
 All the information for mechanical assembly can be found in [this wiki](https://github.com/BenjaminMoff/MixUS/wiki)
