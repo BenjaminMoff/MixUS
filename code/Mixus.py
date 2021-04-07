@@ -427,6 +427,7 @@ class MaintenanceMenu(QDialog):
         self.slider_update(self.comboBox_axis.currentText())
 
     def disable_button_action(self):
+        self.is_home = False
         instructions = GCodeGenerator.disable_steppers()
         if self.serial_synchroniser.can_start_communication():
             self.__send_command(instructions)
@@ -612,7 +613,10 @@ def init_hardware(first_menu):
 
 def initial_machine_homing(first_menu):
     serial_synchroniser = SerialSynchroniser()
-    serial_synchroniser.begin_communication(GCodeGenerator.home())
+    instructions = []
+    instructions.extend(GCodeGenerator.setup_accelerations())
+    instructions.extend(GCodeGenerator.home())
+    serial_synchroniser.begin_communication(instructions)
     serial_synchroniser.track_progress(first_menu)
 
 

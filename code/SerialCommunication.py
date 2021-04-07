@@ -223,35 +223,39 @@ class GCodeGenerator:
     max_y = 150
     max_z = 20
 
+    speed_x = 5000
+    speed_y = speed_x
+    speed_z = 1000
+
     position_dict = {
         1: 7,
         2: 155,
         3: 303,
         4: 490,
-        5: 638,
+        5: 640,
         6: 790}
 
     @staticmethod
     def move_to_slot(index):
         """
         :param index: (int) slot under which the cup should move to
-        :return: List of instructions to move the cup under the specified slot
+        :return: (list of list of string) List of instructions to move the cup under the specified slot
         """
         position = GCodeGenerator.position_dict.get(index)
         if index != 0:
-            return [["G1 X%d\n" % position, "M400\n", "M118 Instruction completed\n"]]
+            return [["G1 X%d F%d\n" % (position, GCodeGenerator.speed_x), "M400\n", "M118 Instruction completed\n"]]
         return [["G28 X\n", "M400\n", "M118 Instruction completed\n"]]
 
     @staticmethod
     def pour(ounces):
         """
         :param ounces: (int) Number of ounces to pour in the cup
-        :return: List of instructions to pour the specified amount of ounces in the cup
+        :return: (list of list of string) List of instructions to pour the specified amount of ounces in the cup
         """
         instructions = []
         for i in range(ounces):
             # Raise z axis to activate dispenser
-            instructions.append(["G1 Z%d\n" % GCodeGenerator.max_z, "M400\n", "M118 Instruction completed\n"])
+            instructions.append(["G1 Z%d F%d\n" % (GCodeGenerator.max_z, GCodeGenerator.speed_z), "M400\n", "M118 Instruction completed\n"])
 
             # Wait 3 seconds to allow the liquid to escape dispenser
             instructions.append(["G4 S3\n", "M400\n", "M118 Instruction completed\n"])
@@ -264,7 +268,7 @@ class GCodeGenerator:
     @staticmethod
     def insert_cup():
         """
-        :return: List of instructions to retract the cup in the machine
+        :return: (list of list of string) List of instructions to retract the cup in the machine
         """
         instructions = [["G28 Y\n", "M400\n", "M118 Instruction completed\n"]]
         return instructions
@@ -272,24 +276,24 @@ class GCodeGenerator:
     @staticmethod
     def serve_cup():
         """
-        :return: List of instructions to get the cup out of the machine
+        :return: (list of list of string) List of instructions to get the cup out of the machine
         """
         instructions = []
         instructions.extend(GCodeGenerator.move_to_slot(0))
-        instructions.append(["G1 Y%d\n" % GCodeGenerator.max_y, "M400\n", "M118 Instruction completed\n"])
+        instructions.append(["G1 Y%d F%d\n" % (GCodeGenerator.max_y, GCodeGenerator.speed_y), "M400\n", "M118 Instruction completed\n"])
         return instructions
 
     @staticmethod
     def wait_for_cup():
         """
-        :return: List of instructions to deploy y axis in order to get the cup from the user
+        :return: (list of list of string) List of instructions to deploy y axis in order to get the cup from the user
         """
-        return [["G1 Y%d\n" % GCodeGenerator.max_y, "M400\n", "M118 Instruction completed\n"]]
+        return [["G1 Y%d F%d\n" % (GCodeGenerator.max_y, GCodeGenerator.speed_y), "M400\n", "M118 Instruction completed\n"]]
 
     @staticmethod
     def home():
         """
-        :return: List of instructions to home each axis
+        :return: (list of list of string) List of instructions to home each axis
         """
         instructions = [["G28 Z\n", "M400\n", "M118 Instruction completed\n"],
                         ["G28 Y\n", "M400\n", "M118 Instruction completed\n"],
@@ -301,18 +305,27 @@ class GCodeGenerator:
         """
         :param pos: (int) Position to move the axis to
         :param axis: (str) Axis X, Y or Z to be moved
-        :return: (list of list) set of instructions to send to Marlin
+        :return: (list of list of string) set of instructions to send to Marlin
         """
-        if (axis == "X" and pos > GCodeGenerator.max_x) or (axis == "Y" and pos > GCodeGenerator.max_y) or (
-                axis == "Z" and pos > GCodeGenerator.max_z):
+        a = str(axis)
+        speed = GCodeGenerator.speed_x if a == "X" else GCodeGenerator.speed_y if a == "Y" else GCodeGenerator.speed_z
+        if (a == "X" and pos > GCodeGenerator.max_x) or (a == "Y" and pos > GCodeGenerator.max_y) or (
+                a == "Z" and pos > GCodeGenerator.max_z):
             raise ValueError(
                 "position given for the current axis is greater than the max distance on the physical axis")
-        instructions = [["G1 " + str(axis) + "%d" % pos + "\n", "M400\n", "M118 Instruction completed\n"]]
+        instructions = [["G1 " + a + "%d F%d" % (pos, speed) + "\n", "M400\n", "M118 Instruction completed\n"]]
         return instructions
 
     @staticmethod
     def disable_steppers():
         """
-        :return: (list of list) set of instructions to deactivate steppers
+        :return: (list of list of string) set of instructions to deactivate steppers
         """
         return [["M18\n", "M400\n", "M118 Instruction completed\n"]]
+
+    @staticmethod
+    def setup_accelerations():
+        """
+        :return: (list of list of string) set of instructions to setup the motors accelerations
+        """
+        return [["M201 X50 Y50\n", "M400\n", "M118 Instruction completed\n"]]
