@@ -1,5 +1,5 @@
 # MixUS
-
+![](https://github.com/BenjaminMoff/MixUS/blob/main/Media%20Wiki/Final%20assembly/demo.gif)
 ## Software License GNU GPL
 MixUS is an open source project that uses the GNU GPL v3 license. This license is used since PyQt5, the framework that the app is built on, is also GNU GPL v3.
 
