@@ -28,7 +28,7 @@ Under the following terms:
 More information about this license can be found [here](https://creativecommons.org/licenses/by-sa/4.0/?fbclid=IwAR1nMqahF2SNDniU5qahvUERI8FzeTw22oniBX6LPSnPQnIk0aLiyP96HRw)
 
 ## Mechanical Assembly
-All the information for mechanical assembly can be found in [this wiki](https://github.com/BenjaminMoff/MixUS/wiki)
+All the information for mechanical assembly can be found in [this wiki](https://github.com/BenjaminMoff/MixUS/wiki).
 ## Software
 
 ### Raspberry Pi Setup
