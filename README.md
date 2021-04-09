@@ -63,4 +63,4 @@ To run the application, you need to run the following command in the terminal fr
 The entire documentation for the code can be found [here](https://htmlpreview.github.io/?https://raw.githubusercontent.com/BenjaminMoff/MixUS/main/code/documentation/_build/html/index.html).
 
 ## Special thanks to
-Société des alcools du Québec for providing the pictures used in the app. All of the pictures are their property and shall not be used for any other purpose other than recreating this project.
+Société des Alcools du Québec for providing the pictures used in the app. All of the pictures are their property and shall not be used for any other purpose other than recreating this project.
