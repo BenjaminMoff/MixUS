@@ -9,7 +9,7 @@ MixUS is an open source project that uses the GNU GPL v3 license. This license i
 2. You have to include the license and copyright notice with each and every distribution.
 3. You can use this software privately.
 4. You can use this software for commercial purposes.
-5. If you dare build your business solely from this code, you risk open-sourcing the whole code base.
+5. If you build your business solely from this code, you need to open-source the whole code base.
 6. If you modify it, you have to indicate changes made to the code.
 7. Any modifications of this code base MUST be distributed with the same license, GPLv3.
 8. This software is provided without warranty.
