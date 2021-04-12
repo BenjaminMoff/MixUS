@@ -1,9 +1,10 @@
 # MixUS
-![](https://github.com/BenjaminMoff/MixUS/blob/main/Media%20Wiki/Final%20assembly/demo.gif)
-
-![](https://github.com/BenjaminMoff/MixUS/blob/main/Media%20Wiki/Final%20assembly/Cad_assembly_rotation.gif)
-
-![](https://github.com/BenjaminMoff/MixUS/blob/main/Media%20Wiki/PXL_20210407_184159122.MP.jpg)
+<p align="center">
+  <img src="https://github.com/BenjaminMoff/MixUS/blob/main/Media%20Wiki/Final%20assembly/demo.gif" alt="animated" />
+  <img src="https://github.com/BenjaminMoff/MixUS/blob/main/Media%20Wiki/Final%20assembly/Cad_assembly_rotation.gif" alt="animated" />
+  
+  <img src="https://github.com/BenjaminMoff/MixUS/blob/main/Media%20Wiki/PXL_20210407_184159122.MP.jpg" alt="animated" />
+</p>
 
 From left to right : Laurent Tétreault, Yohan Bélanger, Félix Richard, Benjamin Moffett & Raphaël Cloutier
 ## Software License GNU GPL
