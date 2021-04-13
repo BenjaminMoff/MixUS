@@ -294,5 +294,4 @@ def get_screen_resolution(app):
     :return: QRect(0, 0, sc_res.width(), sc_res.height())
     """
     sc_res = app.desktop().screenGeometry()
-    sc_res = QRect(0, 0, 1024, 600)
     return sc_res

@@ -600,7 +600,7 @@ def init_app_ui(app):
     init_hardware(window_manager.get_window("MainMenu"))
     window_manager.switch_window("MainMenu", in_motion=True)
 
-    stack.show()  # FullScreen()
+    stack.showFullScreen()
 
 
 def init_hardware(first_menu):
